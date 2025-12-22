@@ -7,6 +7,7 @@ import RegionManager from '../modules/Admin/RegionManager';
 import BranchManager from '../modules/Admin/BranchManager';
 import StaffManager from '../modules/HR/StaffManager';
 import RestorationVault from '../modules/Admin/RestorationVault';
+import DesignationManager from '../modules/Admin/DesignationManager';
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
@@ -53,6 +54,8 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <StaffManager />;
             case 'repair_vault':
                 return <RestorationVault />;
+            case 'designation_manager':
+                return <DesignationManager />;
             default:
                 return <div>Module Under Construction</div>;
         }
@@ -144,6 +147,11 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                                 onClick={() => setActiveView('repair_vault')}
                                 style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'repair_vault' ? 'red' : 'var(--text-secondary)', fontWeight: activeView === 'repair_vault' ? 'bold' : 'normal' }}>
                                 Restoration Vault
+                            </li>
+                            <li
+                                onClick={() => setActiveView('designation_manager')}
+                                style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'designation_manager' ? 'var(--secondary-color)' : 'inherit' }}>
+                                Designations
                             </li>
                         )}
                     </ul>

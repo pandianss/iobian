@@ -138,6 +138,34 @@ app.delete('/api/regions/:code', (req, res) => {
     }
 });
 
+// --- 5.5. Designation Management ---
+app.get('/api/designations', (req, res) => {
+    res.json(mockData.designations);
+});
+
+app.post('/api/designations', (req, res) => {
+    const { title } = req.body;
+    if (!title) return res.status(400).json({ success: false, message: 'Title is required' });
+
+    const exists = mockData.designations.find(d => d.title.toLowerCase() === title.toLowerCase());
+    if (exists) return res.status(400).json({ success: false, message: 'Designation already exists' });
+
+    const newDesignation = { id: mockData.designations.length + 1, title };
+    mockData.designations.push(newDesignation);
+    res.json({ success: true, designation: newDesignation });
+});
+
+app.delete('/api/designations/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = mockData.designations.findIndex(d => d.id === id);
+    if (index !== -1) {
+        mockData.designations.splice(index, 1);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false, message: 'Designation not found' });
+    }
+});
+
 // --- 6. Branch Management ---
 app.get('/api/branches', (req, res) => {
     res.json(mockData.orgMaster.filter(b => !b.is_deleted));

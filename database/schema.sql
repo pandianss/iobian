@@ -66,3 +66,20 @@ INSERT INTO system_config (config_key, config_value) VALUES
 ('secondary_color', '#17a2b8'),
 ('font_family', 'Inter, sans-serif'),
 ('logo_url', '/assets/iob_logo.png');
+
+-- Dynamic Staff Designations
+CREATE TABLE designations (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(100) UNIQUE NOT NULL
+);
+
+INSERT INTO designations (title) VALUES
+('Customer Service Associate'),
+('Assistant Manager'),
+('Manager'),
+('Senior Manager'),
+('Chief Manager'),
+('Assistant General Manager'),
+('Senior Regional Manager'),
+('Chief Regional Manager'),
+('General Manager');

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const StaffManager = () => {
     const [staffList, setStaffList] = useState([]);
+    const [designations, setDesignations] = useState([]);
     const [form, setForm] = useState({
         roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
         designation: '', designation_hindi: '',
@@ -11,7 +12,19 @@ const StaffManager = () => {
 
     useEffect(() => {
         fetchStaff();
+        fetchDesignations();
     }, []);
+
+    const fetchDesignations = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/designations');
+            if (res.ok) {
+                setDesignations(await res.json());
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchStaff = async () => {
         const res = await fetch('http://localhost:5000/api/staff');
@@ -89,7 +102,17 @@ const StaffManager = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
                             <div>
                                 <label>Designation (English)</label>
-                                <input value={form.designation} onChange={e => setForm({ ...form, designation: e.target.value })} placeholder="e.g. Manager" />
+                                <select
+                                    value={form.designation}
+                                    onChange={e => setForm({ ...form, designation: e.target.value })}
+                                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                    required
+                                >
+                                    <option value="">Select Designation</option>
+                                    {designations.map(d => (
+                                        <option key={d.id} value={d.title}>{d.title}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label>Designation (Hindi)</label>

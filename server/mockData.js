@@ -87,5 +87,16 @@ module.exports = {
         '--bg-color': '#f4f7f6',
         '--text-color': '#333333',
         '--header-height': '60px'
-    }
+    },
+    designations: [
+        { id: 1, title: 'Customer Service Associate' },
+        { id: 2, title: 'Assistant Manager' },
+        { id: 3, title: 'Manager' },
+        { id: 4, title: 'Senior Manager' },
+        { id: 5, title: 'Chief Manager' },
+        { id: 6, title: 'Assistant General Manager' },
+        { id: 7, title: 'Senior Regional Manager' },
+        { id: 8, title: 'Chief Regional Manager' },
+        { id: 9, title: 'General Manager' }
+    ]
 };
