@@ -454,9 +454,7 @@ const CampaignManager = ({ user }) => {
                         <button onClick={() => setActiveTab('infographics')} className={`tab-btn ${activeTab === 'infographics' ? 'active' : ''}`}>
                             Infographics
                         </button>
-                        <button onClick={() => setActiveTab('map')} className={`tab-btn ${activeTab === 'map' ? 'active' : ''}`}>
-                            Map View
-                        </button>
+
                     </div>
 
                     <div className="tab-content">
