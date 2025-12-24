@@ -669,15 +669,19 @@ const CampaignManager = ({ user }) => {
                                         captureWrapper.appendChild(clone);
 
                                         try {
+                                            const currentScrollY = window.scrollY;
                                             const canvas = await html2canvas(captureWrapper, {
                                                 useCORS: true,
                                                 scale: 2, // Retina quality
-                                                backgroundColor: '#ffffff'
+                                                backgroundColor: '#ffffff',
+                                                scrollX: 0,
+                                                scrollY: -window.scrollY // Offset the current scroll
                                             });
                                             const link = document.createElement('a');
                                             link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
                                             link.href = canvas.toDataURL('image/png');
                                             link.click();
+                                            window.scrollTo(0, currentScrollY); // Restore just in case
                                         } catch (err) {
                                             console.error("Export failed", err);
                                             alert("Failed to export image. Please check console.");
