@@ -89,7 +89,7 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             case 'planning':
                 return <PlanningDashboard user={user} />;
             case 'branch_opening_survey': // Added case for BranchOpeningSurvey
-                return <BranchOpeningSurvey user={user} />;
+                return <PlanningDashboard user={user} />;
             case 'joining_offer_letter':
                 return <JoiningOfferGenerator />;
             case 'campaign_manager':
