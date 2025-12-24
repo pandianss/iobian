@@ -1,21 +1,44 @@
 // ... imports ...
-import React, { useState } from 'react';
-import DocumentGenerator from '../modules/CTE/DocumentGenerator';
-import Scorecard from '../modules/PMS/Scorecard';
-import InventoryManager from '../modules/Inventory/InventoryManager'; // Import Inventory
-import RegionManager from '../modules/Admin/RegionManager';
-import BranchManager from '../modules/Admin/BranchManager';
-import StaffManager from '../modules/HR/StaffManager';
-import RestorationVault from '../modules/Admin/RestorationVault';
-import DesignationManager from '../modules/Admin/DesignationManager';
+import React, { useState, Suspense } from 'react';
+import {
+    LayoutDashboard,
+    Wrench,
+    FileText,
+    LineChart,
+    Package,
+    Map as MapIcon,
+    Globe,
+    Building2,
+    Users,
+    ShieldCheck,
+    BadgeCheck,
+    ChevronLeft,
+    ChevronRight,
+    LogOut,
+    Clock
+} from 'lucide-react';
+
+// Lazy Load Modules
+const DocumentGenerator = React.lazy(() => import('../modules/CTE/DocumentGenerator'));
+const Scorecard = React.lazy(() => import('../modules/PMS/Scorecard'));
+const InventoryManager = React.lazy(() => import('../modules/Inventory/InventoryManager'));
+const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
+const BranchManager = React.lazy(() => import('../modules/Admin/BranchManager'));
+const StaffManager = React.lazy(() => import('../modules/HR/StaffManager'));
+const RestorationVault = React.lazy(() => import('../modules/Admin/RestorationVault'));
+const DesignationManager = React.lazy(() => import('../modules/Admin/DesignationManager'));
+const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const renderContent = () => {
+        // ... existing switch statement ...
         switch (activeView) {
             case 'dashboard':
                 return (
+                    // ... dashboard content
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div className="card">
                             <h3>Welcome back, {user.full_name}</h3>
@@ -24,7 +47,7 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                                 {user.linked_branch_code && <span> Managing Branch: <strong>{user.linked_branch_code}</strong></span>}
                             </p>
                         </div>
-
+                        {/* ... */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                             <div className="card">
                                 <h4>Pending Actions</h4>
@@ -40,6 +63,7 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                         </div>
                     </div>
                 );
+            // ... strict cases ...
             case 'cte':
                 return <DocumentGenerator branchCode={user.linked_branch_code || 'CO'} branchName={user.office_level} />;
             case 'pms':
@@ -49,13 +73,15 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             case 'region_manager':
                 return <RegionManager />;
             case 'branch_manager':
-                return <BranchManager />;
+                return <BranchManager user={user} />;
             case 'staff_manager':
-                return <StaffManager />;
+                return <StaffManager user={user} />;
             case 'repair_vault':
                 return <RestorationVault />;
             case 'designation_manager':
-                return <DesignationManager />;
+                return <DesignationManager user={user} />;
+            case 'planning':
+                return <PlanningDashboard user={user} />;
             default:
                 return <div>Module Under Construction</div>;
         }
@@ -66,109 +92,127 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             {/* Top Navigation */}
             <header style={{
                 height: 'var(--header-height, 60px)',
-                background: 'var(--primary-color)',
-                color: 'white',
+                background: 'var(--surface-color)',
+                borderBottom: '1px solid var(--border-color)',
+                color: 'var(--text-on-light)',
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 2rem',
                 justifyContent: 'space-between'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>IOB Portal</div>
-                    <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>| {user.office_level} Workspace</div>
+                    <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '45px', objectFit: 'contain' }} />
+                    <div style={{ fontSize: '0.9rem', opacity: 0.8, borderLeft: '1px solid #e2e8f0', paddingLeft: '1rem', color: 'var(--text-on-light)' }}>{user.office_level} Workspace</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.2)', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem' }}>
-                        ⏱ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                    <div style={{ background: '#f1f5f9', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem', color: 'var(--text-on-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Clock size={14} />
+                        {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                     </div>
-                    <span>{user.full_name}</span>
-                    <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', padding: '0.4rem 1rem', borderRadius: '4px' }}>
-                        Logout
+                    <span style={{ color: 'var(--text-on-light)' }}>{user.full_name}</span>
+                    <button onClick={onLogout} style={{ background: '#ef4444', border: 'none', color: 'white', padding: '0.4rem 1rem', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <LogOut size={16} /> Logout
                     </button>
                 </div>
             </header>
 
-            <main style={{ flex: 1, padding: '2rem', display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem' }}>
+            <main style={{
+                flex: 1,
+                padding: '2rem',
+                display: 'grid',
+                gridTemplateColumns: isSidebarCollapsed ? '80px 1fr' : '250px 1fr',
+                gap: '2rem',
+                transition: 'grid-template-columns 0.3s ease'
+            }}>
                 {/* Sidebar */}
-                <aside className="card" style={{ height: 'fit-content' }}>
-                    <h4 style={{ marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Menu</h4>
+                <aside className="card" style={{
+                    height: 'fit-content',
+                    transition: 'width 0.3s ease',
+                    width: isSidebarCollapsed ? '80px' : '100%',
+                    padding: isSidebarCollapsed ? '1rem 0.5rem' : '1.5rem',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                        {!isSidebarCollapsed && <h4 style={{ margin: 0 }}>Menu</h4>}
+                        <button
+                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: 'var(--text-secondary)',
+                                marginLeft: isSidebarCollapsed ? 'auto' : '0',
+                                marginRight: isSidebarCollapsed ? 'auto' : '0',
+                                width: '100%',
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}
+                            title={isSidebarCollapsed ? "Expand" : "Collapse"}
+                        >
+                            {isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                        </button>
+                    </div>
+
                     <ul style={{ listStyle: 'none' }}>
-                        <li
-                            onClick={() => setActiveView('dashboard')}
-                            style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'dashboard' ? 'var(--secondary-color)' : 'inherit', fontWeight: activeView === 'dashboard' ? 'bold' : 'normal' }}>
-                            Dashboard
-                        </li>
-                        <li
-                            onClick={() => setActiveView('service_requests')}
-                            style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'service_requests' ? 'var(--secondary-color)' : 'inherit' }}>
-                            Service Requests
-                        </li>
-                        <li
-                            onClick={() => setActiveView('cte')}
-                            style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'cte' ? 'var(--secondary-color)' : 'inherit' }}>
-                            Document Generator (CTE)
-                        </li>
-                        <li
-                            onClick={() => setActiveView('pms')}
-                            style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'pms' ? 'var(--secondary-color)' : 'inherit' }}>
-                            Performance (PMS)
-                        </li>
-                        <li
-                            onClick={() => setActiveView('inventory')}
-                            style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'inventory' ? 'var(--secondary-color)' : 'inherit' }}>
-                            Inventory
-                        </li>
+                        {[
+                            { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [] },
+                            { id: 'service_requests', label: 'Service Requests', icon: <Wrench size={20} />, roles: [] },
+                            { id: 'cte', label: 'Document Generator (CTE)', icon: <FileText size={20} />, roles: [] },
+                            { id: 'pms', label: 'Performance (PMS)', icon: <LineChart size={20} />, roles: [] },
+                            { id: 'inventory', label: 'Inventory', icon: <Package size={20} />, roles: [] },
+                            { id: 'planning', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
+                            { id: 'region_manager', label: 'Region Management', icon: <Globe size={20} />, roles: ['SuperAdmin', 'CO_Planning'] },
+                            { id: 'branch_manager', label: 'Branch Network', icon: <Building2 size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
+                            { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
+                            { id: 'repair_vault', label: 'Restoration & Vault', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'CO_Gad'] },
+                            { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] }
+                        ].map(item => {
+                            if (item.roles.length > 0 && !item.roles.includes(user.role)) return null;
 
-                        {(user.role === 'SuperAdmin' || user.role === 'CO_Planning') && (
-                            <>
+                            const isActive = activeView === item.id;
+                            return (
                                 <li
-                                    onClick={() => setActiveView('region_manager')}
-                                    style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'region_manager' ? 'var(--secondary-color)' : 'inherit', borderTop: '1px solid var(--border-color)', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
-                                    Region Management
+                                    key={item.id}
+                                    onClick={() => setActiveView(item.id)}
+                                    title={isSidebarCollapsed ? item.label : ''}
+                                    style={{
+                                        padding: '0.75rem 0.5rem',
+                                        cursor: 'pointer',
+                                        color: isActive ? 'var(--secondary-color)' : 'inherit',
+                                        fontWeight: isActive ? 'bold' : 'normal',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                                        gap: '0.75rem',
+                                        borderRadius: '0.5rem',
+                                        background: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                        marginBottom: '0.25rem'
+                                    }}
+                                >
+                                    <span style={{ display: 'flex', alignItems: 'center' }}>{item.icon}</span>
+                                    {!isSidebarCollapsed && <span>{item.label}</span>}
                                 </li>
-                                <li
-                                    onClick={() => setActiveView('branch_manager')}
-                                    style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'branch_manager' ? 'var(--secondary-color)' : 'inherit' }}>
-                                    Branch Network
-                                </li>
-                            </>
-                        )}
-
-                        {(user.role === 'SuperAdmin' || user.role === 'CO_HRD') && (
-                            <li
-                                onClick={() => setActiveView('staff_manager')}
-                                style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'staff_manager' ? 'var(--secondary-color)' : 'inherit' }}>
-                                Staff Management
-                            </li>
-                        )}
-
-                        {user.role === 'SuperAdmin' && (
-                            <li
-                                onClick={() => setActiveView('repair_vault')}
-                                style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'repair_vault' ? 'red' : 'var(--text-secondary)', fontWeight: activeView === 'repair_vault' ? 'bold' : 'normal' }}>
-                                Restoration Vault
-                            </li>
-                            <li
-                                onClick={() => setActiveView('designation_manager')}
-                                style={{ padding: '0.5rem 0', cursor: 'pointer', color: activeView === 'designation_manager' ? 'var(--secondary-color)' : 'inherit' }}>
-                                Designations
-                            </li>
-                        )}
+                            );
+                        })}
                     </ul>
                 </aside>
 
+
+
                 {/* content area */}
                 <div style={{ animation: 'fadeIn 0.3s ease' }}>
-                    {renderContent()}
+                    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading Module...</div>}>
+                        {renderContent()}
+                    </Suspense>
                 </div>
-            </main>
+            </main >
             <style>{`
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
-        </div>
+        </div >
     );
 };
 

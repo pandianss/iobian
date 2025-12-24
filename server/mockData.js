@@ -2,7 +2,7 @@ module.exports = {
     users: [
         {
             user_id: 1,
-            roll_number: '1000',
+            roll_number: '00000',
             password_hash: 'pass',
             role: 'SuperAdmin',
             office_level: 'CO',
@@ -31,6 +31,7 @@ module.exports = {
             password_hash: 'pass',
             role: 'RO',
             office_level: 'RO',
+            linked_region_code: 'R01',
             full_name: 'Sarah Jenkins',
             designation: 'Chief Manager',
             is_deleted: false
@@ -74,7 +75,8 @@ module.exports = {
     ],
     regions: [
         { region_code: 'R01', region_name: 'Chennai Region', region_name_hindi: 'चेन्नई क्षेत्र', head_office_code: 'CO', is_deleted: false },
-        { region_code: 'R02', region_name: 'Mumbai Region', region_name_hindi: 'मुंबई क्षेत्र', head_office_code: 'CO', is_deleted: false }
+        { region_code: 'R02', region_name: 'Mumbai Region', region_name_hindi: 'मुंबई क्षेत्र', head_office_code: 'CO', is_deleted: false },
+        { region_code: 'R05', region_name: 'Dindigul Region', region_name_hindi: 'डिंडीगुल क्षेत्र', head_office_code: 'CO', is_deleted: false }
     ],
     divisions: [
         { id: 1, name: 'Planning' },
@@ -89,14 +91,16 @@ module.exports = {
         '--header-height': '60px'
     },
     designations: [
-        { id: 1, title: 'Customer Service Associate' },
-        { id: 2, title: 'Assistant Manager' },
-        { id: 3, title: 'Manager' },
-        { id: 4, title: 'Senior Manager' },
-        { id: 5, title: 'Chief Manager' },
-        { id: 6, title: 'Assistant General Manager' },
-        { id: 7, title: 'Senior Regional Manager' },
-        { id: 8, title: 'Chief Regional Manager' },
-        { id: 9, title: 'General Manager' }
-    ]
+        { id: 1, title: 'Customer Service Associate', workclass: 60 },
+        { id: 2, title: 'Assistant Manager', workclass: 150 },
+        { id: 3, title: 'Manager', workclass: 200 },
+        { id: 4, title: 'Senior Manager', workclass: 250 },
+        { id: 5, title: 'Chief Manager', workclass: 300 },
+        { id: 6, title: 'Assistant General Manager', workclass: 350 },
+        { id: 7, title: 'Senior Regional Manager', workclass: 400 },
+        { id: 8, title: 'Chief Regional Manager', workclass: 450 },
+        { id: 9, title: 'General Manager', workclass: 500 }
+    ],
+    // --- Planning Dept ---
+    branch_surveys: []
 };

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const RegionManager = () => {
     const [regions, setRegions] = useState([]);
     const [form, setForm] = useState({ region_code: '', region_name: '', region_name_hindi: '' });
+    const [originalCode, setOriginalCode] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [msg, setMsg] = useState('');
 
@@ -26,12 +27,14 @@ const RegionManager = () => {
             region_name: r.region_name,
             region_name_hindi: r.region_name_hindi || ''
         });
+        setOriginalCode(r.region_code);
         setIsEditing(true);
         setMsg('');
     };
 
     const handleCancel = () => {
         setForm({ region_code: '', region_name: '', region_name_hindi: '' });
+        setOriginalCode(null);
         setIsEditing(false);
         setMsg('');
     };
@@ -40,7 +43,7 @@ const RegionManager = () => {
         e.preventDefault();
         setMsg('');
         const url = isEditing
-            ? `http://localhost:5000/api/regions/${form.region_code}`
+            ? `http://localhost:5000/api/regions/${originalCode}`
             : 'http://localhost:5000/api/regions';
 
         const method = isEditing ? 'PUT' : 'POST';
@@ -96,8 +99,8 @@ const RegionManager = () => {
                             value={form.region_code}
                             onChange={e => setForm({ ...form, region_code: e.target.value })}
                             placeholder="e.g. R04"
-                            disabled={isEditing}
-                            style={{ background: isEditing ? '#eee' : 'white' }}
+                            // disabled={isEditing} // Enabled for editing
+                            style={{ background: 'white' }}
                             required
                         />
 

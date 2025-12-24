@@ -21,6 +21,7 @@ const PublicHome = ({ onLoginClick }) => {
             background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)'
         }}>
             <div className="glass-panel" style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center', maxWidth: '800px', width: '90%' }}>
+                <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '80px', marginBottom: '1.5rem' }} />
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Unified Banking Operations Portal</h1>
                 <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
                     Centralized coordination for seamless banking operations.
@@ -32,7 +33,7 @@ const PublicHome = ({ onLoginClick }) => {
                             Employee Login
                         </button>
                         <button className="btn" style={{ background: 'white', border: '1px solid var(--border-color)' }} onClick={handleGuestClick}>
-                            Guest
+                            Visit RO / CO Department Website
                         </button>
                     </div>
                 ) : (

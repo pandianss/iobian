@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Login.css'; // Assuming you might add specific styles
+import './Login.css';
 
 const Login = ({ onLoginSuccess, onBack }) => {
   const [step, setStep] = useState(1); // 1: Validate Roll No, 2: Password
@@ -12,13 +12,13 @@ const Login = ({ onLoginSuccess, onBack }) => {
   // Helper: Numeric Validation
   const handleRollChange = (e) => {
     const val = e.target.value.replace(/\D/g, ''); // Remove non-digits
-    if (val.length <= 6) setRollNumber(val);
+    if (val.length <= 5) setRollNumber(val);
   };
 
   const validateUser = async (e) => {
     e.preventDefault();
-    if (rollNumber.length < 4) {
-      setError('Roll Number must be 4-6 digits');
+    if (rollNumber.length !== 5) {
+      setError('Roll Number must be exactly 5 digits');
       return;
     }
 
@@ -80,6 +80,9 @@ const Login = ({ onLoginSuccess, onBack }) => {
         <button onClick={onBack} style={{ marginBottom: '1rem', background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
           ← Back
         </button>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '60px' }} />
+        </div>
         <h2 style={{ marginBottom: '1.5rem' }}>Secure Employee Login</h2>
 
         {step === 1 ? (
@@ -90,22 +93,22 @@ const Login = ({ onLoginSuccess, onBack }) => {
                 type="text"
                 value={rollNumber}
                 onChange={handleRollChange}
-                placeholder="e.g. 1000, 2001"
+                placeholder="e.g. 12345"
                 autoFocus
               />
-              <small style={{ color: 'var(--text-secondary)' }}>Enter your 4-6 digit numeric ID.</small>
+              <small style={{ color: 'var(--text-secondary)' }}>Enter your 5 digit Roll Number.</small>
             </div>
-            {error && <div style={{ color: 'red', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
+            {error && <div style={{ color: 'var(--error-color)', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
               {loading ? 'Validating...' : 'Next'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleLogin}>
-            <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', border: '1px solid #bae6fd' }}>
+            <div style={{ background: 'rgba(37, 74, 160, 0.1)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', border: '1px solid rgba(37, 74, 160, 0.3)' }}>
               <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{userData.full_name}</div>
               <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{userData.designation} | {userData.office_level}</div>
-              <div style={{ fontSize: '0.8rem', color: '#0284c7', cursor: 'pointer', marginTop: '0.5rem' }} onClick={() => setStep(1)}>change user?</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--secondary-color)', cursor: 'pointer', marginTop: '0.5rem' }} onClick={() => setStep(1)}>change user?</div>
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
@@ -118,7 +121,7 @@ const Login = ({ onLoginSuccess, onBack }) => {
                 autoFocus
               />
             </div>
-            {error && <div style={{ color: 'red', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
+            {error && <div style={{ color: 'var(--error-color)', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
               {loading ? 'Authenticating...' : 'Login'}
             </button>

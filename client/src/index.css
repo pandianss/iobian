@@ -1,17 +1,30 @@
 :root {
-  --primary-color: #0f172a; /* Slate 900 */
-  --secondary-color: #3b82f6; /* Blue 500 */
-  --accent-color: #06b6d4; /* Cyan 500 */
-  --bg-color: #f8fafc; /* Slate 50 */
+  --primary-color: #254aa0;
+  /* IOB Logo Blue */
+  --secondary-color: #3b82f6;
+  /* Lighter Blue for highlights */
+  --accent-color: #06b6d4;
+  /* Cyan 500 */
+  --bg-color: #020617;
+  /* Deep Navy (Slate 950) */
   --surface-color: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  /* White Cards */
+  --text-primary: #f8fafc;
+  /* Default Text (for dark body) */
+  --text-on-light: #0f172a;
+  /* Dark Text for Cards */
+  --text-secondary: #94a3b8;
+  /* Slate 400 */
   --border-color: #e2e8f0;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  /* Light Border for Cards */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(59, 130, 246, 0.1);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+  --error-color: #ef4444;
+  --success-color: #22c55e;
+  --warning-color: #f59e0b;
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -29,9 +42,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--secondary-color);
   margin-bottom: 0.5em;
 }
 
@@ -64,6 +82,7 @@ button {
 
 .card {
   background: var(--surface-color);
+  color: var(--text-on-light);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
@@ -77,12 +96,15 @@ button {
   box-shadow: var(--shadow-lg);
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   background: var(--surface-color);
+  color: var(--text-on-light);
   transition: border-color 0.2s;
 }
 
@@ -90,4 +112,131 @@ input:focus {
   outline: none;
   border-color: var(--secondary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Fix for Checkboxes & Radios */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+/* Dense Table Inputs */
+.input-cell {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.input-cell:hover,
+.input-cell:focus {
+  background: white;
+  border-color: var(--secondary-color);
+}
+
+.form-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #64748b;
+  text-align: left;
+}
+
+.form-table td {
+  border: 1px solid #e2e8f0;
+}
+
+.main-table {
+  width: 96%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  border: 1px solid black;
+}
+
+.main-table th,
+.main-table td {
+  border: 1px solid black;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.main-table th {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+
+@media print {
+  @page {
+    margin: 10mm;
+    size: A4;
+  }
+
+  /* Hide all generic content first */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Explicitly remove layout elements so they don't take up space */
+  aside,
+  header,
+  .page-header,
+  nav,
+  .btn,
+  .noprint {
+    display: none !important;
+  }
+
+  /* Reset Main Layout Grid */
+  main {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Reset Page Container */
+  .page-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Reset overrides */
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white;
+  }
+
+  /* Show Printable Content */
+  #printable-content,
+  #printable-content * {
+    visibility: visible;
+  }
+
+  #printable-content {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white;
+    box-shadow: none;
+    border: none;
+    transform: none !important;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
 }
