@@ -750,7 +750,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                             <strong>{formData.applicantDesignation || 'Senior Regional Manager / Chief Regional Manager / General Manager'}</strong>
                                         </td>
                                         <td width="20%" className="center" style={{ verticalAlign: 'bottom' }}>
-                                            <div style={{ border: '1px solid black', height: '104px', width: '110px', margin: '0 auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', fontSize: '12px', paddingBottom: '10px', color: 'rgba(0,0,0,0.3)' }}>RO SEAL</div>
+                                            <div style={{ border: '1px solid black', height: '104px', width: '110px', margin: '0 auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', fontSize: '12px', paddingBottom: '10px', color: 'rgba(0,0,0,0.3)', textAlign: 'center' }}>Regional Office<br />SEAL</div>
                                         </td>
                                         <td width="40%" style={{ textAlign: 'right' }}>
                                             <strong>Survey done by:</strong><br /><br /><br /><br />

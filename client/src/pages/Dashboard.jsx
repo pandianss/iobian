@@ -15,7 +15,9 @@ import {
     ChevronLeft,
     ChevronRight,
     LogOut,
-    Clock
+    Clock,
+    Layers,
+    Megaphone
 } from 'lucide-react';
 
 // Lazy Load Modules
@@ -24,10 +26,14 @@ const Scorecard = React.lazy(() => import('../modules/PMS/Scorecard'));
 const InventoryManager = React.lazy(() => import('../modules/Inventory/InventoryManager'));
 const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
 const BranchManager = React.lazy(() => import('../modules/Admin/BranchManager'));
+const BranchOpeningSurvey = React.lazy(() => import('../modules/Planning/BranchOpeningSurvey')); // Added
+const CampaignManager = React.lazy(() => import('../modules/RO/CampaignManager')); // Added
 const StaffManager = React.lazy(() => import('../modules/HR/StaffManager'));
 const RestorationVault = React.lazy(() => import('../modules/Admin/RestorationVault'));
 const DesignationManager = React.lazy(() => import('../modules/Admin/DesignationManager'));
 const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
+const JoiningOfferGenerator = React.lazy(() => import('../modules/HR/JoiningOfferGenerator'));
+const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentManager'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
@@ -82,6 +88,14 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <DesignationManager user={user} />;
             case 'planning':
                 return <PlanningDashboard user={user} />;
+            case 'branch_opening_survey': // Added case for BranchOpeningSurvey
+                return <BranchOpeningSurvey user={user} />;
+            case 'joining_offer_letter':
+                return <JoiningOfferGenerator />;
+            case 'campaign_manager':
+                return <CampaignManager user={user} />;
+            case 'department_manager':
+                return <DepartmentManager />;
             default:
                 return <div>Module Under Construction</div>;
         }
@@ -102,7 +116,9 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '45px', objectFit: 'contain' }} />
-                    <div style={{ fontSize: '0.9rem', opacity: 0.8, borderLeft: '1px solid #e2e8f0', paddingLeft: '1rem', color: 'var(--text-on-light)' }}>{user.office_level} Workspace</div>
+                    <div style={{ fontSize: '0.9rem', opacity: 0.8, borderLeft: '1px solid #e2e8f0', paddingLeft: '1rem', color: 'var(--text-on-light)' }}>
+                        {user.office_level === 'CO' ? 'Central Office' : user.office_level === 'RO' ? 'Regional Office' : user.office_level} Workspace
+                    </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ background: '#f1f5f9', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem', color: 'var(--text-on-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -160,12 +176,15 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                             { id: 'cte', label: 'Document Generator (CTE)', icon: <FileText size={20} />, roles: [] },
                             { id: 'pms', label: 'Performance (PMS)', icon: <LineChart size={20} />, roles: [] },
                             { id: 'inventory', label: 'Inventory', icon: <Package size={20} />, roles: [] },
-                            { id: 'planning', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
+                            { id: 'branch_opening_survey', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] }, // Renamed 'planning' to 'branch_opening_survey' and updated label
                             { id: 'region_manager', label: 'Region Management', icon: <Globe size={20} />, roles: ['SuperAdmin', 'CO_Planning'] },
                             { id: 'branch_manager', label: 'Branch Network', icon: <Building2 size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
-                            { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
+                            { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['RO', 'CO'] }, // Updated roles
+                            { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['RO'] }, // Added new sidebar item
                             { id: 'repair_vault', label: 'Restoration & Vault', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'CO_Gad'] },
-                            { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] }
+                            { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
+                            { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
+                            { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] }
                         ].map(item => {
                             if (item.roles.length > 0 && !item.roles.includes(user.role)) return null;
 

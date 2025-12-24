@@ -43,7 +43,7 @@ const StaffManager = ({ user }) => {
 
     const fetchDivisions = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/divisions');
+            const res = await fetch('http://localhost:5000/api/departments');
             if (res.ok) setDivisions(await res.json());
         } catch (err) { console.error(err); }
     };
@@ -319,7 +319,7 @@ const StaffManager = ({ user }) => {
                         <label style={{ marginTop: '0.5rem' }}>Office Level</label>
                         <select value={form.office_level} onChange={e => setForm({ ...form, office_level: e.target.value })} style={{ marginBottom: '1rem' }}>
                             <option value="Branch">Branch</option>
-                            <option value="RO">Region</option>
+                            <option value="RO">Regional Office</option>
                             <option value="CO">Central Office</option>
                         </select>
 
@@ -375,17 +375,18 @@ const StaffManager = ({ user }) => {
                                 <label>Assign Divisions/Departments:</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
                                     {divisions.map(div => (
-                                        <span key={div.id}
-                                            onClick={() => toggleDept(div.id)}
+                                        <span key={div.code}
+                                            onClick={() => toggleDept(div.code)}
+                                            title={div.name}
                                             style={{
                                                 padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem',
-                                                background: form.departments.includes(div.id) ? 'var(--secondary-color)' : '#eee',
-                                                color: form.departments.includes(div.id) ? 'white' : 'black'
+                                                background: form.departments.includes(div.code) ? 'var(--secondary-color)' : '#eee',
+                                                color: form.departments.includes(div.code) ? 'white' : 'black'
                                             }}>
-                                            {div.name}
+                                            {div.shortform || div.name}
                                         </span>
                                     ))}
-                                    {divisions.length === 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>No divisions loaded</span>}
+                                    {divisions.length === 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>No departments loaded</span>}
                                 </div>
                             </div>
                         )}

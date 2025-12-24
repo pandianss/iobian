@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatDate } from '../../utils/formatters';
 
 const BranchSurveyList = ({ onCreateNew, onSelect }) => {
     const [branchSurveys, setBranchSurveys] = useState([]);
@@ -89,7 +90,7 @@ const BranchSurveyList = ({ onCreateNew, onSelect }) => {
                                     >
                                         <td style={{ padding: '0.75rem', fontWeight: 'bold' }}>{survey.refNo || '-'}</td>
                                         <td style={{ padding: '0.75rem' }}>
-                                            {survey.date ? new Date(survey.date).toLocaleDateString('en-GB') : 'N/A'}
+                                            {survey.date ? formatDate(survey.date) : 'N/A'}
                                         </td>
                                         <td style={{ padding: '0.75rem' }}>
                                             {survey.applicationType === 'new' ? 'New Branch' : 'Shifting'}

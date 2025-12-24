@@ -68,7 +68,7 @@ const BranchManager = ({ user }) => {
 
             // Filter for RO User
             if (user?.role === 'RO' && user?.linked_region_code) {
-                allBranches = allBranches.filter(b => b.region_code === user.linked_region_code);
+                allBranches = allBranches.filter(b => String(b.region_code) === String(user.linked_region_code));
             }
 
             setBranches(allBranches);

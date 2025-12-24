@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const persistence = require('./persistence');
+const { v4: uuidv4 } = require('uuid');
 
 // Load initial data
 let mockData = persistence.loadData();
@@ -10,7 +11,7 @@ const app = express();
 const PORT = 5000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 
 // Middleware to save data after specific methods? 
 // No, explicit save is better control.
@@ -156,6 +157,17 @@ app.delete('/api/staff/:rollNumber/history/:index', (req, res) => {
 app.get('/api/admin/restore', (req, res) => {
     const deletedUsers = mockData.users.filter(u => u.is_deleted);
     res.json({ users: deletedUsers });
+});
+
+// Lookup endpoint for Campaign Manager Name Resolution
+app.get('/api/users/lookup', (req, res) => {
+    // Return simplified list: roll_number, full_name, linked_branch_code
+    const simpleUsers = mockData.users.map(u => ({
+        roll_number: u.roll_number,
+        full_name: u.full_name,
+        linked_branch_code: u.linked_branch_code
+    }));
+    res.json(simpleUsers);
 });
 
 // --- 4.5 Divisions ---
@@ -468,6 +480,171 @@ app.delete('/api/branch-surveys/:id', (req, res) => {
         res.json({ success: true });
     } else {
         res.status(404).json({ success: false, message: 'Survey not found' });
+    }
+});
+
+// --- Campaigns Endpoints ---
+app.get('/api/campaigns', (req, res) => {
+    res.json(mockData.campaigns || []);
+});
+
+app.post('/api/campaigns', (req, res) => {
+    const { title, description, department_code, startDate, endDate, type, unit, image, overall_target, data } = req.body;
+
+    if (!title || !department_code) {
+        return res.status(400).json({ success: false, message: 'Title and Department are required.' });
+    }
+
+    if (!mockData.campaigns) mockData.campaigns = [];
+
+    const newCampaign = {
+        id: uuidv4(),
+        title,
+        description: description || '',
+        department_code,
+        startDate: startDate || '',
+        endDate: endDate || '',
+        type: type || 'Growth',
+        unit: unit || 'Count',
+        status: 'Active',
+        image: image || '',
+        overall_target: overall_target || 0,
+        data: data || [],
+        createdAt: new Date().toISOString()
+    };
+
+    // Auto-calculate overall_target if not provided but data exists
+    if (!overall_target && data && data.length > 0) {
+        newCampaign.overall_target = data.reduce((sum, item) => sum + (Number(item.target) || 0), 0);
+    }
+
+    mockData.campaigns.push(newCampaign);
+    persistence.saveData(mockData);
+    res.json({ success: true, campaign: newCampaign });
+});
+
+app.put('/api/campaigns/:id', (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (!mockData.campaigns) mockData.campaigns = [];
+    const campaign = mockData.campaigns.find(c => c.id === id);
+
+    if (!campaign) {
+        return res.status(404).json({ success: false, message: 'Campaign not found.' });
+    }
+
+    // Update allowed fields
+    const allowedFields = ['title', 'description', 'startDate', 'endDate', 'type', 'unit', 'status', 'image', 'overall_target', 'data', 'achievement_entries'];
+    allowedFields.forEach(field => {
+        if (updates[field] !== undefined) campaign[field] = updates[field];
+    });
+
+    // Re-calculate overall_target if data changed and target not explicitly set in this update
+    if (updates.data && updates.overall_target === undefined) {
+        campaign.overall_target = updates.data.reduce((sum, item) => sum + (Number(item.target) || 0), 0);
+    }
+
+    persistence.saveData(mockData);
+    res.json({ success: true, campaign });
+});
+
+app.delete('/api/campaigns/:id', (req, res) => {
+    const { id } = req.params;
+    if (!mockData.campaigns) mockData.campaigns = [];
+
+    const index = mockData.campaigns.findIndex(c => c.id === id);
+    if (index !== -1) {
+        mockData.campaigns.splice(index, 1);
+        persistence.saveData(mockData);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false, message: 'Campaign not found.' });
+    }
+});
+
+// --- 8. Department Management ---
+app.get('/api/departments', (req, res) => {
+    res.json(mockData.departments || []);
+});
+
+app.post('/api/departments', (req, res) => {
+    const { code, name, name_hindi, shortform } = req.body;
+
+    // Validation: Code must be numeric and 4 digits
+    if (!/^\d{4}$/.test(code)) {
+        return res.status(400).json({ success: false, message: 'Department code must be a 4-digit number.' });
+    }
+
+    // Validation: Code must be unique
+    const existing = (mockData.departments || []).find(d => d.code === code);
+    if (existing) {
+        return res.status(400).json({ success: false, message: 'Department code already exists.' });
+    }
+
+    const newDept = { code, name, name_hindi: name_hindi || '', shortform: shortform || '' };
+    if (!mockData.departments) mockData.departments = [];
+
+    mockData.departments.push(newDept);
+    persistence.saveData(mockData);
+    res.json({ success: true, department: newDept });
+});
+
+app.put('/api/departments/:code', (req, res) => {
+    const { code, name, name_hindi, shortform } = req.body;
+    const oldCode = req.params.code;
+
+    if (!mockData.departments) mockData.departments = [];
+    const dept = mockData.departments.find(d => d.code === oldCode);
+
+    if (!dept) {
+        return res.status(404).json({ success: false, message: 'Department not found.' });
+    }
+
+    // If code is changing
+    if (code && code !== oldCode) {
+        // Validate new code numeric and 4 digits
+        if (!/^\d{4}$/.test(code)) {
+            return res.status(400).json({ success: false, message: 'Department code must be a 4-digit number.' });
+        }
+        // Validate uniqueness
+        const existing = mockData.departments.find(d => d.code === code);
+        if (existing) {
+            return res.status(400).json({ success: false, message: 'Department code already exists.' });
+        }
+
+        dept.code = code;
+        // Optionally update references in other tables if needed, BUT currently users seem to store department IDs or something else? 
+        // Checking user structure: "departments": [1, 2] (looks like IDs). 
+        // Wait, the new requirement says "numeric code" for Department. 
+        // Existing mock data has integers in user.departments. 
+        // If I change the Department structure to rely on 'code', I should check if users are linked by ID or Code. 
+        // The mockData `divisions` array seems to be what was used before? 
+        // "divisions": [{"id": 1, "name": "Planning"}]
+        // Users link to 'id'. 
+        // The requirement is "Build Departments management... Each Department must have a unique numeric code".
+        // It implies replacing or extending 'divisions'. 
+        // I'll stick to 'departments' as a new entity for now to avoid breaking existing stuff unless explicitly asked to replace 'divisions'.
+    }
+
+    if (name) dept.name = name;
+    if (shortform !== undefined) dept.shortform = shortform;
+
+    persistence.saveData(mockData);
+    res.json({ success: true, department: dept });
+});
+
+app.delete('/api/departments/:code', (req, res) => {
+    const code = req.params.code;
+    if (!mockData.departments) mockData.departments = [];
+
+    const index = mockData.departments.findIndex(d => d.code === code);
+    if (index !== -1) {
+        mockData.departments.splice(index, 1);
+        persistence.saveData(mockData);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false, message: 'Department not found.' });
     }
 });
 

@@ -71,6 +71,30 @@ module.exports = {
             longitude: '77.478241',
             pincode: '625531',
             is_deleted: false
+        },
+        {
+            branch_code: '0232',
+            branch_name: 'Madurai Main',
+            branch_type: 'Branch',
+            region_code: 'R05',
+            state: 'Tamil Nadu',
+            is_deleted: false
+        },
+        {
+            branch_code: '0243',
+            branch_name: 'Trichy Road',
+            branch_type: 'Branch',
+            region_code: 'R05',
+            state: 'Tamil Nadu',
+            is_deleted: false
+        },
+        {
+            branch_code: '0883',
+            branch_name: 'Coimbatore Civil',
+            branch_type: 'Branch',
+            region_code: 'R05',
+            state: 'Tamil Nadu',
+            is_deleted: false
         }
     ],
     regions: [

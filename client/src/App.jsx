@@ -34,7 +34,9 @@ function App() {
     // Countdown
     const interval = setInterval(() => {
       setTimeLeft(prev => {
+        // console.log("Timer tick:", prev); // Too noisy
         if (prev <= 1) {
+          console.log("Session expired. Prev:", prev);
           clearInterval(interval);
           alert("Session Expired due to inactivity.");
           handleLogout();
@@ -66,6 +68,7 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
+    setTimeLeft(15 * 60); // Explicitly reset timer on login
     setView('dashboard');
     localStorage.setItem('user_session', JSON.stringify(userData));
   };
