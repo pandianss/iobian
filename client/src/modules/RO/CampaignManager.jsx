@@ -362,7 +362,9 @@ const CampaignManager = ({ user }) => {
 
     const aggregatedData = useMemo(() => {
         if (!viewingCampaign) return [];
-        return getAggregatedData(viewingCampaign);
+        const data = getAggregatedData(viewingCampaign);
+        // Sort by Achievement (Descending)
+        return data.sort((a, b) => b.achievement - a.achievement);
     }, [viewingCampaign]);
 
 
@@ -411,6 +413,7 @@ const CampaignManager = ({ user }) => {
         const totalTarget = viewingCampaign.overall_target || 1;
         const totalAchv = aggregatedData.reduce((s, x) => s + x.achievement, 0);
         const percent = Math.min((totalAchv / totalTarget) * 100, 100).toFixed(1);
+        const maxAchievement = Math.max(...aggregatedData.map(d => d.achievement), 1);
 
         return (
             <div className="campaign-detail-container fade-in">
@@ -425,7 +428,7 @@ const CampaignManager = ({ user }) => {
                             <h2>{viewingCampaign.title}</h2>
                             <p>{viewingCampaign.description}</p>
                             <div className="detail-meta">
-                                <span className="meta-item"><Calendar size={14} /> {viewingCampaign.startDate} to {viewingCampaign.endDate}</span>
+                                <span className="meta-item"><Calendar size={14} /> {formatDate(viewingCampaign.startDate || viewingCampaign.start_date)} to {formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}</span>
                                 <span className={`type-badge ${viewingCampaign.type.toLowerCase()}`}>{viewingCampaign.type}</span>
                             </div>
                         </div>
@@ -491,8 +494,21 @@ const CampaignManager = ({ user }) => {
                                                 <tr key={i}>
                                                     <td className="font-medium">{row.id}</td>
                                                     <td>{row.name}</td>
-                                                    <td className="text-right mono">{row.target.toLocaleString()}</td>
-                                                    <td className="text-right mono bold">{row.achievement.toLocaleString()}</td>
+                                                    <td className="text-right mono">{formatNumber(row.target)}</td>
+                                                    <td className="text-right mono bold" style={{ position: 'relative' }}>
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: '10%',
+                                                            bottom: '10%',
+                                                            left: 0,
+                                                            width: `${(row.achievement / maxAchievement) * 100}%`,
+                                                            backgroundColor: '#e0f2fe',
+                                                            zIndex: 0,
+                                                            borderRadius: '0 4px 4px 0',
+                                                            opacity: 0.6
+                                                        }}></div>
+                                                        <span style={{ position: 'relative', zIndex: 1 }}>{formatNumber(row.achievement)}</span>
+                                                    </td>
                                                     <td className="text-right">
                                                         <span className={`status-badge ${Number(row.pct) >= 100 ? 'success' : 'pending'}`}>
                                                             {row.pct}%
@@ -523,10 +539,10 @@ const CampaignManager = ({ user }) => {
                                         <tbody>
                                             {[...viewingCampaign.achievement_entries].reverse().map((entry, i) => (
                                                 <tr key={i}>
-                                                    <td>{entry.date}</td>
+                                                    <td>{formatDate(entry.date)}</td>
                                                     <td className="font-medium">{entry.sol_or_staff}</td>
                                                     <td>{entry.details}</td>
-                                                    <td className="text-right mono bold">{entry.amount.toLocaleString()}</td>
+                                                    <td className="text-right mono bold">{formatNumber(entry.amount)}</td>
                                                 </tr>
                                             ))}
                                             {viewingCampaign.achievement_entries.length === 0 && (
