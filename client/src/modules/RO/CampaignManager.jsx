@@ -11,6 +11,7 @@ import './Infographics.css';
 const CampaignManager = ({ user }) => {
     const [campaigns, setCampaigns] = useState([]);
     const [myDepartments, setMyDepartments] = useState([]);
+    const [allDepartments, setAllDepartments] = useState([]);
     const [branches, setBranches] = useState([]);
     const [staffList, setStaffList] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
@@ -59,9 +60,8 @@ const CampaignManager = ({ user }) => {
         fetch('http://localhost:5000/api/branches').then(r => r.json()).then(setBranches).catch(console.error);
         fetch('http://localhost:5000/api/users/lookup').then(r => r.json()).then(setStaffList).catch(console.error);
 
-        if (canCreate) {
-            fetchMyDepartments();
-        }
+        // Fetch All Departments (for Name Lookup & Create Dropdown)
+        fetchAllDepartments();
     }, [user]);
 
     const getName = (id, type) => {
@@ -92,13 +92,18 @@ const CampaignManager = ({ user }) => {
         } catch (err) { console.error("Failed to fetch campaigns", err); }
     };
 
-    const fetchMyDepartments = async () => {
+    const fetchAllDepartments = async () => {
         try {
             const res = await fetch('http://localhost:5000/api/departments');
             if (res.ok) {
                 const allDepts = await res.json();
-                const myDepts = allDepts.filter(d => user.departments.includes(d.code));
-                setMyDepartments(myDepts);
+                setAllDepartments(allDepts);
+
+                // Set My Departments if applicable
+                if (user?.departments?.length > 0) {
+                    const myDepts = allDepts.filter(d => user.departments.includes(d.code));
+                    setMyDepartments(myDepts);
+                }
             }
         } catch (err) { console.error(err); }
     };
@@ -445,7 +450,9 @@ const CampaignManager = ({ user }) => {
                 <div className="campaign-detail-card">
                     <div className="detail-header">
                         <div className="detail-title-section">
-                            <span className="dept-badge">{viewingCampaign.department_code}</span>
+                            <span className="dept-badge">
+                                {allDepartments.find(d => d.code === viewingCampaign.department_code)?.name || viewingCampaign.department_code}
+                            </span>
                             <h2>{viewingCampaign.title}</h2>
                             <p>{viewingCampaign.description}</p>
                             <div className="detail-meta">
