@@ -138,7 +138,7 @@
 
 /* Infographics */
 .infographics-grid {
-    column-count: 2;
+    column-width: 350px;
     column-gap: 1.5rem;
     width: 100%;
 }
@@ -151,7 +151,7 @@
     width: 100%;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 768px) {
     .infographics-grid {
         column-count: 1;
     }

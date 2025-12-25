@@ -797,7 +797,7 @@ const CampaignManager = ({ user }) => {
                                         <div className="infographics-wrapper">
                                             <div className="infographics-grid animate-fade">
                                                 {/* Overview Stats (Width: Full) */}
-                                                <div className="chart-card full-width-chart">
+                                                <div className="chart-card">
                                                     <div className="big-stat-row">
                                                         <div className="stat-boxes flex-row-center">
                                                             <div className="stat-box">
