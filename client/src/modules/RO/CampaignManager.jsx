@@ -64,6 +64,19 @@ const CampaignManager = ({ user }) => {
         }
     }, [user]);
 
+    const getName = (id, type) => {
+        if (!id) return '-';
+        if (type === 'branch' || (id && id.length === 4)) {
+            const b = branches.find(b => b.branch_code === String(id));
+            if (b) return b.branch_name;
+        }
+        // Fallback or Staff check
+        const s = staffList.find(s => String(s.pf_number) === String(id));
+        if (s) return s.name;
+        // If still not found, return ID
+        return id;
+    };
+
     const fetchCampaigns = async () => {
         try {
             const res = await fetch('http://localhost:5000/api/campaigns');
@@ -979,46 +992,118 @@ const CampaignManager = ({ user }) => {
                     </form>
                 </div>
             ) : (
-                <div className="campaign-grid">
+                <div className="campaign-list-wrapper">
                     {campaigns.length === 0 && <div className="empty-message">No active campaigns found.</div>}
-                    {campaigns.map(camp => {
-                        // Aggregate for card view
-                        // If achievement_entries exists, sum them. Else fallback (for older data support?)
-                        const entries = camp.achievement_entries || [];
-                        const totalAchv = entries.reduce((s, x) => s + x.amount, 0);
-                        const target = camp.overall_target || 1;
-                        const pct = Math.min((totalAchv / target) * 100, 100);
+                    <table className="styled-table campaign-list-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '80px' }}>Image</th>
+                                <th>Campaign Details</th>
+                                <th>Status</th>
+                                <th style={{ width: '200px' }}>Target vs Achv</th>
+                                <th>Top Performer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {campaigns
+                                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+                                .map(camp => {
+                                    const entries = camp.achievement_entries || [];
+                                    const totalAchv = entries.reduce((s, x) => s + x.amount, 0);
+                                    const target = camp.overall_target || 1;
+                                    const pct = Math.min((totalAchv / target) * 100, 100);
 
-                        return (
-                            <div key={camp.id} onClick={() => handleView(camp)} className="campaign-card">
-                                <div className="card-image-header" style={{ backgroundImage: camp.image ? `url(${camp.image})` : 'none' }}>
-                                    {!camp.image && <BarChart2 className="placeholder-icon" />}
-                                    <div className="card-badge">{camp.department_code}</div>
-                                </div>
-                                <div className="card-body">
-                                    <div className="card-title-row">
-                                        <h3>{camp.title}</h3>
-                                        {canCreate && user.departments.includes(camp.department_code) && (
-                                            <div className="card-actions" onClick={e => e.stopPropagation()}>
-                                                <button onClick={() => handleEdit(camp)} title="Edit"><Edit size={14} /></button>
-                                                <button onClick={() => handleDelete(camp.id)} title="Delete"><Trash2 size={14} /></button>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <p>{camp.description}</p>
-                                    <div className="progress-section">
-                                        <div className="progress-label">
-                                            <span>Progress</span>
-                                            <span>{pct.toFixed(0)}%</span>
-                                        </div>
-                                        <div className="progress-bar">
-                                            <div className="fill" style={{ width: `${pct}%`, backgroundColor: pct >= 100 ? '#22c55e' : '#3b82f6' }}></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                                    // Status Logic
+                                    const today = new Date();
+                                    const start = new Date(camp.startDate || camp.start_date);
+                                    const end = new Date(camp.endDate || camp.end_date);
+                                    const daysRemaining = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+
+                                    let status = 'Active';
+                                    let statusClass = 'success';
+                                    if (daysRemaining < 0) {
+                                        status = 'Expired';
+                                        statusClass = 'danger';
+                                    } else if (daysRemaining <= 7) {
+                                        status = 'Ending Soon';
+                                        statusClass = 'warning';
+                                    } else if (start > today) {
+                                        status = 'Upcoming';
+                                        statusClass = 'primary';
+                                    }
+
+                                    // Top Performer Logic
+                                    const aggregated = entries.reduce((acc, curr) => {
+                                        acc[curr.sol_or_staff] = (acc[curr.sol_or_staff] || 0) + curr.amount;
+                                        return acc;
+                                    }, {});
+                                    let topPerformerId = '-';
+                                    let topVal = 0;
+                                    Object.entries(aggregated).forEach(([id, val]) => {
+                                        if (val > topVal) {
+                                            topVal = val;
+                                            topPerformerId = id;
+                                        }
+                                    });
+                                    // Try to resolve name if available in cache/state (simple lookup if possible, otherwise ID)
+                                    // Optimization: getName() is available in component scope?
+                                    // Yes, getName(id, type) is defined in component. Check if we can infer type.
+                                    // Usually Sol is 4 digits, Staff is 6. Simple heuristic.
+                                    const topName = getName ? getName(topPerformerId, topPerformerId.length === 4 ? 'branch' : 'staff') : topPerformerId;
+
+
+                                    return (
+                                        <tr key={camp.id} onClick={() => handleView(camp)} className="clickable-row">
+                                            <td>
+                                                <div className="camp-list-img" style={{ backgroundImage: camp.image ? `url(${camp.image})` : 'none' }}>
+                                                    {!camp.image && <BarChart2 size={16} />}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="fw-bold">{camp.title}</div>
+                                                <div className="text-muted small">
+                                                    {formatDate(camp.startDate || camp.start_date)} - {formatDate(camp.endDate || camp.end_date)}
+                                                </div>
+                                                <div className="text-muted small" style={{ marginTop: '2px' }}>
+                                                    {daysRemaining > 0 ? `${daysRemaining} days remaining` : 'Ended'}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`status-badge ${statusClass}`}>{status}</span>
+                                            </td>
+                                            <td>
+                                                <div className="progress-section compact">
+                                                    <div className="flex-row-sb small mb-1">
+                                                        <span>{pct.toFixed(0)}%</span>
+                                                        <span className="text-muted">{formatNumber(totalAchv)} / {formatNumber(target)}</span>
+                                                    </div>
+                                                    <div className="progress-bar small">
+                                                        <div className="fill" style={{ width: `${pct}%`, backgroundColor: pct >= 100 ? '#22c55e' : '#3b82f6' }}></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {topPerformerId !== '-' ? (
+                                                    <div>
+                                                        <div className="fw-600 small">{topName}</div>
+                                                        <div className="text-muted smaller">{formatNumber(topVal)}</div>
+                                                    </div>
+                                                ) : <span className="text-muted">-</span>}
+                                            </td>
+                                            <td>
+                                                {canCreate && user.departments.includes(camp.department_code) && (
+                                                    <div className="action-buttons" onClick={e => e.stopPropagation()}>
+                                                        <button onClick={() => handleEdit(camp)} className="btn-icon small" title="Edit"><Edit size={16} /></button>
+                                                        <button onClick={() => handleDelete(camp.id)} className="btn-icon small danger" title="Delete"><Trash2 size={16} /></button>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>
