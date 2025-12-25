@@ -795,9 +795,9 @@ const CampaignManager = ({ user }) => {
 
                                     return (
                                         <div className="infographics-wrapper">
-                                            <div className="infographics-grid animate-fade">
-                                                {/* Overview Stats (Width: Full) */}
-                                                <div className="chart-card">
+                                            <div className="infographics-grid animate-fade" style={{ columnWidth: '350px', columnGap: '1.5rem', width: '100%', display: 'block' }}>
+                                                {/* Overview Stats */}
+                                                <div className="chart-card" style={{ breakInside: 'avoid', marginBottom: '1.5rem', display: 'inline-block', width: '100%' }}>
                                                     <div className="big-stat-row">
                                                         <div className="stat-boxes flex-row-center">
                                                             <div className="stat-box">
@@ -829,10 +829,18 @@ const CampaignManager = ({ user }) => {
                                                     </div>
                                                 </div>
 
-                                                <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
-                                                <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
-                                                <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
-                                                <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
+                                                <div style={{ breakInside: 'avoid', marginBottom: '1.5rem', display: 'inline-block', width: '100%' }}>
+                                                    <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
+                                                </div>
+                                                <div style={{ breakInside: 'avoid', marginBottom: '1.5rem', display: 'inline-block', width: '100%' }}>
+                                                    <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
+                                                </div>
+                                                <div style={{ breakInside: 'avoid', marginBottom: '1.5rem', display: 'inline-block', width: '100%' }}>
+                                                    <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
+                                                </div>
+                                                <div style={{ breakInside: 'avoid', marginBottom: '1.5rem', display: 'inline-block', width: '100%' }}>
+                                                    <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
+                                                </div>
                                             </div>
                                         </div>
                                     );
