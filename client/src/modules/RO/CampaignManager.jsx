@@ -795,9 +795,10 @@ const CampaignManager = ({ user }) => {
 
                                     return (
                                         <div className="infographics-wrapper">
-                                            <div className="infographics-grid animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', width: '100%' }}>
+                                            {/* Renamed class to bypass cache and force new layout */}
+                                            <div className="stats-grid-container animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%' }}>
                                                 {/* Overview Stats */}
-                                                <div className="chart-card">
+                                                <div className="stats-overview-card" style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                                                     <div className="big-stat-row">
                                                         <div className="stat-boxes flex-row-center">
                                                             <div className="stat-box">
