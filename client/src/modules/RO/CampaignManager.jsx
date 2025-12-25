@@ -832,7 +832,7 @@ const CampaignManager = ({ user }) => {
                                                 <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
                                                 <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
                                                 <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
-                                                <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#64748b" data={nilPerformers} className="danger-striped" />
+                                                <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
                                             </div>
                                         </div>
                                     );
