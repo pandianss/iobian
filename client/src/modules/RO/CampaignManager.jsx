@@ -1056,7 +1056,7 @@ const CampaignManager = ({ user }) => {
                                     return (
                                         <tr key={camp.id} onClick={() => handleView(camp)} className="clickable-row">
                                             <td>
-                                                <div className="camp-list-img" style={{ backgroundImage: camp.image ? `url(${camp.image})` : 'none' }}>
+                                                <div className="camp-list-img" style={{ backgroundImage: camp.image ? `url("${camp.image}")` : 'none' }}>
                                                     {!camp.image && <BarChart2 size={16} />}
                                                 </div>
                                             </td>
