@@ -138,11 +138,23 @@
 
 /* Infographics */
 .infographics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-    /* Prevents stretching height */
+    column-count: 2;
+    column-gap: 1.5rem;
+    width: 100%;
+}
+
+.infographics-grid>div {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    /* Fixes some rendering glitches in columns */
+    width: 100%;
+}
+
+@media (max-width: 1000px) {
+    .infographics-grid {
+        column-count: 1;
+    }
 }
 
 .danger-striped {
