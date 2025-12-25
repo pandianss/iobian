@@ -66,14 +66,22 @@ const CampaignManager = ({ user }) => {
 
     const getName = (id, type) => {
         if (!id) return '-';
-        if (type === 'branch' || (id && id.length === 4)) {
-            const b = branches.find(b => b.branch_code === String(id));
-            if (b) return b.branch_name;
+        const strId = String(id);
+
+        // Try exact match first
+        let b = branches.find(b => b.branch_code === strId);
+
+        // If not found and looks like a short SOL (e.g. "376"), try padding to 4 chars
+        if (!b && strId.length < 4) {
+            b = branches.find(b => b.branch_code === strId.padStart(4, '0'));
         }
+
+        if (b) return b.branch_name;
+
         // Fallback or Staff check
-        const s = staffList.find(s => String(s.pf_number) === String(id));
+        const s = staffList.find(s => String(s.pf_number) === strId);
         if (s) return s.name;
-        // If still not found, return ID
+
         return id;
     };
 
@@ -1046,8 +1054,8 @@ const CampaignManager = ({ user }) => {
                                             topPerformerId = id;
                                         }
                                     });
-                                    // Try to resolve name if available in cache/state (simple lookup if possible, otherwise ID)
-                                    // Optimization: getName() is available in component scope?
+
+
                                     // Yes, getName(id, type) is defined in component. Check if we can infer type.
                                     // Usually Sol is 4 digits, Staff is 6. Simple heuristic.
                                     const topName = getName ? getName(topPerformerId, topPerformerId.length === 4 ? 'branch' : 'staff') : topPerformerId;
@@ -1056,8 +1064,16 @@ const CampaignManager = ({ user }) => {
                                     return (
                                         <tr key={camp.id} onClick={() => handleView(camp)} className="clickable-row">
                                             <td>
-                                                <div className="camp-list-img" style={{ backgroundImage: camp.image ? `url("${camp.image}")` : 'none' }}>
-                                                    {!camp.image && <BarChart2 size={16} />}
+                                                <div className="camp-list-img">
+                                                    {camp.image ? (
+                                                        <img
+                                                            src={camp.image}
+                                                            alt="camp"
+                                                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                                                        />
+                                                    ) : (
+                                                        <BarChart2 size={16} />
+                                                    )}
                                                 </div>
                                             </td>
                                             <td>
@@ -1074,9 +1090,9 @@ const CampaignManager = ({ user }) => {
                                             </td>
                                             <td>
                                                 <div className="progress-section compact">
-                                                    <div className="flex-row-sb small mb-1">
-                                                        <span>{pct.toFixed(0)}%</span>
-                                                        <span className="text-muted">{formatNumber(totalAchv)} / {formatNumber(target)}</span>
+                                                    <div className="flex-row-sb small mb-1" style={{ flexDirection: 'column', gap: '2px' }}>
+                                                        <div className="fw-bold text-primary">{pct.toFixed(0)}%</div>
+                                                        <div className="text-muted small">{formatNumber(totalAchv)} / {formatNumber(target)}</div>
                                                     </div>
                                                     <div className="progress-bar small">
                                                         <div className="fill" style={{ width: `${pct}%`, backgroundColor: pct >= 100 ? '#22c55e' : '#3b82f6' }}></div>
