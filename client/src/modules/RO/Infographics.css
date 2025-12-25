@@ -139,7 +139,7 @@
 /* Infographics */
 .infographics-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 1.5rem;
     align-items: start;
     /* Prevents stretching height */
@@ -196,7 +196,7 @@
 }
 
 .full-width-chart {
-    grid-column: 1 / -1;
+    /* grid-column: 1 / -1; removed to allow flow */
     background: white;
     border-radius: 1rem;
     padding: 1.5rem;
