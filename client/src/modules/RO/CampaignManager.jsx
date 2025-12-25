@@ -181,7 +181,8 @@ const CampaignManager = ({ user }) => {
 
                 const branchCode = find(['SOL', 'Branch Code', 'Branch', 'BranchCode']);
                 const staffRoll = find(['Staff Roll', 'Roll No', 'PF Number', 'StaffNo']);
-                const target = find(['Target', 'Goal', 'Target Amount']);
+                // Support 'Base' alias for Reduction campaigns
+                const target = find(['Target', 'Goal', 'Target Amount', 'Base', 'Base Data', 'Base Amount']);
 
                 if ((branchCode || staffRoll) && target !== null) {
                     return {
@@ -378,19 +379,33 @@ const CampaignManager = ({ user }) => {
             return '—';
         };
 
-        // Calculate per-row percentage against individual target, if any
-        return Array.from(map.values()).map(r => ({
-            ...r,
-            name: getName(r.id, r.type),
-            pct: r.target > 0 ? ((r.achievement / r.target) * 100).toFixed(1) : '—'
-        }));
+        // Calculate per-row percentage/score
+        return Array.from(map.values()).map(r => {
+            let pctVal = 0;
+            if (campaign.type === 'Reduction') {
+                // Reduction: Score is % Reduced. (Base - Current) / Base * 100
+                // r.achievement is "Current Level"
+                // If Current > Base, score is Negative.
+                pctVal = r.target > 0 ? ((r.target - r.achievement) / r.target * 100) : 0;
+            } else {
+                // Growth: Score is % Achieved.
+                pctVal = r.target > 0 ? ((r.achievement / r.target) * 100) : 0;
+            }
+
+            return {
+                ...r,
+                name: getName(r.id, r.type),
+                score: pctVal, // Numeric score for sorting
+                pct: pctVal.toFixed(1) // Display string
+            };
+        });
     };
 
     const aggregatedData = useMemo(() => {
         if (!viewingCampaign) return [];
         const data = getAggregatedData(viewingCampaign);
-        // Sort by Achievement (Descending)
-        return data.sort((a, b) => b.achievement - a.achievement);
+        // Sort by Score (Descending) - Works for both Growth (Highest Achievement) and Reduction (Highest Reduction %)
+        return data.sort((a, b) => b.score - a.score);
     }, [viewingCampaign]);
 
 
@@ -436,9 +451,27 @@ const CampaignManager = ({ user }) => {
 
     // Render Detail View
     if (viewingCampaign) {
+        const isReduction = viewingCampaign.type === 'Reduction';
         const totalTarget = viewingCampaign.overall_target || 1;
-        const totalAchv = aggregatedData.reduce((s, x) => s + x.achievement, 0);
-        const percent = Math.min((totalAchv / totalTarget) * 100, 100).toFixed(1);
+        const totalAchv = aggregatedData.reduce((s, x) => s + x.achievement, 0); // Sum of Current Levels or Achievements
+
+        let percentVal = 0;
+        if (isReduction) {
+            percentVal = ((totalTarget - totalAchv) / totalTarget) * 100;
+        } else {
+            percentVal = (totalAchv / totalTarget) * 100;
+        }
+
+        // Cap for Progress Bar visual (can't go > 100) but keep real val for text
+        const percent = percentVal.toFixed(1);
+        const progressPercent = Math.min(Math.max(percentVal, 0), 100);
+
+        // For Scale in Databars:
+        // Growth: Max Achievement
+        // Reduction: Base is usually max, but achievement (current) could be higher if worsened. 
+        // We use Score for visual ranking, but Achievement for absolute databar? 
+        // Actually for reduction, databar usually represents "Current Level" vs "Base".
+        // Or "Percentage of Reduction Done"?
         const maxAchievement = Math.max(...aggregatedData.map(d => d.achievement), 1);
 
         return (
@@ -581,265 +614,211 @@ const CampaignManager = ({ user }) => {
                         )}
 
                         {/* Infographics Tab */}
-                        {activeTab === 'infographics' && (
-                            <div className="infographics-grid animate-fade">
-                                {/* Row 1: Overall Stats */}
-                                <div className="chart-card full-width-chart">
-                                    <h3><BarChart2 size={20} /> Overall Performance</h3>
-                                    <div className="big-stat-row">
-                                        <div className="big-stat-item">
-                                            <div className="stat-value">{percent}%</div>
-                                            <div className="stat-label">Completion</div>
-                                        </div>
-                                        <div className="progress-bar-container large">
-                                            <div className="progress-bar-fill" style={{ width: `${percent}%`, backgroundColor: Number(percent) >= 100 ? '#22c55e' : '#3b82f6' }}></div>
-                                        </div>
-                                        <div className="stat-boxes">
-                                            <div className="stat-box">
-                                                <div className="label">Region Target</div>
-                                                <div className="value">{formatNumber(totalTarget)}</div>
+                        {activeTab === 'infographics' && (() => {
+
+
+
+                            const sorted = [...aggregatedData].sort((a, b) => b.achievement - a.achievement);
+
+                            // Top 20% Logic
+                            const topCount20 = Math.ceil(aggregatedData.length * 0.20) || 1;
+                            const topData = sorted.slice(0, topCount20);
+
+                            // Bottom 20% Logic
+                            const sortedAsc = [...aggregatedData].sort((a, b) => a.achievement - b.achievement);
+                            const bottomData = sortedAsc.slice(0, topCount20);
+
+                            const achievers = aggregatedData
+                                .filter(r => r.target > 0 && r.achievement >= r.target)
+                                .sort((a, b) => {
+                                    const pctA = (a.achievement / a.target) * 100;
+                                    const pctB = (b.achievement / b.target) * 100;
+                                    return pctB - pctA;
+                                });
+
+                            const nilPerformers = aggregatedData.filter(r => r.achievement === 0);
+
+
+
+
+                            const handleExport = async (panelId, title) => {
+                                // If Bulk Export
+                                if (panelId === 'all') {
+                                    const panels = [
+                                        { id: 'panel-overall-performance', title: 'Overall-Performance' },
+                                        { id: 'panel-Top-20%-Performers', title: 'Top-20-Performers' },
+                                        { id: 'panel-Bottom-20%-Performers', title: 'Bottom-20-Performers' },
+                                        { id: 'panel-Achievers-(100%+)', title: 'Achievers-100-Plus' },
+                                        { id: 'panel-Nil-Performers', title: 'Nil-Performers' }
+                                    ];
+
+                                    for (const panel of panels) {
+                                        await handleExport(panel.id, `${viewingCampaign.title}-${panel.title}`);
+                                        // Small delay to prevent browser throttling downloads
+                                        await new Promise(resolve => setTimeout(resolve, 800));
+                                    }
+                                    return;
+                                }
+
+                                const element = document.getElementById(panelId);
+                                if (!element) return;
+
+                                // Create wrapper
+                                const captureWrapper = document.createElement('div');
+                                captureWrapper.style.position = 'absolute';
+                                captureWrapper.style.left = '-9999px';
+                                captureWrapper.style.top = '0';
+                                captureWrapper.style.width = Math.max(element.offsetWidth + 40, 800) + 'px'; // width + padding (min 800px)
+                                captureWrapper.style.backgroundColor = '#fff';
+                                captureWrapper.style.padding = '20px'; // Add margin around content
+
+                                // Inject Compact Styles for Image
+                                const style = document.createElement('style');
+                                style.innerHTML = `
+                                    .modern-list-table td { padding: 6px 8px !important; }
+                                    .modern-list-table .rank-circle { width: 28px; height: 28px; font-size: 0.85rem; }
+                                    .modern-list-table .fw-600 { font-size: 0.9rem; }
+                                `;
+                                captureWrapper.appendChild(style);
+                                document.body.appendChild(captureWrapper);
+
+                                // Inject Header
+                                // Layout: 
+                                // Row 1: Logo (Left) ... Campaign Image (Right)
+                                // Row 2: Title & Region
+                                const regionName = user?.region_name || user?.region_code ? `Region: ${user.region_name || user.region_code}` : '';
+
+                                const headerHtml = `
+                                    <div style="padding:1rem;background:#fff;border-bottom:1px solid #e2e8f0;font-family:inherit;margin-bottom:1rem;">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                                            <div style="display:flex;align-items:center;gap:1rem;">
+                                                <img src="${iobLogo}" style="height:60px;object-fit:contain;" />
+                                                <h2 style="margin:0;font-size:1.5rem;color:#1e293b;font-weight:700;">Performance Overview</h2>
                                             </div>
-                                            <div className="stat-box highlight">
-                                                <div className="label">Achievement</div>
-                                                <div className="value">{formatNumber(totalAchv)}</div>
-                                            </div>
+                                            ${viewingCampaign.image ? `<img src="${viewingCampaign.image}" style="height:80px;width:auto;object-fit:contain;" />` : '<div></div>'}
+                                        </div>
+                                        <div style="text-align:center;">
+                                            <h3 style="font-size:1.8rem;color:#0f172a;margin:0 0 0.25rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
+                                            ${regionName ? `<p style="font-size:1rem;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
+                                            <p style="font-size:0.9rem;color:#64748b;margin:0.25rem 0 0 0;font-weight:500;">
+                                                Campaign Period: ${formatDate(viewingCampaign.startDate || viewingCampaign.start_date)} - ${formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
+                                    `;
+                                captureWrapper.innerHTML = headerHtml;
 
-                                {/* Lists */}
-                                {(() => {
-                                    const sorted = [...aggregatedData].sort((a, b) => b.achievement - a.achievement);
+                                // Clone Panel
+                                const clone = element.cloneNode(true);
+                                clone.style.margin = '0';
+                                clone.style.boxShadow = 'none';
+                                // Removed lines that stripped border and radius to preserve "Achievers" top bar style
 
-                                    // Top 20% Logic
-                                    const topCount20 = Math.ceil(aggregatedData.length * 0.20) || 1;
-                                    const topData = sorted.slice(0, topCount20);
+                                // Remove export button from clone
+                                const btn = clone.querySelector('.export-btn');
+                                if (btn) btn.remove();
 
-                                    // Bottom 20% Logic
-                                    const sortedAsc = [...aggregatedData].sort((a, b) => a.achievement - b.achievement);
-                                    const bottomData = sortedAsc.slice(0, topCount20);
+                                // Expand list to show all items
+                                const scrollArea = clone.querySelector('.list-scroll');
+                                if (scrollArea) {
+                                    scrollArea.style.maxHeight = 'none';
+                                    scrollArea.style.overflow = 'visible';
+                                }
 
-                                    const achievers = aggregatedData
-                                        .filter(r => r.target > 0 && r.achievement >= r.target)
-                                        .sort((a, b) => {
-                                            const pctA = (a.achievement / a.target) * 100;
-                                            const pctB = (b.achievement / b.target) * 100;
-                                            return pctB - pctA;
-                                        });
+                                // Make Header Prominent
+                                const panelHeader = clone.querySelector('h4');
+                                if (panelHeader) {
+                                    panelHeader.style.fontSize = '1.4rem';
+                                    panelHeader.style.fontWeight = '800';
+                                }
 
-                                    const nilPerformers = aggregatedData.filter(r => r.achievement === 0);
+                                captureWrapper.appendChild(clone);
+
+                                try {
+                                    const currentScrollY = window.scrollY;
+                                    window.scrollTo(0, 0); // Scroll to top to ensure no cropping
+                                    await new Promise(resolve => setTimeout(resolve, 300)); // Wait for scroll
+
+                                    const canvas = await html2canvas(captureWrapper, {
+                                        useCORS: true,
+                                        scale: 2, // Retina quality
+                                        backgroundColor: '#ffffff',
+                                        scrollX: 0,
+                                        scrollY: 0 // We already scrolled to 0
+                                    });
+                                    const link = document.createElement('a');
+                                    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+                                    link.href = canvas.toDataURL('image/png');
+                                    link.click();
+                                    window.scrollTo(0, currentScrollY); // Restore just in case
+                                } catch (err) {
+                                    console.error("Export failed", err);
+                                    alert("Failed to export image. Please check console.");
+                                } finally {
+                                    document.body.removeChild(captureWrapper);
+                                }
+                            };
 
 
-                                    const formatNumber = (num) => {
-                                        return Number(num || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                    };
 
-                                    const handleExport = async (panelId, title) => {
-                                        const element = document.getElementById(panelId);
-                                        if (!element) return;
+                            // formatNumber is now imported from utils
+                            // handleExport and ListPanel are already defined above or need to be preserved if they were overwritten
 
-                                        // Create wrapper
-                                        const captureWrapper = document.createElement('div');
-                                        captureWrapper.style.position = 'absolute';
-                                        captureWrapper.style.left = '-9999px';
-                                        captureWrapper.style.top = '0';
-                                        captureWrapper.style.width = (element.offsetWidth + 40) + 'px'; // width + padding
-                                        captureWrapper.style.backgroundColor = '#fff';
-                                        captureWrapper.style.padding = '20px'; // Add margin around content
-                                        document.body.appendChild(captureWrapper);
-
-                                        // Inject Header
-                                        // Layout: 
-                                        // Row 1: Logo (Left) ... Campaign Image (Right)
-                                        // Row 2: Title & Region
-                                        const regionName = user?.region_name || user?.region_code ? `Region: ${user.region_name || user.region_code}` : '';
-
-                                        const headerHtml = `
-                                            <div style="padding:1rem;background:#fff;border-bottom:1px solid #e2e8f0;font-family:inherit;margin-bottom:1rem;">
-                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                                                    <img src="${iobLogo}" style="height:60px;object-fit:contain;" />
-                                                    ${viewingCampaign.image ? `<img src="${viewingCampaign.image}" style="height:80px;width:auto;object-fit:contain;" />` : '<div></div>'}
-                                                </div>
-                                                <div style="text-align:center;">
-                                                    <h3 style="font-size:1.8rem;color:#0f172a;margin:0 0 0.25rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
-                                                    ${regionName ? `<p style="font-size:1rem;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
-                                                </div>
-                                            </div>
-                                        `;
-                                        captureWrapper.innerHTML = headerHtml;
-
-                                        // Clone Panel
-                                        const clone = element.cloneNode(true);
-                                        clone.style.margin = '0';
-                                        clone.style.boxShadow = 'none';
-                                        // Removed lines that stripped border and radius to preserve "Achievers" top bar style
-
-                                        // Remove export button from clone
-                                        const btn = clone.querySelector('.export-btn');
-                                        if (btn) btn.remove();
-
-                                        // Expand list to show all items
-                                        const scrollArea = clone.querySelector('.list-scroll');
-                                        if (scrollArea) {
-                                            scrollArea.style.maxHeight = 'none';
-                                            scrollArea.style.overflow = 'visible';
-                                        }
-
-                                        // Make Header Prominent
-                                        const panelHeader = clone.querySelector('h4');
-                                        if (panelHeader) {
-                                            panelHeader.style.fontSize = '1.4rem';
-                                            panelHeader.style.fontWeight = '800';
-                                        }
-
-                                        captureWrapper.appendChild(clone);
-
-                                        try {
-                                            const currentScrollY = window.scrollY;
-                                            const canvas = await html2canvas(captureWrapper, {
-                                                useCORS: true,
-                                                scale: 2, // Retina quality
-                                                backgroundColor: '#ffffff',
-                                                scrollX: 0,
-                                                scrollY: -window.scrollY // Offset the current scroll
-                                            });
-                                            const link = document.createElement('a');
-                                            link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
-                                            link.href = canvas.toDataURL('image/png');
-                                            link.click();
-                                            window.scrollTo(0, currentScrollY); // Restore just in case
-                                        } catch (err) {
-                                            console.error("Export failed", err);
-                                            alert("Failed to export image. Please check console.");
-                                        } finally {
-                                            document.body.removeChild(captureWrapper);
-                                        }
-                                    };
-
-                                    const ListPanel = ({ title, icon, color, data, className, showPercentage }) => {
-                                        const panelId = `panel-${title.replace(/\s+/g, '-')}`;
-                                        return (
-                                            <div id={panelId} className={`list-panel card ${className || ''}`} style={{ borderTop: `4px solid ${color}` }}>
-                                                <div className="panel-header">
-                                                    <div className="icon-box" style={{ backgroundColor: `${color}20`, color: color }}>
-                                                        {icon}
+                            return (
+                                <div className="infographics-wrapper">
+                                    <div className="flex-row-between" style={{ marginBottom: '1rem', alignItems: 'center' }}>
+                                        <h4 style={{ margin: 0, color: '#64748b' }}>Detailed Performance Analytics</h4>
+                                        <button
+                                            onClick={() => handleExport('all', 'all')}
+                                            className="btn btn-primary"
+                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                        >
+                                            <Download size={18} /> Export All Panels
+                                        </button>
+                                    </div>
+                                    {/* Renamed class to bypass cache and force new layout */}
+                                    <div id="infographics-export-container" className="stats-view-grid animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%' }}>
+                                        {/* Overview Stats */}
+                                        <div id="panel-overall-performance" className="stats-view-card">
+                                            <div className="big-stat-row">
+                                                <div className="stat-boxes flex-row-center">
+                                                    <div className="stat-box">
+                                                        <div className="label">Start Date</div>
+                                                        <div className="value-sm">{formatDate(viewingCampaign.startDate || viewingCampaign.start_date)}</div>
                                                     </div>
-                                                    <h4 style={{ flex: 1 }}>{title} <span className="count-badge" style={{ backgroundColor: color }}>{data.length}</span></h4>
-                                                    <button
-                                                        className="export-btn"
-                                                        onClick={() => handleExport(panelId, title)}
-                                                        title="Export as Image"
-                                                        style={{
-                                                            marginLeft: 'auto',
-                                                            padding: '0.4rem 0.6rem',
-                                                            background: '#f1f5f9',
-                                                            border: 'none',
-                                                            borderRadius: '8px',
-                                                            cursor: 'pointer',
-                                                            color: '#64748b',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                                                        }}
-                                                    >
-                                                        <Share2 size={18} />
-                                                    </button>
-                                                </div>
-                                                <div className="list-scroll">
-                                                    <table className="modern-list-table">
-                                                        <tbody>
-                                                            {data.map((r, i) => {
-                                                                const maxVal = Math.max(...data.map(d => d.achievement || 0));
-                                                                let width = 0;
-                                                                if (maxVal > 0 && r.achievement > 0) {
-                                                                    width = (r.achievement / maxVal) * 100;
-                                                                }
-
-                                                                const pct = r.target ? Math.round((r.achievement / r.target) * 100) : 0;
-
-                                                                return (
-                                                                    <tr key={i}>
-                                                                        <td className="rank-col">
-                                                                            <div className="rank-circle" style={{ borderColor: color, color: color }}>{i + 1}</div>
-                                                                        </td>
-                                                                        <td className="info-col">
-                                                                            <div className="fw-600" style={{ fontSize: '0.95rem' }}>{r.name}</div>
-                                                                        </td>
-                                                                        <td className="val-col">
-                                                                            <div className="val-text">
-                                                                                {formatNumber(r.achievement)}
-                                                                                {showPercentage && r.target > 0 && (
-                                                                                    <span style={{ fontSize: '0.75rem', marginLeft: '6px', color: color, fontWeight: 700 }}>
-                                                                                        ({pct}%)
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="databar-bg">
-                                                                                <div className="databar-fill" style={{ width: `${width}%`, backgroundColor: color }}></div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            })}
-                                                            {data.length === 0 && <tr><td colSpan="3" className="text-center text-muted p-4">No data available</td></tr>}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        );
-                                    };
-
-                                    // formatNumber is now imported from utils
-                                    // handleExport and ListPanel are already defined above or need to be preserved if they were overwritten
-
-                                    return (
-                                        <div className="infographics-wrapper">
-                                            {/* Renamed class to bypass cache and force new layout */}
-                                            <div className="stats-grid-container animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%' }}>
-                                                {/* Overview Stats */}
-                                                <div className="stats-overview-card" style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                                                    <div className="big-stat-row">
-                                                        <div className="stat-boxes flex-row-center">
-                                                            <div className="stat-box">
-                                                                <div className="label">Start Date</div>
-                                                                <div className="value-sm">{formatDate(viewingCampaign.startDate || viewingCampaign.start_date)}</div>
-                                                            </div>
-                                                            <div className="stat-box">
-                                                                <div className="label">End Date</div>
-                                                                <div className="value-sm">{formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}</div>
-                                                            </div>
-                                                            <div className="stat-box">
-                                                                <div className="label">Region Target</div>
-                                                                <div className="value">{formatNumber(totalTarget)}</div>
-                                                            </div>
-                                                            <div className="stat-box highlight">
-                                                                <div className="label">Total Achievement</div>
-                                                                <div className="value" style={{ color: Number(percent) >= 100 ? '#16a34a' : '#2563eb' }}>{formatNumber(totalAchv)}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="overall-progress">
-                                                            <div className="progress-label-row">
-                                                                <span>Completion Status</span>
-                                                                <span className="fw-bold">{percent}%</span>
-                                                            </div>
-                                                            <div className="progress-bar-container large">
-                                                                <div className="progress-bar-fill" style={{ width: `${Math.min(percent, 100)}%`, backgroundColor: Number(percent) >= 100 ? '#22c55e' : '#3b82f6' }}></div>
-                                                            </div>
-                                                        </div>
+                                                    <div className="stat-box">
+                                                        <div className="label">End Date</div>
+                                                        <div className="value-sm">{formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}</div>
+                                                    </div>
+                                                    <div className="stat-box">
+                                                        <div className="label">{viewingCampaign.type === 'Reduction' ? 'Base Data' : 'Region Target'}</div>
+                                                        <div className="value">{formatNumber(totalTarget)}</div>
+                                                    </div>
+                                                    <div className="stat-box highlight">
+                                                        <div className="label">{viewingCampaign.type === 'Reduction' ? 'Current Level' : 'Total Achievement'}</div>
+                                                        <div className="value" style={{ color: Number(percent) >= 100 ? '#16a34a' : '#2563eb' }}>{formatNumber(totalAchv)}</div>
                                                     </div>
                                                 </div>
-
-                                                <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
-                                                <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
-                                                <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
-                                                <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
+                                                <div className="overall-progress">
+                                                    <div className="progress-label-row">
+                                                        <span>{viewingCampaign.type === 'Reduction' ? 'Reduction Status' : 'Completion Status'}</span>
+                                                        <span className="fw-bold">{percent}%</span>
+                                                    </div>
+                                                    <div className="progress-bar-container large">
+                                                        <div className="progress-bar-fill" style={{ width: `${progressPercent}%`, backgroundColor: Number(percent) >= 100 ? '#22c55e' : '#3b82f6' }}></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    );
-                                })()}
-                            </div>
-                        )}
+
+                                        <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
+                                        <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
+                                        <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
+                                        <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
+                                    </div>
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div >
 
@@ -1130,6 +1109,61 @@ const CampaignManager = ({ user }) => {
                     </table>
                 </div>
             )}
+        </div>
+    );
+};
+
+// Sub-component defined outside to prevent re-renders losing scroll state
+const ListPanel = ({ title, icon, color, data, className, showPercentage }) => {
+    const panelId = `panel-${title.replace(/\s+/g, '-')}`;
+    return (
+        <div id={panelId} className={`list-panel card ${className || ''}`} style={{ borderTop: `4px solid ${color}` }}>
+            <div className="panel-header">
+                <div className="icon-box" style={{ backgroundColor: `${color}20`, color: color }}>
+                    {icon}
+                </div>
+                <h4 style={{ flex: 1 }}>{title} <span className="count-badge" style={{ backgroundColor: color }}>{data.length}</span></h4>
+            </div>
+            <div className="list-scroll">
+                <table className="modern-list-table">
+                    <tbody>
+                        {data.map((r, i) => {
+                            const maxVal = Math.max(...data.map(d => d.achievement || 0));
+                            let width = 0;
+                            if (maxVal > 0 && r.achievement > 0) {
+                                width = (r.achievement / maxVal) * 100;
+                            }
+
+                            const pct = r.target ? Math.round((r.achievement / r.target) * 100) : 0;
+
+                            return (
+                                <tr key={i}>
+                                    <td className="rank-col">
+                                        <div className="rank-circle" style={{ borderColor: color, color: color }}>{i + 1}</div>
+                                    </td>
+                                    <td className="info-col">
+                                        <div className="fw-600" style={{ fontSize: '0.95rem' }}>{r.name}</div>
+                                    </td>
+                                    <td className="val-col">
+                                        <div className="val-text">
+                                            {formatNumber(r.achievement)}
+                                            {showPercentage && r.target > 0 && (
+                                                <span style={{ fontSize: '0.75rem', marginLeft: '6px', color: color, fontWeight: 700 }}>
+                                                    ({pct}%)
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="databar-bg">
+                                            <div className="databar-fill" style={{ width: `${width}%`, backgroundColor: color }}></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                        {data.length === 0 && <tr><td colSpan="3" className="text-center text-muted p-4">No data available</td></tr>}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
