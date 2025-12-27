@@ -17,7 +17,8 @@ import {
     LogOut,
     Clock,
     Layers,
-    Megaphone
+    Megaphone,
+    Percent
 } from 'lucide-react';
 
 // Lazy Load Modules
@@ -34,6 +35,7 @@ const DesignationManager = React.lazy(() => import('../modules/Admin/Designation
 const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
 const JoiningOfferGenerator = React.lazy(() => import('../modules/HR/JoiningOfferGenerator'));
 const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentManager'));
+const InterestRateManager = React.lazy(() => import('../modules/Planning/InterestRateManager'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
@@ -96,6 +98,8 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <CampaignManager user={user} />;
             case 'department_manager':
                 return <DepartmentManager />;
+            case 'interest_rates':
+                return <InterestRateManager user={user} />;
             default:
                 return <div>Module Under Construction</div>;
         }
@@ -177,10 +181,11 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                             { id: 'pms', label: 'Performance (PMS)', icon: <LineChart size={20} />, roles: [] },
                             { id: 'inventory', label: 'Inventory', icon: <Package size={20} />, roles: [] },
                             { id: 'branch_opening_survey', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] }, // Renamed 'planning' to 'branch_opening_survey' and updated label
+                            { id: 'interest_rates', label: 'Interest Rates', icon: <Percent size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
                             { id: 'region_manager', label: 'Region Management', icon: <Globe size={20} />, roles: ['SuperAdmin', 'CO_Planning'] },
                             { id: 'branch_manager', label: 'Branch Network', icon: <Building2 size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
                             { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['RO', 'CO'] }, // Updated roles
-                            { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['RO'] }, // Added new sidebar item
+                            { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['SuperAdmin', 'RO'] }, // Added new sidebar item
                             { id: 'repair_vault', label: 'Restoration & Vault', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'CO_Gad'] },
                             { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
                             { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },

@@ -8,30 +8,32 @@ const PlanningDashboard = ({ user }) => {
     const [selectedSurvey, setSelectedSurvey] = useState(null);
 
     return (
-        <div style={{ position: 'relative' }}>
-            {mode === 'list' && (
-                <BranchSurveyList
-                    onCreateNew={() => {
-                        setSelectedSurvey(null);
-                        setMode('create');
-                    }}
-                    onSelect={(survey) => {
-                        setSelectedSurvey(survey);
-                        setMode('edit');
-                    }}
-                />
-            )}
+        <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+                {mode === 'list' && (
+                    <BranchSurveyList
+                        onCreateNew={() => {
+                            setSelectedSurvey(null);
+                            setMode('create');
+                        }}
+                        onSelect={(survey) => {
+                            setSelectedSurvey(survey);
+                            setMode('edit');
+                        }}
+                    />
+                )}
 
-            {(mode === 'create' || mode === 'edit') && (
-                <BranchOpeningSurvey
-                    user={user}
-                    onBack={() => {
-                        setMode('list');
-                        setSelectedSurvey(null);
-                    }}
-                    initialData={selectedSurvey}
-                />
-            )}
+                {(mode === 'create' || mode === 'edit') && (
+                    <BranchOpeningSurvey
+                        user={user}
+                        onBack={() => {
+                            setMode('list');
+                            setSelectedSurvey(null);
+                        }}
+                        initialData={selectedSurvey}
+                    />
+                )}
+            </div>
         </div>
     );
 };

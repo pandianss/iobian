@@ -172,108 +172,139 @@
     gap: 1.5rem;
 }
 
-.report-visual-header {
+/* Modern Stats Grid */
+.stat-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.stat-card-modern {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 2rem;
-    background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    gap: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.header-campaign-img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
+.stat-card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
     border-radius: 12px;
-    border: 1px solid #f1f5f9;
-    padding: 0.5rem;
-    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.header-text h3 {
-    font-size: 1.875rem;
-    color: #0f172a;
-    margin: 0 0 0.5rem 0;
-    font-weight: 700;
-    line-height: 1.2;
+.stat-icon-wrapper.blue {
+    background: #eff6ff;
+    color: #3b82f6;
 }
 
-.header-text p {
-    color: #64748b;
-    margin: 0;
-    font-size: 1.1rem;
+.stat-icon-wrapper.green {
+    background: #f0fdf4;
+    color: #22c55e;
 }
 
-.full-width-chart {
-    /* grid-column: 1 / -1; removed to allow flow */
-    background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 0.5rem;
+.stat-icon-wrapper.indigo {
+    background: #eef2ff;
+    color: #6366f1;
 }
 
-.big-stat-row {
+.stat-icon-wrapper.orange {
+    background: #fff7ed;
+    color: #f97316;
+}
+
+.stat-content {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
 }
 
-.flex-row-center {
-    display: flex;
-    gap: 2rem;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-}
-
-.stat-box {
-    background: #f8fafc;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    min-width: 140px;
-    border: 1px solid #f1f5f9;
-}
-
-.stat-box.highlight {
-    background: #f0f9ff;
-    border-color: #bae6fd;
-}
-
-.stat-box .label {
-    font-size: 0.875rem;
+.stat-label {
+    font-size: 0.75rem;
     color: #64748b;
-    margin-bottom: 0.25rem;
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
 }
 
-.stat-box .value,
-.stat-box .value-sm {
+.stat-value {
     font-size: 1.25rem;
-    font-weight: 700;
     color: #0f172a;
-}
-
-.stat-box .value-sm {
-    font-size: 1.1rem;
+    font-weight: 700;
     font-family: 'DM Mono', monospace;
 }
 
-.overall-progress {
-    background: #f8fafc;
-    padding: 1.25rem;
-    border-radius: 12px;
-    border: 1px solid #f1f5f9;
+.stat-value.highlight {
+    color: #2563eb;
+    font-size: 1.5rem;
 }
 
-.progress-label-row {
+/* Chart Container */
+.chart-container-modern {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: 0.75rem;
-    color: #334155;
-    font-weight: 600;
+    justify-content: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* Matrix Panel Styles */
+.full-width-panel {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.matrix-table th,
+.matrix-table td {
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+
+.matrix-table th {
+    background: #f8fafc;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.mono {
+    font-family: 'DM Mono', monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.fw-bold {
+    font-weight: 700;
+}
+
+.text-muted {
+    color: #94a3b8;
 }

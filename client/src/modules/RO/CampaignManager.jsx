@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import { Plus, Upload, FileText, BarChart2, Calendar, Trash2, Edit, AlertCircle, CheckCircle, Save, X, List, TrendingUp, TrendingDown, Award, AlertTriangle, Download, Share2 } from 'lucide-react';
+import { Plus, Upload, FileText, BarChart2, Calendar, Trash2, Edit, AlertCircle, CheckCircle, Save, X, List, TrendingUp, TrendingDown, Award, AlertTriangle, Download, Share2, Target } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import BranchMap from '../Admin/BranchMap';
 import iobLogo from '../../assets/iob_logo_opt.png';
@@ -344,11 +344,12 @@ const CampaignManager = ({ user }) => {
                 // Infer type if possible from lookup existence (Branch priority)
                 const isBranch = branches.some(b => b.branch_code === String(id));
                 const type = isBranch ? 'branch' : 'staff';
-                map.set(id, { id, type, target: 0, achievement: 0, details: [] });
+                map.set(id, { id, type, target: 0, achievement: 0, count: 0, details: [] });
             }
             const rec = map.get(id);
             rec.achievement += entry.amount;
-            // Optionally we could store last few details, but for now we aggregate numbers
+            rec.count = (rec.count || 0) + 1; // Increment count
+            if (entry.details) rec.details.push(entry.details.trim()); // Store detail
         });
 
         // Helper to resolve name with strict typing
@@ -382,7 +383,7 @@ const CampaignManager = ({ user }) => {
         // Calculate per-row percentage/score
         return Array.from(map.values()).map(r => {
             let pctVal = 0;
-            if (campaign.type === 'Reduction') {
+            if (camp.type === 'Reduction') {
                 // Reduction: Score is % Reduced. (Base - Current) / Base * 100
                 // r.achievement is "Current Level"
                 // If Current > Base, score is Negative.
@@ -407,6 +408,273 @@ const CampaignManager = ({ user }) => {
         // Sort by Score (Descending) - Works for both Growth (Highest Achievement) and Reduction (Highest Reduction %)
         return data.sort((a, b) => b.score - a.score);
     }, [viewingCampaign]);
+
+
+    // Product Stats
+    const productStats = useMemo(() => {
+        if (!viewingCampaign) return [];
+        const stats = {};
+        (viewingCampaign.achievement_entries || []).forEach(entry => {
+            const product = entry.details?.trim() || 'Unspecified';
+            if (!stats[product]) {
+                stats[product] = { product, count: 0, amount: 0 };
+            }
+            stats[product].count += 1;
+            stats[product].amount += entry.amount;
+        });
+        return Object.values(stats).sort((a, b) => b.amount - a.amount);
+    }, [viewingCampaign]);
+
+    // Infographics Derived Data
+    const { topData, bottomData, achievers, nilPerformers, categoryPanels, branchStats, matrixColumns, matrixData } = useMemo(() => {
+        if (!aggregatedData.length) return { topData: [], bottomData: [], achievers: [], nilPerformers: [], categoryPanels: [], branchStats: [], matrixColumns: [], matrixData: [] };
+
+        const sorted = [...aggregatedData].sort((a, b) => b.achievement - a.achievement);
+        const topCount20 = Math.ceil(aggregatedData.length * 0.20) || 1;
+        const topData = sorted.slice(0, topCount20);
+
+        const sortedAsc = [...aggregatedData].sort((a, b) => a.achievement - b.achievement);
+        const bottomData = sortedAsc.slice(0, topCount20);
+
+        const achievers = aggregatedData
+            .filter(r => r.target > 0 && r.achievement >= r.target)
+            .sort((a, b) => {
+                const pctA = (a.achievement / a.target) * 100;
+                const pctB = (b.achievement / b.target) * 100;
+                return pctB - pctA;
+            });
+
+        const nilPerformers = aggregatedData.filter(r => r.achievement === 0);
+
+        // Branch Performance List (Count & Amount)
+        const branchStats = aggregatedData
+            .filter(r => r.type === 'branch' && r.achievement > 0)
+            .sort((a, b) => b.achievement - a.achievement);
+
+        const categories = [...new Set(aggregatedData.map(d => d.category).filter(Boolean))];
+        const categoryPanels = categories.map(cat => {
+            const catData = aggregatedData
+                .filter(d => d.category === cat)
+                .sort((a, b) => b.score - a.score);
+            const title = `${cat} Performance`;
+            return {
+                id: `panel-${title.replace(/\s+/g, '-')}`,
+                title: title,
+                data: catData
+            };
+        });
+
+        // Branch Product Matrix (Pivot)
+        // 1. Identify Top Products (Top 4 by Total Amount)
+        const productTotals = {};
+        (aggregatedData || []).forEach(r => {
+            // We need raw entries for this, but aggregatedData only has summaries.
+            // We can re-scan entries or if we stored details in aggregatedData.
+        });
+        // Actually, better to scan raw entries
+        const rawEntries = viewingCampaign.achievement_entries || [];
+        rawEntries.forEach(e => {
+            const p = e.details?.trim() || 'Unspecified';
+            productTotals[p] = (productTotals[p] || 0) + e.amount;
+        });
+
+        const topProducts = Object.entries(productTotals)
+            .sort((a, b) => b[1] - a[1])
+            .filter(e => e[0] !== 'Others' && e[0] !== 'others') // Avoid duplication
+            .slice(0, 4)
+            .map(e => e[0]);
+
+        // 2. Build Matrix Rows
+        const matrixData = branchStats.map(branch => {
+            // Find entries for this branch
+            const branchEntries = rawEntries.filter(e => String(e.sol_or_staff) === String(branch.id));
+            const row = { id: branch.id, name: branch.name, total: branch.achievement, count: branch.count };
+
+            let topSum = 0;
+            let topCount = 0;
+            topProducts.forEach(prod => {
+                const matches = branchEntries.filter(e => (e.details?.trim() || 'Unspecified') === prod);
+                const sum = matches.reduce((s, e) => s + e.amount, 0);
+                const count = matches.length;
+                row[prod] = { amount: sum, count: count };
+                topSum += sum;
+                topCount += count;
+            });
+            row.others = { amount: row.total - topSum, count: row.count - topCount };
+            return row;
+        });
+
+        return { topData, bottomData, achievers, nilPerformers, categoryPanels, branchStats, matrixColumns: topProducts, matrixData };
+    }, [aggregatedData]);
+
+    const handleExport = async (panelId, title) => {
+        // If Bulk Export
+        if (panelId === 'all') {
+            const panels = [
+                { id: 'panel-overall-performance', title: 'Overall-Performance' },
+                { id: 'panel-Products-Sourced', title: 'Products-Sourced' },
+                ...categoryPanels.map(cat => ({ id: cat.id, title: cat.title })),
+                { id: 'panel-Branch-Performance', title: 'Branch-Performance' },
+                { id: 'panel-Branch-Matrix', title: 'Branch-Product-Matrix' },
+                { id: 'panel-Top-20%-Performers', title: 'Top-20-Performers' },
+                { id: 'panel-Bottom-20%-Performers', title: 'Bottom-20-Performers' },
+                { id: 'panel-Achievers-(100%+)', title: 'Achievers-100-Plus' },
+                { id: 'panel-Nil-Performers', title: 'Nil-Performers' }
+            ];
+
+            for (const panel of panels) {
+                await handleExport(panel.id, `${viewingCampaign.title}-${panel.title}`);
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+            return;
+        }
+
+        const element = document.getElementById(panelId);
+        if (!element) return;
+
+        // Create wrapper
+        const captureWrapper = document.createElement('div');
+        captureWrapper.style.position = 'absolute';
+        captureWrapper.style.left = '-9999px';
+        captureWrapper.style.top = '0';
+        // Wider canvas for Matrix panel to fit columns
+        captureWrapper.style.width = panelId === 'panel-Branch-Matrix' ? '2400px' : '1500px';
+        captureWrapper.style.backgroundColor = '#fff';
+        captureWrapper.style.padding = '40px';
+
+        // Direct DOM manipulation to guarantee styles apply
+        const applyStyles = (parent) => {
+            parent.querySelectorAll('.modern-list-table td').forEach(td => {
+                td.style.setProperty('padding', '12px 20px', 'important');
+                td.style.setProperty('height', 'auto', 'important');
+                td.style.setProperty('line-height', '1.3', 'important');
+            });
+
+            // Matrix Specific Styles
+            if (panelId === 'panel-Branch-Matrix') {
+                parent.querySelectorAll('.matrix-table th').forEach(th => {
+                    th.style.setProperty('font-size', '1.8rem', 'important');
+                    th.style.setProperty('padding', '16px 24px', 'important');
+                    th.style.setProperty('white-space', 'nowrap', 'important');
+                });
+                parent.querySelectorAll('.matrix-table td').forEach(td => {
+                    td.style.setProperty('font-size', '2rem', 'important'); // Base cell size
+                    td.style.setProperty('padding', '16px 24px', 'important');
+                });
+                parent.querySelectorAll('.matrix-table .fw-600').forEach(el => {
+                    el.style.setProperty('font-size', '2.2rem', 'important');
+                });
+                parent.querySelectorAll('.matrix-table .fw-bold').forEach(el => {
+                    el.style.setProperty('font-size', '2.4rem', 'important');
+                });
+                parent.querySelectorAll('.matrix-table .small').forEach(el => {
+                    el.style.setProperty('font-size', '1.4rem', 'important');
+                    el.style.setProperty('color', '#64748b', 'important');
+                });
+            } else {
+                // Standard List Styles (Existing)
+                parent.querySelectorAll('.fw-600').forEach(el => {
+                    el.style.setProperty('font-size', '3.5rem', 'important');
+                });
+                parent.querySelectorAll('.val-text').forEach(el => {
+                    el.style.setProperty('font-size', '3.5rem', 'important');
+                });
+            }
+
+            parent.querySelectorAll('.rank-circle').forEach(el => {
+                el.style.setProperty('width', '64px', 'important');
+                el.style.setProperty('height', '64px', 'important');
+                el.style.setProperty('font-size', '2.2rem', 'important');
+                el.style.setProperty('margin', '4px auto', 'important');
+            });
+
+            parent.querySelectorAll('.stat-value').forEach(el => {
+                el.style.setProperty('font-size', '1.8rem', 'important');
+                el.style.setProperty('white-space', 'nowrap', 'important');
+            });
+            parent.querySelectorAll('.stat-label').forEach(el => {
+                el.style.setProperty('font-size', '1rem', 'important');
+                el.style.setProperty('white-space', 'nowrap', 'important');
+            });
+            parent.querySelectorAll('.stat-icon-wrapper').forEach(el => {
+                el.style.setProperty('width', '56px', 'important');
+                el.style.setProperty('height', '56px', 'important');
+                el.style.setProperty('min-width', '56px', 'important');
+            });
+            const grid = parent.querySelector('.stat-grid-modern');
+            if (grid) {
+                grid.style.setProperty('display', 'grid', 'important');
+                grid.style.setProperty('grid-template-columns', 'repeat(4, 1fr)', 'important');
+                grid.style.setProperty('gap', '20px', 'important');
+            }
+        };
+
+        document.body.appendChild(captureWrapper);
+
+        const regionName = user?.region_name || user?.region_code ? `Region: ${user.region_name || user.region_code}` : '';
+        const headerHtml = `
+            <div style="padding:1rem;background:#fff;border-bottom:1px solid #e2e8f0;font-family:inherit;margin-bottom:1rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                    <div style="display:flex;align-items:center;gap:1.5rem;">
+                        <img src="${iobLogo}" style="height:80px;object-fit:contain;" />
+                        <h2 style="margin:0;font-size:2.5rem;color:#1e293b;font-weight:700;">Performance Overview</h2>
+                    </div>
+                    ${viewingCampaign.image ? `<img src="${viewingCampaign.image}" style="height:100px;width:auto;object-fit:contain;" />` : '<div></div>'}
+                </div>
+                <div style="text-align:center;">
+                    <h3 style="font-size:3.0rem;color:#0f172a;margin:0 0 0.5rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
+                    ${regionName ? `<p style="font-size:1.5rem;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
+                    <p style="font-size:1.4rem;color:#64748b;margin:0.5rem 0 0 0;font-weight:500;">
+                        Campaign Period: ${formatDate(viewingCampaign.startDate || viewingCampaign.start_date)} - ${formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}
+                    </p>
+                </div>
+            </div>`;
+        captureWrapper.innerHTML = headerHtml;
+
+        const clone = element.cloneNode(true);
+        clone.style.margin = '0';
+        clone.style.boxShadow = 'none';
+        const btn = clone.querySelector('.export-btn');
+        if (btn) btn.remove();
+
+        const scrollArea = clone.querySelector('.list-scroll');
+        if (scrollArea) {
+            scrollArea.style.maxHeight = 'none';
+            scrollArea.style.overflow = 'visible';
+        }
+        const panelHeader = clone.querySelector('h4');
+        if (panelHeader) {
+            panelHeader.style.fontSize = '2.4rem';
+            panelHeader.style.fontWeight = '800';
+        }
+
+        applyStyles(clone);
+        captureWrapper.appendChild(clone);
+
+        try {
+            const currentScrollY = window.scrollY;
+            window.scrollTo(0, 0);
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const canvas = await html2canvas(captureWrapper, {
+                useCORS: true,
+                scale: 2,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            });
+            const link = document.createElement('a');
+            link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            window.scrollTo(0, currentScrollY);
+        } catch (err) {
+            console.error("Export failed", err);
+            alert("Failed to export image. Please check console.");
+        } finally {
+            document.body.removeChild(captureWrapper);
+        }
+    };
 
 
     // Manual Entry Logic (Detail View)
@@ -614,211 +882,185 @@ const CampaignManager = ({ user }) => {
                         )}
 
                         {/* Infographics Tab */}
-                        {activeTab === 'infographics' && (() => {
-
-
-
-                            const sorted = [...aggregatedData].sort((a, b) => b.achievement - a.achievement);
-
-                            // Top 20% Logic
-                            const topCount20 = Math.ceil(aggregatedData.length * 0.20) || 1;
-                            const topData = sorted.slice(0, topCount20);
-
-                            // Bottom 20% Logic
-                            const sortedAsc = [...aggregatedData].sort((a, b) => a.achievement - b.achievement);
-                            const bottomData = sortedAsc.slice(0, topCount20);
-
-                            const achievers = aggregatedData
-                                .filter(r => r.target > 0 && r.achievement >= r.target)
-                                .sort((a, b) => {
-                                    const pctA = (a.achievement / a.target) * 100;
-                                    const pctB = (b.achievement / b.target) * 100;
-                                    return pctB - pctA;
-                                });
-
-                            const nilPerformers = aggregatedData.filter(r => r.achievement === 0);
-
-
-
-
-                            const handleExport = async (panelId, title) => {
-                                // If Bulk Export
-                                if (panelId === 'all') {
-                                    const panels = [
-                                        { id: 'panel-overall-performance', title: 'Overall-Performance' },
-                                        { id: 'panel-Top-20%-Performers', title: 'Top-20-Performers' },
-                                        { id: 'panel-Bottom-20%-Performers', title: 'Bottom-20-Performers' },
-                                        { id: 'panel-Achievers-(100%+)', title: 'Achievers-100-Plus' },
-                                        { id: 'panel-Nil-Performers', title: 'Nil-Performers' }
-                                    ];
-
-                                    for (const panel of panels) {
-                                        await handleExport(panel.id, `${viewingCampaign.title}-${panel.title}`);
-                                        // Small delay to prevent browser throttling downloads
-                                        await new Promise(resolve => setTimeout(resolve, 800));
-                                    }
-                                    return;
-                                }
-
-                                const element = document.getElementById(panelId);
-                                if (!element) return;
-
-                                // Create wrapper
-                                const captureWrapper = document.createElement('div');
-                                captureWrapper.style.position = 'absolute';
-                                captureWrapper.style.left = '-9999px';
-                                captureWrapper.style.top = '0';
-                                captureWrapper.style.width = Math.max(element.offsetWidth + 40, 800) + 'px'; // width + padding (min 800px)
-                                captureWrapper.style.backgroundColor = '#fff';
-                                captureWrapper.style.padding = '20px'; // Add margin around content
-
-                                // Inject Compact Styles for Image
-                                const style = document.createElement('style');
-                                style.innerHTML = `
-                                    .modern-list-table td { padding: 6px 8px !important; }
-                                    .modern-list-table .rank-circle { width: 28px; height: 28px; font-size: 0.85rem; }
-                                    .modern-list-table .fw-600 { font-size: 0.9rem; }
-                                `;
-                                captureWrapper.appendChild(style);
-                                document.body.appendChild(captureWrapper);
-
-                                // Inject Header
-                                // Layout: 
-                                // Row 1: Logo (Left) ... Campaign Image (Right)
-                                // Row 2: Title & Region
-                                const regionName = user?.region_name || user?.region_code ? `Region: ${user.region_name || user.region_code}` : '';
-
-                                const headerHtml = `
-                                    <div style="padding:1rem;background:#fff;border-bottom:1px solid #e2e8f0;font-family:inherit;margin-bottom:1rem;">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                                            <div style="display:flex;align-items:center;gap:1rem;">
-                                                <img src="${iobLogo}" style="height:60px;object-fit:contain;" />
-                                                <h2 style="margin:0;font-size:1.5rem;color:#1e293b;font-weight:700;">Performance Overview</h2>
-                                            </div>
-                                            ${viewingCampaign.image ? `<img src="${viewingCampaign.image}" style="height:80px;width:auto;object-fit:contain;" />` : '<div></div>'}
-                                        </div>
-                                        <div style="text-align:center;">
-                                            <h3 style="font-size:1.8rem;color:#0f172a;margin:0 0 0.25rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
-                                            ${regionName ? `<p style="font-size:1rem;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
-                                            <p style="font-size:0.9rem;color:#64748b;margin:0.25rem 0 0 0;font-weight:500;">
-                                                Campaign Period: ${formatDate(viewingCampaign.startDate || viewingCampaign.start_date)} - ${formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    `;
-                                captureWrapper.innerHTML = headerHtml;
-
-                                // Clone Panel
-                                const clone = element.cloneNode(true);
-                                clone.style.margin = '0';
-                                clone.style.boxShadow = 'none';
-                                // Removed lines that stripped border and radius to preserve "Achievers" top bar style
-
-                                // Remove export button from clone
-                                const btn = clone.querySelector('.export-btn');
-                                if (btn) btn.remove();
-
-                                // Expand list to show all items
-                                const scrollArea = clone.querySelector('.list-scroll');
-                                if (scrollArea) {
-                                    scrollArea.style.maxHeight = 'none';
-                                    scrollArea.style.overflow = 'visible';
-                                }
-
-                                // Make Header Prominent
-                                const panelHeader = clone.querySelector('h4');
-                                if (panelHeader) {
-                                    panelHeader.style.fontSize = '1.4rem';
-                                    panelHeader.style.fontWeight = '800';
-                                }
-
-                                captureWrapper.appendChild(clone);
-
-                                try {
-                                    const currentScrollY = window.scrollY;
-                                    window.scrollTo(0, 0); // Scroll to top to ensure no cropping
-                                    await new Promise(resolve => setTimeout(resolve, 300)); // Wait for scroll
-
-                                    const canvas = await html2canvas(captureWrapper, {
-                                        useCORS: true,
-                                        scale: 2, // Retina quality
-                                        backgroundColor: '#ffffff',
-                                        scrollX: 0,
-                                        scrollY: 0 // We already scrolled to 0
-                                    });
-                                    const link = document.createElement('a');
-                                    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
-                                    link.href = canvas.toDataURL('image/png');
-                                    link.click();
-                                    window.scrollTo(0, currentScrollY); // Restore just in case
-                                } catch (err) {
-                                    console.error("Export failed", err);
-                                    alert("Failed to export image. Please check console.");
-                                } finally {
-                                    document.body.removeChild(captureWrapper);
-                                }
-                            };
-
-
-
-                            // formatNumber is now imported from utils
-                            // handleExport and ListPanel are already defined above or need to be preserved if they were overwritten
-
-                            return (
-                                <div className="infographics-wrapper">
-                                    <div className="flex-row-between" style={{ marginBottom: '1rem', alignItems: 'center' }}>
-                                        <h4 style={{ margin: 0, color: '#64748b' }}>Detailed Performance Analytics</h4>
-                                        <button
-                                            onClick={() => handleExport('all', 'all')}
-                                            className="btn btn-primary"
-                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                                        >
-                                            <Download size={18} /> Export All Panels
-                                        </button>
-                                    </div>
-                                    {/* Renamed class to bypass cache and force new layout */}
-                                    <div id="infographics-export-container" className="stats-view-grid animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%' }}>
-                                        {/* Overview Stats */}
-                                        <div id="panel-overall-performance" className="stats-view-card">
-                                            <div className="big-stat-row">
-                                                <div className="stat-boxes flex-row-center">
-                                                    <div className="stat-box">
-                                                        <div className="label">Start Date</div>
-                                                        <div className="value-sm">{formatDate(viewingCampaign.startDate || viewingCampaign.start_date)}</div>
-                                                    </div>
-                                                    <div className="stat-box">
-                                                        <div className="label">End Date</div>
-                                                        <div className="value-sm">{formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}</div>
-                                                    </div>
-                                                    <div className="stat-box">
-                                                        <div className="label">{viewingCampaign.type === 'Reduction' ? 'Base Data' : 'Region Target'}</div>
-                                                        <div className="value">{formatNumber(totalTarget)}</div>
-                                                    </div>
-                                                    <div className="stat-box highlight">
-                                                        <div className="label">{viewingCampaign.type === 'Reduction' ? 'Current Level' : 'Total Achievement'}</div>
-                                                        <div className="value" style={{ color: Number(percent) >= 100 ? '#16a34a' : '#2563eb' }}>{formatNumber(totalAchv)}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="overall-progress">
-                                                    <div className="progress-label-row">
-                                                        <span>{viewingCampaign.type === 'Reduction' ? 'Reduction Status' : 'Completion Status'}</span>
-                                                        <span className="fw-bold">{percent}%</span>
-                                                    </div>
-                                                    <div className="progress-bar-container large">
-                                                        <div className="progress-bar-fill" style={{ width: `${progressPercent}%`, backgroundColor: Number(percent) >= 100 ? '#22c55e' : '#3b82f6' }}></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
-                                        <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
-                                        <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
-                                        <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
-                                    </div>
+                        {activeTab === 'infographics' && (
+                            <div className="infographics-wrapper">
+                                <div className="flex-row-between" style={{ marginBottom: '1rem', alignItems: 'center' }}>
+                                    <h4 style={{ margin: 0, color: '#64748b' }}>Detailed Performance Analytics</h4>
+                                    <button
+                                        onClick={() => handleExport('all', 'Campaign-Report')}
+                                        className="btn btn-primary"
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                    >
+                                        <Download size={18} /> Export All Panels
+                                    </button>
                                 </div>
-                            );
-                        })()}
+                                <div id="infographics-export-container" className="stats-view-grid animate-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%' }}>
+
+                                    {/* Overall Performance Panel */}
+                                    <div id="panel-overall-performance" className="info-panel card">
+                                        <div className="panel-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
+                                            <div className="icon-box primary">
+                                                <Target size={20} />
+                                            </div>
+                                            <h4 style={{ flex: 1, margin: 0 }}>Overall Performance</h4>
+                                            <button onClick={() => handleExport('panel-overall-performance', 'Overall-Performance')} className="export-btn" title="Export Image">
+                                                <Share2 size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="panel-body">
+                                            <div className="stat-grid-modern" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                                                <div className="stat-item-modern">
+                                                    <div className="stat-icon-wrapper blue"><Target size={20} /></div>
+                                                    <div className="stat-content"><span className="stat-value">{formatNumber(totalTarget)}</span><span className="stat-label">Total Target</span></div>
+                                                </div>
+                                                <div className="stat-item-modern">
+                                                    <div className="stat-icon-wrapper green"><Award size={20} /></div>
+                                                    <div className="stat-content"><span className="stat-value">{formatNumber(totalAchv)}</span><span className="stat-label">Achievement</span></div>
+                                                </div>
+                                                <div className="stat-item-modern">
+                                                    <div className="stat-icon-wrapper purple"><List size={20} /></div>
+                                                    <div className="stat-content"><span className="stat-value">{aggregatedData.filter(d => d.achievement > 0).length} / {aggregatedData.length}</span><span className="stat-label">Participating</span></div>
+                                                </div>
+                                                <div className="stat-item-modern">
+                                                    <div className="stat-icon-wrapper orange"><CheckCircle size={20} /></div>
+                                                    <div className="stat-content"><span className="stat-value">{aggregatedData.filter(d => d.target > 0 && d.achievement >= d.target).length}</span><span className="stat-label">Achievers</span></div>
+                                                </div>
+                                            </div>
+                                            <div className="overall-progress">
+                                                <div className="progress-label-row">
+                                                    <span>{viewingCampaign.type === 'Reduction' ? 'Reduction Status' : 'Completion Status'}</span>
+                                                    <span className="fw-bold">{percent}%</span>
+                                                </div>
+                                                <div className="progress-bar-container large">
+                                                    <div className="progress-bar-fill" style={{ width: `${progressPercent}%`, backgroundColor: Number(percent) >= 100 ? '#22c55e' : '#3b82f6' }}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Products Sourced Panel */}
+                                    <div id="panel-Products-Sourced" className="info-panel card">
+                                        <div className="panel-header">
+                                            <div className="icon-box" style={{ backgroundColor: '#e0f2fe', color: '#0ea5e9' }}>
+                                                <List size={20} />
+                                            </div>
+                                            <h4 style={{ flex: 1 }}>Products Sourced</h4>
+                                            <button onClick={() => handleExport('panel-Products-Sourced', 'Products-Sourced')} className="export-btn" title="Export Image">
+                                                <Share2 size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="list-scroll">
+                                            <table className="modern-list-table">
+                                                <tbody>
+                                                    {productStats.map((p, i) => (
+                                                        <tr key={i}>
+                                                            <td className="info-col">
+                                                                <div className="fw-600">{p.product}</div>
+                                                                <div className="text-muted small">{p.count} entries</div>
+                                                            </td>
+                                                            <td className="val-col text-right">
+                                                                <div className="val-text">{formatNumber(p.amount)}</div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                    {productStats.length === 0 && <tr><td colSpan="2" className="text-center text-muted">No product data</td></tr>}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {/* Branch Product Matrix Panel (Pivot) */}
+                                    <div id="panel-Branch-Matrix" className="info-panel card full-width-panel" style={{ gridColumn: '1 / -1' }}>
+                                        <div className="panel-header">
+                                            <div className="icon-box" style={{ backgroundColor: '#fdf4ff', color: '#c026d3' }}>
+                                                <List size={20} />
+                                            </div>
+                                            <h4 style={{ flex: 1 }}>Branch Product Matrix</h4>
+                                            <button onClick={() => handleExport('panel-Branch-Matrix', 'Branch-Product-Matrix')} className="export-btn" title="Export Image">
+                                                <Share2 size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="list-scroll">
+                                            <table className="modern-list-table matrix-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Branch</th>
+                                                        {matrixColumns.map((col, i) => <th key={i} className="text-right">{col}</th>)}
+                                                        <th className="text-right">Others</th>
+                                                        <th className="text-right fw-bold">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {matrixData.map((row, i) => (
+                                                        <tr key={i}>
+                                                            <td className="fw-600">{row.name} ({row.id})</td>
+                                                            {matrixColumns.map((col, j) => (
+                                                                <td key={j} className="text-right mono">
+                                                                    <div className="fw-bold">{row[col]?.amount ? formatNumber(row[col].amount) : '-'}</div>
+                                                                    {row[col]?.count > 0 && <div className="text-muted small" style={{ fontSize: '0.7rem' }}>{row[col].count}</div>}
+                                                                </td>
+                                                            ))}
+                                                            <td className="text-right mono text-muted">
+                                                                <div className="fw-bold">{row.others?.amount ? formatNumber(row.others.amount) : '-'}</div>
+                                                                {row.others?.count > 0 && <div className="text-muted small" style={{ fontSize: '0.7rem' }}>{row.others.count}</div>}
+                                                            </td>
+                                                            <td className="text-right mono fw-bold">{formatNumber(row.total)}</td>
+                                                        </tr>
+                                                    ))}
+                                                    {matrixData.length === 0 && <tr><td colSpan={matrixColumns.length + 3} className="text-center text-muted">No branch data</td></tr>}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {/* Category Panels */}
+                                    {categoryPanels.map(panel => (
+                                        <ListPanel key={panel.id} title={panel.title} icon={<Target size={20} />} color="#6366f1" data={panel.data} />
+                                    ))}
+
+                                    {/* Branch Performance Panel (Count & Achievement) */}
+                                    <div id="panel-Branch-Performance" className="info-panel card">
+                                        <div className="panel-header">
+                                            <div className="icon-box" style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+                                                <BarChart2 size={20} />
+                                            </div>
+                                            <h4 style={{ flex: 1 }}>Branch Performance</h4>
+                                            <button onClick={() => handleExport('panel-Branch-Performance', 'Branch-Performance')} className="export-btn" title="Export Image">
+                                                <Share2 size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="list-scroll">
+                                            <table className="modern-list-table">
+                                                <tbody>
+                                                    {branchStats.map((p, i) => (
+                                                        <tr key={i}>
+                                                            <td className="info-col">
+                                                                <div className="fw-600">{p.name} ({p.id})</div>
+                                                                <div className="text-muted small">{p.count || 0} entries</div>
+                                                            </td>
+                                                            <td className="val-col text-right">
+                                                                <div className="val-text">{formatNumber(p.achievement)}</div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                    {branchStats.length === 0 && <tr><td colSpan="2" className="text-center text-muted">No branch data</td></tr>}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <ListPanel title="Top 20% Performers" icon={<TrendingUp size={20} />} color="#16a34a" data={topData} />
+                                    <ListPanel title="Bottom 20% Performers" icon={<TrendingDown size={20} />} color="#dc2626" data={bottomData} />
+                                    <ListPanel title="Achievers (100%+)" icon={<Award size={20} />} color="#ca8a04" data={achievers} showPercentage={true} />
+                                    <ListPanel title="Nil Performers" icon={<AlertTriangle size={20} />} color="#dc2626" data={nilPerformers} className="danger-striped" />
+                                </div>
+                            </div>
+                        )}
+
+
+
+
+
                     </div>
                 </div >
 

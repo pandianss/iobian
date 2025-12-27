@@ -4,6 +4,7 @@ import iobLogo from '../../assets/iob_logo.svg';
 const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
     const lh = { logo: iobLogo };
     const [viewMode, setViewMode] = useState('edit'); // 'edit' | 'preview'
+    const [showWorksheet, setShowWorksheet] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
 
     const steps = [
@@ -187,7 +188,9 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
         if (parse(formData.advanceGrowth) > 0) {
             calcProspectsAdv = (parse(formData.advanceGrowth) * workingDays);
             if (parse(formData.yieldOnAdvance) > 0) {
-                calcIntAdv = (parse(formData.advanceGrowth) * 182.5 * (parse(formData.yieldOnAdvance) / 100));
+                // Formula: (Total Growth * Rate) / 2
+                // Represents interest on a linearly growing balance over the year
+                calcIntAdv = (parse(formData.advanceGrowth) * workingDays * (parse(formData.yieldOnAdvance) / 100)) / 2;
             }
         }
 
@@ -206,7 +209,8 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
         if (parse(formData.depositGrowth) > 0) {
             calcProspectsDep = (parse(formData.depositGrowth) * workingDays);
             if (parse(formData.costOfDeposit) > 0) {
-                calcIntDep = (parse(formData.depositGrowth) * 182.5 * (parse(formData.costOfDeposit) / 100));
+                // Formula: (Total Growth * Rate) / 2
+                calcIntDep = (parse(formData.depositGrowth) * workingDays * (parse(formData.costOfDeposit) / 100)) / 2;
             }
         }
 
@@ -218,8 +222,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
             parse(formData.stationeryMisc) +
             calcRent +
             calcIntDep +
-            parse(formData.interestBorrowed) +
-            parse(formData.estCharges); // Added estCharges to totalExp calculation just in case it was missing
+            parse(formData.interestBorrowed);
 
         const profit = totalInc - totalExp;
 
@@ -642,7 +645,10 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                 </div>
 
                                 <div className="mt-6 p-4 border rounded dashed">
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Calculators (Optional)</h4>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        Calculators (Optional)
+                                        <button onClick={(e) => { e.preventDefault(); setShowWorksheet(true); }} style={{ fontSize: '0.75rem', background: '#3b82f6', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Show Worksheet</button>
+                                    </h4>
                                     <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', fontSize: '0.85rem' }}>
                                         <div><label>Daily Deposit Growth</label><input className="input" value={formData.depositGrowth} onChange={e => handleChange('depositGrowth', e.target.value)} /></div>
                                         <div><label>Cost of Deposit (%)</label><input className="input" value={formData.costOfDeposit} onChange={e => handleChange('costOfDeposit', e.target.value)} /></div>
@@ -653,6 +659,17 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                     </div>
                                 </div>
                             </div>
+                        )}
+
+                        {showWorksheet && (
+                            <InterestWorksheet
+                                onClose={() => setShowWorksheet(false)}
+                                data={{
+                                    growth: parseFloat(formData.depositGrowth) > 0 ? formData.depositGrowth : formData.advanceGrowth,
+                                    rate: parseFloat(formData.depositGrowth) > 0 ? formData.costOfDeposit : formData.yieldOnAdvance,
+                                    workingDays: 365 - 52 - 24 - (parseFloat(formData.manualHolidays) || 0)
+                                }}
+                            />
                         )}
 
                         {currentStep === 6 && (
@@ -1388,6 +1405,127 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                     .page-break { page-break-before: always !important; }
                 }
             `}</style>
+        </div>
+    );
+};
+
+
+// Helper Component for Interest Worksheet
+const InterestWorksheet = ({ onClose, data }) => {
+    const { growth, rate, workingDays, totalDays = 365 } = data;
+
+    // Simulate Ledger
+    const ledger = [];
+    let balance = 0;
+    let totalInterest = 0;
+    let totalCredit = 0;
+
+    // Distribute working days uniformly
+    const holidayProbability = 1 - (workingDays / totalDays);
+
+    // We'll create a deterministic uniform distribution for the simulation
+    let workingDaysCounted = 0;
+
+    for (let day = 1; day <= totalDays; day++) {
+        let isWorking = false;
+
+        // Simple logic to distribute working days evenly
+        // We want to fit 'workingDays' into 'totalDays'
+        // Target accumulated working days at this point = (day / totalDays) * workingDays
+        const targetWorkingDays = Math.ceil((day / totalDays) * workingDays);
+        if (targetWorkingDays > workingDaysCounted) {
+            isWorking = true;
+            workingDaysCounted++;
+        }
+
+        const credit = isWorking ? parseFloat(growth) : 0;
+        balance += credit;
+        const dailyInterest = (balance * (rate / 100)) / 365;
+
+        totalInterest += dailyInterest;
+        totalCredit += credit;
+
+        ledger.push({
+            day,
+            isWorking,
+            credit,
+            balance,
+            interest: dailyInterest
+        });
+    }
+
+    return (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+        }}>
+            <div className="card" style={{ width: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: '0' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0 }}>Interest Calculation Worksheet (Simulation)</h3>
+                    <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                </div>
+
+                <div style={{ padding: '1rem', background: '#f8fafc', borderBottom: '1px solid #e5e7eb', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', fontSize: '0.9rem' }}>
+                    <div><strong>Daily Growth:</strong> {growth}</div>
+                    <div><strong>Working Days:</strong> {workingDays} / {totalDays}</div>
+                    <div><strong>Interest Rate:</strong> {rate}%</div>
+                    <div><strong>Total Interest:</strong> {totalInterest.toFixed(2)}</div>
+                </div>
+
+                <div style={{ padding: '0.5rem 1rem', background: '#fffbeb', fontSize: '0.8rem', borderBottom: '1px solid #e5e7eb', color: '#92400e' }}>
+                    <strong>Note:</strong> Interest is calculated daily on the closing balance. "Cumulative Int" matches the logic: <em>(Day 1 Balance × Rate/365) + (Day 2 Balance × Rate/365)...</em>
+                </div>
+
+                <div style={{ overflowY: 'auto', flex: 1, padding: '1rem' }}>
+                    <table className="form-table" style={{ width: '100%', fontSize: '0.85rem', textAlign: 'right' }}>
+                        <thead style={{ position: 'sticky', top: 0, background: 'white' }}>
+                            <tr style={{ background: '#f1f5f9' }}>
+                                <th style={{ textAlign: 'center', padding: '8px' }}>Day</th>
+                                <th style={{ textAlign: 'center', padding: '8px' }}>Type</th>
+                                <th style={{ padding: '8px' }}>Credit</th>
+                                <th style={{ padding: '8px' }}>Balance (Product)</th>
+                                <th style={{ padding: '8px' }}>Daily Int.</th>
+                                <th style={{ padding: '8px' }}>Cum. Int.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ledger.map((row, i) => {
+                                // Show first 10, last 10, and every 30th day to keep DOM light
+                                if (i < 10 || i > 355 || i % 30 === 0) {
+                                    let cumInt = 0;
+                                    for (let j = 0; j <= i; j++) cumInt += ledger[j].interest;
+
+                                    return (
+                                        <tr key={row.day} style={{ background: row.isWorking ? 'white' : '#fff1f2' }}>
+                                            <td style={{ textAlign: 'center', padding: '6px' }}>{row.day}</td>
+                                            <td style={{ textAlign: 'center', padding: '6px', color: row.isWorking ? '#16a34a' : '#ef4444' }}>
+                                                {row.isWorking ? 'Working' : 'Holiday'}
+                                            </td>
+                                            <td style={{ padding: '6px' }}>{row.credit.toFixed(2)}</td>
+                                            <td style={{ padding: '6px', fontWeight: 'bold' }}>{row.balance.toFixed(2)}</td>
+                                            <td style={{ padding: '6px' }}>{row.interest.toFixed(4)}</td>
+                                            <td style={{ padding: '6px' }}>{cumInt.toFixed(2)}</td>
+                                        </tr>
+                                    );
+                                }
+                                if (i === 10) {
+                                    return <tr key="skip"><td colSpan="6" style={{ textAlign: 'center', color: '#94a3b8' }}>... (Skipping intermediate rows) ...</td></tr>;
+                                }
+                                return null;
+                            })}
+                        </tbody>
+                        <tfoot style={{ position: 'sticky', bottom: 0, background: '#f8fafc', fontWeight: 'bold' }}>
+                            <tr>
+                                <td colSpan="2" style={{ textAlign: 'center', padding: '8px' }}>Totals</td>
+                                <td style={{ padding: '8px' }}>{totalCredit.toFixed(2)}</td>
+                                <td style={{ padding: '8px' }}>-</td>
+                                <td style={{ padding: '8px' }}>-</td>
+                                <td style={{ padding: '8px' }}>{totalInterest.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
