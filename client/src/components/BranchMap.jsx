@@ -10,6 +10,7 @@ const BranchMap = ({ branches, regionName }) => {
     const canvasRef = useRef(null);
     const [selectedBranch, setSelectedBranch] = useState(null);
     const [hoveredBranch, setHoveredBranch] = useState(null);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         if (!branches || branches.length === 0) return;
@@ -195,6 +196,9 @@ const BranchMap = ({ branches, regionName }) => {
         const moveX = (e.clientX - rect.left) * scaleX;
         const moveY = (e.clientY - rect.top) * scaleY;
 
+        // Store mouse position relative to canvas container
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
         const hovered = canvas.coords.findIndex(c => {
             const dist = Math.sqrt((c.x - moveX) ** 2 + (c.y - moveY) ** 2);
             return dist < 10;
@@ -248,11 +252,11 @@ const BranchMap = ({ branches, regionName }) => {
 
                 {hoveredBranch !== null && !selectedBranch && branches[hoveredBranch] && (
                     <div
-                        className="absolute bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-none"
+                        className="absolute bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-none whitespace-nowrap"
                         style={{
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -120%)',
+                            left: `${mousePos.x}px`,
+                            top: `${mousePos.y - 40}px`,
+                            transform: 'translateX(-50%)',
                             zIndex: 1000
                         }}
                     >

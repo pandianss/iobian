@@ -315,8 +315,14 @@ const RegionTemplate = () => {
                 <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-gray-900 truncate">{member.full_name}</h4>
                     <p className="text-xs text-gray-500 uppercase tracking-wide">{member.designation}</p>
-                    {member.department && (
-                        <p className="text-xs text-blue-600 font-medium mt-1">{member.department}</p>
+                    {member.departments && member.departments.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                            {member.departments.map((dept, idx) => (
+                                <span key={idx} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 font-medium">
+                                    {dept}
+                                </span>
+                            ))}
+                        </div>
                     )}
                 </div>
                 <div className="text-right">
@@ -326,6 +332,34 @@ const RegionTemplate = () => {
                 </div>
             </div>
         );
+
+        // Group team members by department
+        const groupByDepartment = () => {
+            const departmentGroups = {};
+            const noDepartment = [];
+
+            orgData.team.forEach(member => {
+                if (!member.departments || member.departments.length === 0) {
+                    noDepartment.push(member);
+                } else {
+                    member.departments.forEach((dept, idx) => {
+                        const deptCode = member.department_codes?.[idx] || dept;
+                        if (!departmentGroups[dept]) {
+                            departmentGroups[dept] = { heads: [], officers: [], code: deptCode };
+                        }
+                        if (member.is_department_head) {
+                            departmentGroups[dept].heads.push(member);
+                        } else {
+                            departmentGroups[dept].officers.push(member);
+                        }
+                    });
+                }
+            });
+
+            return { departmentGroups, noDepartment };
+        };
+
+        const { departmentGroups, noDepartment } = groupByDepartment();
 
         return (
             <div className="min-h-[calc(100vh-80px)] bg-slate-50 flex flex-col items-center p-4 py-20">
@@ -362,16 +396,62 @@ const RegionTemplate = () => {
                             </div>
                         </div>
 
-                        {/* RO Team Section */}
-                        <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300 pb-8">
-                            <h4 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-                                <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                                Regional Office Team
-                            </h4>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                {orgData.team.map(member => renderStaffCard(member))}
+                        {/* Department Hierarchy Section */}
+                        {Object.keys(departmentGroups).length > 0 && (
+                            <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300 pb-8">
+                                <h4 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                                    Department Structure
+                                </h4>
+                                <div className="space-y-6">
+                                    {Object.entries(departmentGroups).map(([deptName, { heads, officers }]) => (
+                                        <div key={deptName} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                                            <h5 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                                <Briefcase size={16} className="text-blue-600" />
+                                                {deptName}
+                                            </h5>
+
+                                            {/* Department Heads */}
+                                            {heads.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                                        <ChevronRight size={12} /> Department Head{heads.length > 1 ? 's' : ''}
+                                                    </p>
+                                                    <div className="ml-4 space-y-2">
+                                                        {heads.map(member => renderStaffCard(member, true))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Department Officers */}
+                                            {officers.length > 0 && (
+                                                <div className="ml-4 pl-4 border-l-2 border-dashed border-gray-200">
+                                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                                        <ChevronRight size={12} /> Officer{officers.length > 1 ? 's' : ''}
+                                                    </p>
+                                                    <div className="space-y-2">
+                                                        {officers.map(member => renderStaffCard(member))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Other RO Team Members (No Department) */}
+                        {noDepartment.length > 0 && (
+                            <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300 pb-8">
+                                <h4 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-gray-400"></span>
+                                    Other Regional Office Staff
+                                </h4>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {noDepartment.map(member => renderStaffCard(member))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Branches Section */}
                         <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300">
