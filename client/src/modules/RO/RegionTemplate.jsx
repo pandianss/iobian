@@ -333,33 +333,28 @@ const RegionTemplate = () => {
             </div>
         );
 
-        // Group team members by department
-        const groupByDepartment = () => {
-            const departmentGroups = {};
-            const noDepartment = [];
+        // Group team members by hierarchy (heads vs officers) - each user appears once
+        const groupByHierarchy = () => {
+            const heads = [];
+            const officers = [];
+            const seen = new Set();
 
             orgData.team.forEach(member => {
-                if (!member.departments || member.departments.length === 0) {
-                    noDepartment.push(member);
+                // Avoid duplicates - each user appears only once
+                if (seen.has(member.full_name)) return;
+                seen.add(member.full_name);
+
+                if (member.is_department_head) {
+                    heads.push(member);
                 } else {
-                    member.departments.forEach((dept, idx) => {
-                        const deptCode = member.department_codes?.[idx] || dept;
-                        if (!departmentGroups[dept]) {
-                            departmentGroups[dept] = { heads: [], officers: [], code: deptCode };
-                        }
-                        if (member.is_department_head) {
-                            departmentGroups[dept].heads.push(member);
-                        } else {
-                            departmentGroups[dept].officers.push(member);
-                        }
-                    });
+                    officers.push(member);
                 }
             });
 
-            return { departmentGroups, noDepartment };
+            return { heads, officers };
         };
 
-        const { departmentGroups, noDepartment } = groupByDepartment();
+        const { heads, officers } = groupByHierarchy();
 
         return (
             <div className="min-h-[calc(100vh-80px)] bg-slate-50 flex flex-col items-center p-4 py-20">
@@ -396,87 +391,57 @@ const RegionTemplate = () => {
                             </div>
                         </div>
 
-                        {/* Department Hierarchy Section - Organic Tree */}
-                        {Object.keys(departmentGroups).length > 0 && (
+                        {/* RO Staff Hierarchy - Organic Tree */}
+                        {(heads.length > 0 || officers.length > 0) && (
                             <div className="ml-8 pb-8 relative">
                                 <h4 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
                                     <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                                    Department Structure
+                                    Regional Office Staff
                                 </h4>
-                                <div className="space-y-8">
-                                    {Object.entries(departmentGroups).map(([deptName, { heads, officers }], deptIndex) => (
-                                        <div key={deptName} className="relative">
-                                            {/* Curved connector from main trunk */}
-                                            <svg className="absolute left-0 top-8" width="40" height="60" style={{ transform: 'translateX(-40px)' }}>
-                                                <path d="M 0 0 Q 20 0, 40 30" stroke="#94a3b8" strokeWidth="2" fill="none" />
-                                            </svg>
 
-                                            <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl border-2 border-blue-200 p-5 shadow-md">
-                                                <h5 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                                                    <Briefcase size={18} className="text-blue-600" />
-                                                    {deptName}
-                                                </h5>
-
-                                                {/* Department Heads - Highlighted */}
-                                                {heads.length > 0 && (
-                                                    <div className="mb-4">
-                                                        <div className="flex items-center gap-2 mb-3">
-                                                            <div className="h-px flex-1 bg-gradient-to-r from-orange-300 to-transparent"></div>
-                                                            <span className="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full">Department Head{heads.length > 1 ? 's' : ''}</span>
-                                                            <div className="h-px flex-1 bg-gradient-to-l from-orange-300 to-transparent"></div>
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            {heads.map(member => renderStaffCard(member, true))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Department Officers - Branching from Head */}
-                                                {officers.length > 0 && (
-                                                    <div className="relative pl-8">
-                                                        {/* Organic curved connector */}
-                                                        <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${officers.length * 80}px` }}>
-                                                            <defs>
-                                                                <linearGradient id={`grad-${deptIndex}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                                                    <stop offset="0%" style={{ stopColor: '#cbd5e1', stopOpacity: 1 }} />
-                                                                    <stop offset="100%" style={{ stopColor: '#e2e8f0', stopOpacity: 0.3 }} />
-                                                                </linearGradient>
-                                                            </defs>
-                                                            {officers.map((_, idx) => (
-                                                                <path
-                                                                    key={idx}
-                                                                    d={`M 0 ${idx * 80 + 40} Q 16 ${idx * 80 + 40}, 32 ${idx * 80 + 40}`}
-                                                                    stroke={`url(#grad-${deptIndex})`}
-                                                                    strokeWidth="2"
-                                                                    fill="none"
-                                                                />
-                                                            ))}
-                                                        </svg>
-                                                        <div className="flex items-center gap-2 mb-3">
-                                                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide bg-blue-50 px-2 py-1 rounded">Officer{officers.length > 1 ? 's' : ''}</span>
-                                                        </div>
-                                                        <div className="space-y-3">
-                                                            {officers.map(member => renderStaffCard(member))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                {/* Department Heads - Highlighted */}
+                                {heads.length > 0 && (
+                                    <div className="mb-6">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="h-px flex-1 bg-gradient-to-r from-orange-300 to-transparent"></div>
+                                            <span className="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border-2 border-orange-300">Department Head{heads.length > 1 ? 's' : ''}</span>
+                                            <div className="h-px flex-1 bg-gradient-to-l from-orange-300 to-transparent"></div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {heads.map(member => renderStaffCard(member, true))}
+                                        </div>
+                                    </div>
+                                )}
 
-                        {/* Other RO Team Members (No Department) */}
-                        {noDepartment.length > 0 && (
-                            <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300 pb-8">
-                                <h4 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                                    Other Regional Office Staff
-                                </h4>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    {noDepartment.map(member => renderStaffCard(member))}
-                                </div>
+                                {/* Officers - Branching from Heads */}
+                                {officers.length > 0 && (
+                                    <div className="relative pl-8">
+                                        {/* Organic curved connectors */}
+                                        <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${Math.ceil(officers.length / 2) * 160}px` }}>
+                                            <defs>
+                                                <linearGradient id="ro-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" style={{ stopColor: '#cbd5e1', stopOpacity: 1 }} />
+                                                    <stop offset="100%" style={{ stopColor: '#e2e8f0', stopOpacity: 0.3 }} />
+                                                </linearGradient>
+                                            </defs>
+                                            {officers.map((_, idx) => (
+                                                <path
+                                                    key={idx}
+                                                    d={`M 0 ${Math.floor(idx / 2) * 160 + 80} Q 16 ${Math.floor(idx / 2) * 160 + 80}, 32 ${Math.floor(idx / 2) * 160 + 80}`}
+                                                    stroke="url(#ro-grad)"
+                                                    strokeWidth="2"
+                                                    fill="none"
+                                                />
+                                            ))}
+                                        </svg>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide bg-blue-50 px-2 py-1 rounded">Officer{officers.length > 1 ? 's' : ''}</span>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {officers.map(member => renderStaffCard(member))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
