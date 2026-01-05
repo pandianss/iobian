@@ -1498,18 +1498,33 @@ app.get('/api/public/region/:code/org', (req, res) => {
         );
 
         const formatUser = (u, officeName) => {
-            // Map department code to name
-            let departmentName = null;
+            // Map all department codes to names
+            let departments = [];
+            let departmentCodes = [];
             if (u.departments && u.departments.length > 0) {
-                const deptCode = String(u.departments[0]);
-                const dept = mockData.departments.find(d => String(d.code) === deptCode);
-                departmentName = dept ? dept.name : null;
+                departments = u.departments
+                    .map(deptCode => {
+                        const dept = mockData.departments ? mockData.departments.find(d => String(d.code) === String(deptCode)) : null;
+                        if (dept) {
+                            departmentCodes.push(String(deptCode));
+                            return dept.name;
+                        }
+                        return null;
+                    })
+                    .filter(name => name !== null);
             }
+
+            // Determine if user is a department head (Chief Manager or higher rank)
+            const headDesignations = ['Chief Manager', 'Senior Manager', 'Assistant General Manager',
+                'Senior Regional Manager', 'Chief Regional Manager', 'General Manager'];
+            const isDepartmentHead = departments.length > 0 && headDesignations.includes(u.designation);
 
             return {
                 full_name: u.full_name,
                 designation: u.designation,
-                department: departmentName,
+                departments: departments, // Array of department names
+                department_codes: departmentCodes, // Array of department codes
+                is_department_head: isDepartmentHead,
                 photo: u.photo_url || null,
                 office: officeName || 'Branch Office',
                 mobile: u.mobile || 'N/A',
