@@ -396,44 +396,71 @@ const RegionTemplate = () => {
                             </div>
                         </div>
 
-                        {/* Department Hierarchy Section */}
+                        {/* Department Hierarchy Section - Organic Tree */}
                         {Object.keys(departmentGroups).length > 0 && (
-                            <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300 pb-8">
+                            <div className="ml-8 pb-8 relative">
                                 <h4 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
                                     <span className="w-3 h-3 rounded-full bg-blue-500"></span>
                                     Department Structure
                                 </h4>
-                                <div className="space-y-6">
-                                    {Object.entries(departmentGroups).map(([deptName, { heads, officers }]) => (
-                                        <div key={deptName} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                                            <h5 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                                <Briefcase size={16} className="text-blue-600" />
-                                                {deptName}
-                                            </h5>
+                                <div className="space-y-8">
+                                    {Object.entries(departmentGroups).map(([deptName, { heads, officers }], deptIndex) => (
+                                        <div key={deptName} className="relative">
+                                            {/* Curved connector from main trunk */}
+                                            <svg className="absolute left-0 top-8" width="40" height="60" style={{ transform: 'translateX(-40px)' }}>
+                                                <path d="M 0 0 Q 20 0, 40 30" stroke="#94a3b8" strokeWidth="2" fill="none" />
+                                            </svg>
 
-                                            {/* Department Heads */}
-                                            {heads.length > 0 && (
-                                                <div className="mb-3">
-                                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-                                                        <ChevronRight size={12} /> Department Head{heads.length > 1 ? 's' : ''}
-                                                    </p>
-                                                    <div className="ml-4 space-y-2">
-                                                        {heads.map(member => renderStaffCard(member, true))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl border-2 border-blue-200 p-5 shadow-md">
+                                                <h5 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                                                    <Briefcase size={18} className="text-blue-600" />
+                                                    {deptName}
+                                                </h5>
 
-                                            {/* Department Officers */}
-                                            {officers.length > 0 && (
-                                                <div className="ml-4 pl-4 border-l-2 border-dashed border-gray-200">
-                                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-                                                        <ChevronRight size={12} /> Officer{officers.length > 1 ? 's' : ''}
-                                                    </p>
-                                                    <div className="space-y-2">
-                                                        {officers.map(member => renderStaffCard(member))}
+                                                {/* Department Heads - Highlighted */}
+                                                {heads.length > 0 && (
+                                                    <div className="mb-4">
+                                                        <div className="flex items-center gap-2 mb-3">
+                                                            <div className="h-px flex-1 bg-gradient-to-r from-orange-300 to-transparent"></div>
+                                                            <span className="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full">Department Head{heads.length > 1 ? 's' : ''}</span>
+                                                            <div className="h-px flex-1 bg-gradient-to-l from-orange-300 to-transparent"></div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            {heads.map(member => renderStaffCard(member, true))}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
+
+                                                {/* Department Officers - Branching from Head */}
+                                                {officers.length > 0 && (
+                                                    <div className="relative pl-8">
+                                                        {/* Organic curved connector */}
+                                                        <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${officers.length * 80}px` }}>
+                                                            <defs>
+                                                                <linearGradient id={`grad-${deptIndex}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                                                                    <stop offset="0%" style={{ stopColor: '#cbd5e1', stopOpacity: 1 }} />
+                                                                    <stop offset="100%" style={{ stopColor: '#e2e8f0', stopOpacity: 0.3 }} />
+                                                                </linearGradient>
+                                                            </defs>
+                                                            {officers.map((_, idx) => (
+                                                                <path
+                                                                    key={idx}
+                                                                    d={`M 0 ${idx * 80 + 40} Q 16 ${idx * 80 + 40}, 32 ${idx * 80 + 40}`}
+                                                                    stroke={`url(#grad-${deptIndex})`}
+                                                                    strokeWidth="2"
+                                                                    fill="none"
+                                                                />
+                                                            ))}
+                                                        </svg>
+                                                        <div className="flex items-center gap-2 mb-3">
+                                                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide bg-blue-50 px-2 py-1 rounded">Officer{officers.length > 1 ? 's' : ''}</span>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            {officers.map(member => renderStaffCard(member))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -497,14 +524,53 @@ const RegionTemplate = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Branch Children (Staff) */}
+                                            {/* Branch Children (Staff) - Organic Tree */}
                                             {isExpanded && (
-                                                <div className="mt-4 ml-8 pl-6 border-l-2 border-dashed border-gray-200 animate-fadeIn space-y-3">
-                                                    {branch.head && renderStaffCard(branch.head, true)}
-                                                    {branch.team.length > 0 ? (
-                                                        branch.team.map(member => renderStaffCard(member))
-                                                    ) : (
-                                                        !branch.head && <p className="text-gray-400 italic text-sm py-2">No staff members assigned.</p>
+                                                <div className="mt-6 ml-8 animate-fadeIn relative">
+                                                    {/* Branch Head - Highlighted */}
+                                                    {branch.head && (
+                                                        <div className="mb-4">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <div className="h-px flex-1 bg-gradient-to-r from-orange-400 to-transparent"></div>
+                                                                <span className="text-xs font-bold text-orange-700 uppercase tracking-wider bg-orange-100 px-3 py-1 rounded-full border-2 border-orange-300">Branch Head</span>
+                                                                <div className="h-px flex-1 bg-gradient-to-l from-orange-400 to-transparent"></div>
+                                                            </div>
+                                                            {renderStaffCard(branch.head, true)}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Other Staff - Branching from Head */}
+                                                    {branch.team.length > 0 && (
+                                                        <div className="relative pl-8">
+                                                            {/* Organic curved connectors */}
+                                                            <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${branch.team.length * 80}px` }}>
+                                                                <defs>
+                                                                    <linearGradient id={`branch-grad-${branch.branch_code}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                                                                        <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 0.4 }} />
+                                                                        <stop offset="100%" style={{ stopColor: '#fb923c', stopOpacity: 0.1 }} />
+                                                                    </linearGradient>
+                                                                </defs>
+                                                                {branch.team.map((_, idx) => (
+                                                                    <path
+                                                                        key={idx}
+                                                                        d={`M 0 ${idx * 80 + 40} Q 16 ${idx * 80 + 40}, 32 ${idx * 80 + 40}`}
+                                                                        stroke={`url(#branch-grad-${branch.branch_code})`}
+                                                                        strokeWidth="2.5"
+                                                                        fill="none"
+                                                                    />
+                                                                ))}
+                                                            </svg>
+                                                            <div className="flex items-center gap-2 mb-3">
+                                                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded">Staff Members</span>
+                                                            </div>
+                                                            <div className="space-y-3">
+                                                                {branch.team.map(member => renderStaffCard(member))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {!branch.head && branch.team.length === 0 && (
+                                                        <p className="text-gray-400 italic text-sm py-2">No staff members assigned.</p>
                                                     )}
                                                 </div>
                                             )}

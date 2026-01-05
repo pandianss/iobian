@@ -363,7 +363,7 @@ const StaffManager = ({ user }) => {
                                 >
                                     <option value="">{form.linked_region_code ? 'Select Branch' : 'Select Region First'}</option>
                                     {branches
-                                        .filter(b => b.region_code === form.linked_region_code) // Filter by selected region
+                                        .filter(b => b.region_code === Number(form.linked_region_code)) // Compare as numbers
                                         .map(b => (
                                             <option key={b.branch_code} value={b.branch_code}>{b.branch_code} - {b.branch_name}</option>
                                         ))

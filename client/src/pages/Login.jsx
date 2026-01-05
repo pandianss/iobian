@@ -80,7 +80,7 @@ const Login = ({ onLoginSuccess }) => {
       background: 'var(--bg-color)'
     }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
-        <button onClick={onBack} style={{ marginBottom: '1rem', background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+        <button onClick={() => navigate('/')} style={{ marginBottom: '1rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
           ← Back
         </button>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
