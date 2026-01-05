@@ -1,5 +1,5 @@
 // ... imports ...
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import {
     LayoutDashboard,
     Wrench,
@@ -18,7 +18,8 @@ import {
     Clock,
     Layers,
     Megaphone,
-    Percent
+    Percent,
+    Calculator
 } from 'lucide-react';
 
 // Lazy Load Modules
@@ -28,22 +29,47 @@ const InventoryManager = React.lazy(() => import('../modules/Inventory/Inventory
 const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
 const BranchManager = React.lazy(() => import('../modules/Admin/BranchManager'));
 const BranchOpeningSurvey = React.lazy(() => import('../modules/Planning/BranchOpeningSurvey')); // Added
-const CampaignManager = React.lazy(() => import('../modules/RO/CampaignManager')); // Added
+const CampaignManager = React.lazy(() => import('../modules/RO/CampaignManager'));
+const RoCommunication = React.lazy(() => import('../modules/RO/Communication/ROCommunication'));
 const StaffManager = React.lazy(() => import('../modules/HR/StaffManager'));
 const RestorationVault = React.lazy(() => import('../modules/Admin/RestorationVault'));
 const DesignationManager = React.lazy(() => import('../modules/Admin/DesignationManager'));
 const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
 const JoiningOfferGenerator = React.lazy(() => import('../modules/HR/JoiningOfferGenerator'));
+// const RetirementGenerator = React.lazy(() => import('../modules/HR/RetirementGenerator')); // Integrated into DocumentGenerator
 const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentManager'));
 const InterestRateManager = React.lazy(() => import('../modules/Planning/InterestRateManager'));
+const InterestWorksheet = React.lazy(() => import('../modules/Planning/InterestWorksheet'));
+const DindigulLanding = React.lazy(() => import('../modules/RO/DindigulRegion/DindigulLanding'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+    useEffect(() => {
+        if (user) {
+            let title = 'IOBIAN';
+            if (user.office_level === 'CO') {
+                title = 'IOBIAN - CO Workspace';
+            } else if (user.office_level === 'RO') {
+                const region = user.region_name || user.linked_region_code;
+                title = region ? `IOBIAN - RO ${region} Workspace` : 'IOBIAN - RO Workspace';
+            } else if (user.office_level === 'Branch') {
+                const branch = user.branch_name || user.linked_branch_code;
+                title = branch ? `IOBIAN - ${branch} Workspace` : 'IOBIAN - Branch Workspace';
+            }
+            document.title = title;
+        } else {
+            document.title = 'IOBIAN';
+        }
+    }, [user]);
+
     const renderContent = () => {
-        // ... existing switch statement ...
         switch (activeView) {
+            // ... existing cases ...
+            case 'department_manager':
+                return <DepartmentManager />;
+            // ...
             case 'dashboard':
                 return (
                     // ... dashboard content
@@ -73,9 +99,9 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 );
             // ... strict cases ...
             case 'cte':
-                return <DocumentGenerator branchCode={user.linked_branch_code || 'CO'} branchName={user.office_level} />;
+                return <DocumentGenerator branchCode={user.linked_branch_code || 'CO'} branchName={user.office_level} user={user} />;
             case 'pms':
-                return <Scorecard divisionId={user.dept_id} />;
+                return <Scorecard user={user} divisionId={user.dept_id} />;
             case 'inventory':
                 return <InventoryManager />;
             case 'region_manager':
@@ -96,17 +122,23 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <JoiningOfferGenerator />;
             case 'campaign_manager':
                 return <CampaignManager user={user} />;
+            case 'communication':
+                return <RoCommunication />;
             case 'department_manager':
                 return <DepartmentManager />;
             case 'interest_rates':
                 return <InterestRateManager user={user} />;
+            case 'interest_worksheet':
+                return <InterestWorksheet user={user} />;
+            case 'dindigul_region':
+                return <DindigulLanding />;
             default:
                 return <div>Module Under Construction</div>;
         }
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Top Navigation */}
             <header style={{
                 height: 'var(--header-height, 60px)',
@@ -116,7 +148,8 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 2rem',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                flexShrink: 0 // Prevent header shrinking
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '45px', objectFit: 'contain' }} />
@@ -141,16 +174,20 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 padding: '2rem',
                 display: 'grid',
                 gridTemplateColumns: isSidebarCollapsed ? '80px 1fr' : '250px 1fr',
+                gridTemplateRows: 'minmax(0, 1fr)', // CRITICAL: Constrain grid height to viewport, preventing expansion
                 gap: '2rem',
-                transition: 'grid-template-columns 0.3s ease'
+                transition: 'grid-template-columns 0.3s ease',
+                overflow: 'hidden', // Enforce constraint on main container
+                minHeight: 0 // Allow shrinking below content size
             }}>
                 {/* Sidebar */}
                 <aside className="card" style={{
-                    height: 'fit-content',
+                    height: '100%', // Full height sidebar
                     transition: 'width 0.3s ease',
                     width: isSidebarCollapsed ? '80px' : '100%',
                     padding: isSidebarCollapsed ? '1rem 0.5rem' : '1.5rem',
-                    overflow: 'hidden'
+                    overflowY: 'auto', // Sidebar scrolls internally if needed
+                    overflowX: 'hidden'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
                         {!isSidebarCollapsed && <h4 style={{ margin: 0 }}>Menu</h4>}
@@ -184,12 +221,15 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                             { id: 'interest_rates', label: 'Interest Rates', icon: <Percent size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
                             { id: 'region_manager', label: 'Region Management', icon: <Globe size={20} />, roles: ['SuperAdmin', 'CO_Planning'] },
                             { id: 'branch_manager', label: 'Branch Network', icon: <Building2 size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
-                            { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['RO', 'CO'] }, // Updated roles
-                            { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['SuperAdmin', 'RO'] }, // Added new sidebar item
+                            { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['SuperAdmin', 'RO', 'CO'] }, // Updated roles
+                            { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['SuperAdmin', 'RO'] },
+                            { id: 'communication', label: 'Communication', icon: <FileText size={20} />, roles: ['RO', 'SuperAdmin'] }, // Added Communication module
                             { id: 'repair_vault', label: 'Restoration & Vault', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'CO_Gad'] },
                             { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
                             { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
-                            { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] }
+                            // { id: 'retirement_generator', label: 'Retirement Relieving', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'CO', 'CO_HRD'] }, // Moved to Document Generator
+                            { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] },
+                            { id: 'dindigul_region', label: 'Dindigul Region', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] }
                         ].map(item => {
                             if (item.roles.length > 0 && !item.roles.includes(user.role)) return null;
 
@@ -224,7 +264,16 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
 
 
                 {/* content area */}
-                <div style={{ animation: 'fadeIn 0.3s ease' }}>
+                <div style={{
+                    animation: 'fadeIn 0.3s ease',
+                    maxWidth: '100%',
+                    height: '100%',
+                    minHeight: 0,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
                     <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading Module...</div>}>
                         {renderContent()}
                     </Suspense>
@@ -240,4 +289,12 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
     );
 };
 
-export default Dashboard;
+import { DataProvider } from '../context/DataContext';
+
+const DashboardWithProvider = (props) => (
+    <DataProvider>
+        <Dashboard {...props} />
+    </DataProvider>
+);
+
+export default DashboardWithProvider;

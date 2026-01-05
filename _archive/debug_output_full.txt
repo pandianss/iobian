@@ -1,0 +1,20 @@
+Use Target 174
+KEYS: ["Region Name","Branch Code","Branch Name","Period","Deposits","Savings Bank","Current Deposits","Term Deposits","Advances","Business","Number of Branches","Source File","Import Date"]
+Branch Code: 174 Type: number
+Savings Bank: "42.904067119" Type: number
+FULL RECORD:
+{
+  "Region Name": "Dindigul Region",
+  "Branch Code": 174,
+  "Branch Name": "Theni - Allinagaram",
+  "Period": 20251231,
+  "Deposits": 82.932568074,
+  "Savings Bank": 42.904067119,
+  "Current Deposits": 2.288108864,
+  "Term Deposits": 37.740392091,
+  "Advances": 100.529551152,
+  "Business": 183.462119226,
+  "Number of Branches": 1,
+  "Source File": "Country_Region_Branch - 2026-01-02T114133.522.csv",
+  "Import Date": "2026-01-02T23:17:17.700Z"
+}

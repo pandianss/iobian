@@ -510,21 +510,23 @@ const CampaignManager = ({ user }) => {
     const handleExport = async (panelId, title) => {
         // If Bulk Export
         if (panelId === 'all') {
-            const panels = [
-                { id: 'panel-overall-performance', title: 'Overall-Performance' },
-                { id: 'panel-Products-Sourced', title: 'Products-Sourced' },
-                ...categoryPanels.map(cat => ({ id: cat.id, title: cat.title })),
-                { id: 'panel-Branch-Performance', title: 'Branch-Performance' },
-                { id: 'panel-Branch-Matrix', title: 'Branch-Product-Matrix' },
-                { id: 'panel-Top-20%-Performers', title: 'Top-20-Performers' },
-                { id: 'panel-Bottom-20%-Performers', title: 'Bottom-20-Performers' },
-                { id: 'panel-Achievers-(100%+)', title: 'Achievers-100-Plus' },
-                { id: 'panel-Nil-Performers', title: 'Nil-Performers' }
-            ];
+            const container = document.getElementById('infographics-export-container');
+            if (!container) return;
+
+            // Dynamically find all panels
+            const panels = Array.from(container.querySelectorAll('.card')).map(el => ({
+                id: el.id,
+                title: (el.querySelector('h4')?.textContent || el.id).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '')
+            }));
 
             for (const panel of panels) {
-                await handleExport(panel.id, `${viewingCampaign.title}-${panel.title}`);
-                await new Promise(resolve => setTimeout(resolve, 800));
+                if (!panel.id) continue;
+                try {
+                    await handleExport(panel.id, `${viewingCampaign.title}-${panel.title}`);
+                } catch (e) {
+                    console.error(`Failed to export ${panel.title}`, e);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
             return;
         }
@@ -553,47 +555,47 @@ const CampaignManager = ({ user }) => {
             // Matrix Specific Styles
             if (panelId === 'panel-Branch-Matrix') {
                 parent.querySelectorAll('.matrix-table th').forEach(th => {
-                    th.style.setProperty('font-size', '1.8rem', 'important');
+                    th.style.setProperty('font-size', '28px', 'important');
                     th.style.setProperty('padding', '16px 24px', 'important');
                     th.style.setProperty('white-space', 'nowrap', 'important');
                 });
                 parent.querySelectorAll('.matrix-table td').forEach(td => {
-                    td.style.setProperty('font-size', '2rem', 'important'); // Base cell size
+                    td.style.setProperty('font-size', '32px', 'important'); // Base cell size
                     td.style.setProperty('padding', '16px 24px', 'important');
                 });
                 parent.querySelectorAll('.matrix-table .fw-600').forEach(el => {
-                    el.style.setProperty('font-size', '2.2rem', 'important');
+                    el.style.setProperty('font-size', '34px', 'important');
                 });
                 parent.querySelectorAll('.matrix-table .fw-bold').forEach(el => {
-                    el.style.setProperty('font-size', '2.4rem', 'important');
+                    el.style.setProperty('font-size', '36px', 'important');
                 });
                 parent.querySelectorAll('.matrix-table .small').forEach(el => {
-                    el.style.setProperty('font-size', '1.4rem', 'important');
+                    el.style.setProperty('font-size', '22px', 'important');
                     el.style.setProperty('color', '#64748b', 'important');
                 });
             } else {
                 // Standard List Styles (Existing)
                 parent.querySelectorAll('.fw-600').forEach(el => {
-                    el.style.setProperty('font-size', '3.5rem', 'important');
+                    el.style.setProperty('font-size', '56px', 'important');
                 });
                 parent.querySelectorAll('.val-text').forEach(el => {
-                    el.style.setProperty('font-size', '3.5rem', 'important');
+                    el.style.setProperty('font-size', '56px', 'important');
                 });
             }
 
             parent.querySelectorAll('.rank-circle').forEach(el => {
                 el.style.setProperty('width', '64px', 'important');
                 el.style.setProperty('height', '64px', 'important');
-                el.style.setProperty('font-size', '2.2rem', 'important');
+                el.style.setProperty('font-size', '30px', 'important');
                 el.style.setProperty('margin', '4px auto', 'important');
             });
 
             parent.querySelectorAll('.stat-value').forEach(el => {
-                el.style.setProperty('font-size', '1.8rem', 'important');
+                el.style.setProperty('font-size', '28px', 'important');
                 el.style.setProperty('white-space', 'nowrap', 'important');
             });
             parent.querySelectorAll('.stat-label').forEach(el => {
-                el.style.setProperty('font-size', '1rem', 'important');
+                el.style.setProperty('font-size', '16px', 'important');
                 el.style.setProperty('white-space', 'nowrap', 'important');
             });
             parent.querySelectorAll('.stat-icon-wrapper').forEach(el => {
@@ -617,14 +619,14 @@ const CampaignManager = ({ user }) => {
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
                     <div style="display:flex;align-items:center;gap:1.5rem;">
                         <img src="${iobLogo}" style="height:80px;object-fit:contain;" />
-                        <h2 style="margin:0;font-size:2.5rem;color:#1e293b;font-weight:700;">Performance Overview</h2>
+                        <h2 style="margin:0;font-size:40px;color:#1e293b;font-weight:700;">Performance Overview</h2>
                     </div>
                     ${viewingCampaign.image ? `<img src="${viewingCampaign.image}" style="height:100px;width:auto;object-fit:contain;" />` : '<div></div>'}
                 </div>
                 <div style="text-align:center;">
-                    <h3 style="font-size:3.0rem;color:#0f172a;margin:0 0 0.5rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
-                    ${regionName ? `<p style="font-size:1.5rem;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
-                    <p style="font-size:1.4rem;color:#64748b;margin:0.5rem 0 0 0;font-weight:500;">
+                    <h3 style="font-size:48px;color:#0f172a;margin:0 0 0.5rem 0;font-weight:700;line-height:1.2;">${viewingCampaign.title}</h3>
+                    ${regionName ? `<p style="font-size:24px;color:#64748b;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${regionName}</p>` : ''}
+                    <p style="font-size:22px;color:#64748b;margin:0.5rem 0 0 0;font-weight:500;">
                         Campaign Period: ${formatDate(viewingCampaign.startDate || viewingCampaign.start_date)} - ${formatDate(viewingCampaign.endDate || viewingCampaign.end_date)}
                     </p>
                 </div>
@@ -644,7 +646,7 @@ const CampaignManager = ({ user }) => {
         }
         const panelHeader = clone.querySelector('h4');
         if (panelHeader) {
-            panelHeader.style.fontSize = '2.4rem';
+            panelHeader.style.fontSize = '38px';
             panelHeader.style.fontWeight = '800';
         }
 
@@ -658,7 +660,7 @@ const CampaignManager = ({ user }) => {
 
             const canvas = await html2canvas(captureWrapper, {
                 useCORS: true,
-                scale: 2,
+                scale: 3,
                 backgroundColor: '#ffffff',
                 scrollX: 0,
                 scrollY: 0
@@ -670,7 +672,7 @@ const CampaignManager = ({ user }) => {
             window.scrollTo(0, currentScrollY);
         } catch (err) {
             console.error("Export failed", err);
-            alert("Failed to export image. Please check console.");
+            alert(`Failed to export image: ${title}`);
         } finally {
             document.body.removeChild(captureWrapper);
         }

@@ -98,7 +98,7 @@ const RegionManager = () => {
                         <input
                             value={form.region_code}
                             onChange={e => setForm({ ...form, region_code: e.target.value })}
-                            placeholder="e.g. R04"
+                            placeholder="e.g. 3933"
                             // disabled={isEditing} // Enabled for editing
                             style={{ background: 'white' }}
                             required

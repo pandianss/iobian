@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
-const Login = ({ onLoginSuccess, onBack }) => {
+const Login = ({ onLoginSuccess }) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Validate Roll No, 2: Password
   const [rollNumber, setRollNumber] = useState('');
   const [password, setPassword] = useState('');
@@ -58,6 +60,7 @@ const Login = ({ onLoginSuccess, onBack }) => {
       const data = await res.json();
       if (data.success) {
         onLoginSuccess(data.user);
+        navigate('/dashboard');
       } else {
         setError(data.message);
       }

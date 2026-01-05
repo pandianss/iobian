@@ -1,0 +1,15 @@
+Use First Record
+KEYS: ["REPORT_DT","SCHM_CODE","SOL_ID","NO_OF_ACS","BALANCE","Region Name","Branch Code","Branch Name","Source File","Import Date"]
+FULL RECORD:
+{
+  "REPORT_DT": 20260101,
+  "SCHM_CODE": "SDR",
+  "SOL_ID": 924,
+  "NO_OF_ACS": 1,
+  "BALANCE": 43000000,
+  "Region Name": "Dindigul Region",
+  "Branch Code": 924,
+  "Branch Name": "Puduchatram",
+  "Source File": "Deposits above 1 crore.csv",
+  "Import Date": "2026-01-02T23:16:31.124Z"
+}

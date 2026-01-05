@@ -19,7 +19,8 @@ const StaffManager = ({ user }) => {
         roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
         designation: '', designation_hindi: '',
         office_level: 'Branch', role: 'Branch', departments: [],
-        linked_branch_code: '', linked_region_code: ''
+        linked_branch_code: '', linked_region_code: '', is_head: false,
+        photo_url: ''
     });
     const [msg, setMsg] = useState('');
 
@@ -82,7 +83,9 @@ const StaffManager = ({ user }) => {
             role: user.role || 'Branch',
             departments: user.departments || [],
             linked_branch_code: user.linked_branch_code || '',
-            linked_region_code: user.linked_region_code || ''
+            linked_region_code: user.linked_region_code || '',
+            is_head: user.is_head || false,
+            photo_url: user.photo_url || ''
         });
         setHistoryLogs(user.history || []);
         setIsEditing(true);
@@ -96,7 +99,7 @@ const StaffManager = ({ user }) => {
             roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
             designation: '', designation_hindi: '',
             office_level: 'Branch', role: 'Branch', departments: [],
-            linked_branch_code: '', linked_region_code: ''
+            linked_branch_code: '', linked_region_code: '', is_head: false, photo_url: ''
         });
         setMsg('');
     };
@@ -123,7 +126,7 @@ const StaffManager = ({ user }) => {
                         roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
                         designation: '', designation_hindi: '',
                         office_level: 'Branch', role: 'Branch', departments: [],
-                        linked_branch_code: '', linked_region_code: ''
+                        linked_branch_code: '', linked_region_code: '', is_head: false
                     });
                 } else {
                     // Refresh history if editing
@@ -391,6 +394,58 @@ const StaffManager = ({ user }) => {
                             </div>
                         )}
 
+                        <div style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '0.5rem', borderRadius: '4px' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Staff Photo (Profile)</label>
+
+                            {/* Preview */}
+                            {form.photo_url && (
+                                <div style={{ marginBottom: '0.5rem' }}>
+                                    <img src={form.photo_url} alt="Profile" style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }} />
+                                    <button type="button" onClick={() => setForm({ ...form, photo_url: '' })} style={{ marginLeft: '1rem', color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>Remove</button>
+                                </div>
+                            )}
+
+                            <input type="file" accept="image/*" onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+
+                                const formData = new FormData();
+                                formData.append('photo', file);
+
+                                try {
+                                    setMsg('Uploading photo...');
+                                    const res = await fetch('http://localhost:5000/api/upload', {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                        setForm({ ...form, photo_url: data.url }); // Update state with new URL
+                                        setMsg('Photo uploaded!');
+                                    } else {
+                                        alert('Upload failed: ' + data.message);
+                                        setMsg('');
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                    alert('Upload network error');
+                                }
+                            }} />
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <input
+                                type="checkbox"
+                                id="is_head"
+                                checked={form.is_head}
+                                onChange={e => setForm({ ...form, is_head: e.target.checked })}
+                                style={{ width: 'auto' }}
+                            />
+                            <label htmlFor="is_head" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 'bold' }}>
+                                Mark as Head of Office? (Branch/Region/Dept Head)
+                            </label>
+                        </div>
+
                         <button className="btn btn-primary" type="submit" style={{ width: '100%' }}>
                             {isEditing ? 'Update User' : 'Create User'}
                         </button>
@@ -449,7 +504,17 @@ const StaffManager = ({ user }) => {
                                 <tr key={u.user_id} style={{ borderBottom: '1px solid #eee' }}>
                                     <td style={{ padding: '0.5rem' }}>{u.roll_number}</td>
                                     <td style={{ padding: '0.5rem' }}>
-                                        <div>{u.full_name}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            {u.full_name}
+                                            {u.is_head && (
+                                                <span style={{
+                                                    background: 'var(--primary-color)', color: 'white',
+                                                    padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem'
+                                                }}>
+                                                    HEAD
+                                                </span>
+                                            )}
+                                        </div>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{u.full_name_hindi}</div>
                                     </td>
                                     <td style={{ padding: '0.5rem' }}>
@@ -463,8 +528,31 @@ const StaffManager = ({ user }) => {
                                         {regions.find(r => r.region_code === u.linked_region_code)?.region_name || '-'}
                                     </td>
                                     <td style={{ padding: '0.5rem' }}>
-                                        <button onClick={() => handleEdit(u)} style={{ marginRight: '0.5rem', border: 'none', background: 'none', cursor: 'pointer' }}>✏️</button>
-                                        <button onClick={() => handleDelete(u.roll_number)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>🗑️</button>
+                                        <button onClick={() => handleEdit(u)} style={{ marginRight: '0.5rem', border: 'none', background: 'none', cursor: 'pointer' }} title="Edit">✏️</button>
+                                        <button onClick={() => handleDelete(u.roll_number)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer', marginRight: '0.5rem' }} title="Delete">🗑️</button>
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm(`Reset password for ${u.full_name}?`)) return;
+                                                // Assuming 'user' prop is passed to StaffManager or available in context. 
+                                                // Wait, StaffManager receives { user } prop.
+                                                try {
+                                                    const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({
+                                                            target_roll_number: u.roll_number,
+                                                            admin_roll_number: user.roll_number
+                                                        })
+                                                    });
+                                                    const data = await res.json();
+                                                    alert(data.message);
+                                                } catch (e) { alert('Failed to reset password'); }
+                                            }}
+                                            style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+                                            title="Reset Password"
+                                        >
+                                            🔑
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

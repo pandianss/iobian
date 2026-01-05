@@ -1,0 +1,27 @@
+{
+  "file": "BOD-excess cash (49).csv",
+  "keys": [
+    "Region Name",
+    "Branch Code",
+    "Branch Name",
+    "Cash on Hand",
+    "ATM Cash",
+    "Cash With BC",
+    "Bulk Note Acceptance",
+    "Total Cash",
+    "Cash Retention Limit",
+    "Excess Cash"
+  ],
+  "record": {
+    "Region Name": "Dindigul Region",
+    "Branch Code": 174,
+    "Branch Name": "Theni - Allinagaram",
+    "Cash on Hand": 5.94,
+    "ATM Cash": 0,
+    "Cash With BC": 0,
+    "Bulk Note Acceptance": 22.48,
+    "Total Cash": 28.42,
+    "Cash Retention Limit": 87,
+    "Excess Cash": -58.58
+  }
+}

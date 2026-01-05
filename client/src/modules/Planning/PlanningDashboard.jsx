@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Settings, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import BranchSurveyList from './BranchSurveyList';
 import BranchOpeningSurvey from './BranchOpeningSurvey';
 
@@ -9,7 +10,7 @@ const PlanningDashboard = ({ user }) => {
 
     return (
         <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ flex: 1, overflow: 'auto' }}>
                 {mode === 'list' && (
                     <BranchSurveyList
                         onCreateNew={() => {

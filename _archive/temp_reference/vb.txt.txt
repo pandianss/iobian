@@ -1,0 +1,769 @@
+Sub processor()
+
+ 
+
+    Dim mud(3), hl(29), vl(6), ajl(4), rjl(4), jl(14), pl(3), mtg(1), edu(12), liq(0), othret(62), jlsch(2), govsch(8), othsch(23), NPA(3) As String
+
+ 
+
+    Set wb = ThisWorkbook
+
+    Set ws1 = wb.Worksheets("Vertical")
+
+    Set ws2 = wb.Worksheets("Data")
+
+    Set ws3 = wb.Worksheets("CoreAgri")
+
+    Set ws4 = wb.Worksheets("KBP")
+
+   
+
+    mud(0) = "SLMUD"
+
+    mud(1) = "CCMUD"
+
+    mud(2) = "CCWMS"
+
+    mud(3) = "TLWMS"
+
+   
+
+    hl(0) = "AHPAP"
+
+    hl(0) = "CCSUB"
+
+    hl(1) = "RHDEC"
+
+    hl(2) = "RHISL"
+
+    hl(3) = "RHLGJ"
+
+    hl(4) = "RHNRI"
+
+    hl(5) = "RHNRR"
+
+    hl(6) = "NRITU"
+
+    hl(7) = "NRIGN"
+
+    hl(8) = "RHPMA"
+
+    hl(9) = "RNHBL"
+
+    hl(10) = "RSPH1"
+
+    hl(11) = "RSPH2"
+
+    hl(12) = "RSUBH"
+
+    hl(13) = "STShl"
+
+    hl(14) = "RGEWS"
+
+    hl(15) = "RGLIG"
+
+    hl(16) = "RGMI1"
+
+    hl(17) = "RGMI2"
+
+    hl(18) = "RSTOP"
+
+    hl(19) = "HOMAD"
+
+    hl(20) = "RMOGR"
+
+    hl(21) = "RAHTN"
+
+    hl(22) = "RBLTN"
+
+    hl(23) = "GNEXT"
+
+    hl(24) = "CRH01"
+
+    hl(25) = "CBH01"
+
+    hl(26) = "CEC01"
+
+    hl(27) = "HLELM"
+
+    hl(28) = "RHLG2"
+
+    hl(29) = "HLKKI"
+
+   
+
+    vl(0) = "RPUSH"
+
+    vl(1) = "RTN2W"
+
+    vl(2) = "RVL2W"
+
+    vl(3) = "SVL2W"
+
+    vl(4) = "SVL4W"
+
+    vl(5) = "RGRVL"
+
+    vl(6) = "RGR2W"
+
+ 
+
+    ajl(0) = "AGEJL"
+
+    ajl(1) = "AGTAJ"
+
+    ajl(2) = "JLSWS"
+
+    ajl(3) = "KCAJL"
+
+    ajl(4) = "KCCJL"
+
+   
+
+    rjl(0) = "GLDPC"
+
+    rjl(1) = "JLOTH"
+
+    rjl(2) = "JLSTF"
+
+    rjl(3) = "JLSUV"
+
+    rjl(4) = "JLSWL"
+
+   
+
+    jl(0) = "AGEJL"
+
+    jl(1) = "AGTAJ"
+
+    jl(2) = "CCCAJ"
+
+    jl(3) = "CSGLD"
+
+    jl(4) = "JLOTH"
+
+    jl(5) = "JLSME"
+
+    jl(6) = "JLSTF"
+
+    jl(7) = "JLSWL"
+
+    jl(8) = "JLSWS"
+
+    jl(9) = "KCCJL"
+
+    jl(10) = "GLDPC"
+
+    jl(11) = "KCAJL"
+
+    jl(12) = "JLSUV"
+
+    jl(13) = "CIF01"
+
+    jl(14) = "CPR01"
+
+   
+
+    pl(0) = "DLCLN"
+
+    pl(1) = "RPLOT"
+
+    pl(2) = "RPTOP"
+
+    pl(3) = "RROYL"
+
+ 
+
+    mtg(0) = "RHNIL"
+
+    mtg(1) = "RRVML"
+
+   
+
+    edu(0) = "NFEDU"
+
+    edu(1) = "NKEDU"
+
+    edu(2) = "RDREM"
+
+    edu(3) = "REVOC"
+
+    edu(4) = "RSCLR"
+
+    edu(5) = "RVIDJ"
+
+    edu(6) = "RSURA"
+
+    edu(7) = "RSRTA"
+
+    edu(8) = "RSRTB"
+
+    edu(9) = "RNCTD"
+
+    edu(10) = "BSCCS"
+
+    edu(11) = "RSKILL"
+
+    edu(12) = "PMVLS"
+
+   
+
+    liq(0) = "RLLIQ"
+
+   
+
+    othret(0) = "CCAKS"
+
+    othret(1) = "CCDEP"
+
+    othret(2) = "CDSTF"
+
+    othret(3) = "DLFAP"
+
+    othret(4) = "DLPEN"
+
+    othret(5) = "DLIPL"
+
+    othret(6) = "RABHI"
+
+    othret(7) = "RAKSH"
+
+    othret(8) = "RALNK"
+
+    othret(9) = "RPASS"
+
+    othret(10) = "SBCGA"
+
+    othret(11) = "SBCRP"
+
+    othret(12) = "SBDNC"
+
+    othret(13) = "SBESY"
+
+    othret(14) = "SBFCR"
+
+    othret(15) = "SBGLO"
+
+    othret(16) = "SBGLT"
+
+    othret(17) = "SBLTS"
+
+    othret(18) = "SBNRE"
+
+    othret(19) = "SBNRO"
+
+    othret(20) = "SBPLT"
+
+    othret(21) = "SBPUB"
+
+    othret(22) = "SBSLO"
+
+    othret(23) = "SBSLT"
+
+    othret(24) = "SBSTF"
+
+    othret(25) = "SBSTR"
+
+    othret(26) = "SBSTU"
+
+    othret(27) = "SBTOD"
+
+    othret(28) = "SFCL2"
+
+    othret(29) = "SFDEC"
+
+    othret(30) = "SFNDE"
+
+    othret(31) = "SJLGO"
+
+    othret(32) = "STDPN"
+
+    othret(33) = "STDRL"
+
+    othret(34) = "STFCC"
+
+    othret(35) = "STFFA"
+
+    othret(36) = "STFFL"
+
+    othret(37) = "STFML"
+
+    othret(38) = "STFWL"
+
+    othret(39) = "SURYA"
+
+    othret(40) = "CCCOR"
+
+    othret(41) = "CCSUV"
+
+    othret(42) = "SBKIT"
+
+    othret(43) = "CABCA"
+
+    othret(44) = "CCJLG"
+
+    othret(45) = "CCPRM"
+
+    othret(46) = "CCSFA"
+
+    othret(47) = "CDSPL"
+
+    othret(48) = "CFITL"
+
+    othret(49) = "CMHLS"
+
+    othret(50) = "CSL01"
+
+    othret(51) = "DLFLX"
+
+    othret(52) = "DLPIP"
+
+    othret(53) = "ECL1E"
+
+    othret(54) = "ECL2E"
+
+    othret(55) = "ECL3E"
+
+    othret(56) = "NFMSY"
+
+    othret(57) = "RKSHG"
+
+    othret(58) = "RPSGB"
+
+    othret(59) = "STCOV"
+
+    othret(60) = "STGAD"
+
+    othret(61) = "DLDEP"
+
+    othret(62) = "DLNSC"
+
+   
+
+    jlsch(0) = "JLOTH"
+
+    jlsch(1) = "JLSME"
+
+    jlsch(2) = "CSGLD"
+
+   
+
+    govsch(0) = "AGINF"
+
+    govsch(1) = "TLFME"
+
+    govsch(2) = "CCFME"
+
+    govsch(3) = "AHITL"
+
+    govsch(4) = "CCITL"
+
+    govsch(5) = "TLCBG"
+
+    govsch(6) = "CCCBG"
+
+    govsch(7) = "TLMAS"
+
+    govsch(8) = "CCMAS"
+
+   
+
+    othsch(0) = "TLKVR"
+
+    othsch(1) = "CCKVR"
+
+    othsch(2) = "TLKRP"
+
+    othsch(3) = "CCKRP"
+
+    othsch(4) = "TLSAR"
+
+    othsch(5) = "CCSAR"
+
+    othsch(6) = "TLSRP"
+
+    othsch(7) = "CCSRP"
+
+    othsch(8) = "TLAGM"
+
+    othsch(9) = "CCAGM"
+
+    othsch(10) = "TLFSH"
+
+    othsch(11) = "CCFSH"
+
+    othsch(12) = "CCIFS"
+
+    othsch(13) = "TLWSH"
+
+    othsch(14) = "AGJLG"
+
+    othsch(15) = "CCJLG"
+
+    othsch(16) = "AGDRY"
+
+    othsch(17) = "AGDTP"
+
+    othsch(18) = "TLDTP"
+
+    othsch(19) = "TLFPR"
+
+    othsch(20) = "CCFPR"
+
+    othsch(21) = "AGPLT"
+
+    othsch(22) = "CCPLT"
+
+    othsch(23) = "AGTPT"
+
+   
+
+    NPA(0) = 33750
+
+    NPA(1) = 33850
+
+    NPA(2) = 33950
+
+    NPA(3) = 33999
+
+ 
+
+ 
+
+ 
+
+    For l = 3 To ws1.Range("a1048576").End(xlUp).Row
+
+       
+
+        mudra = 0
+
+        housing = 0
+
+        vehicle = 0
+
+        agrijl = 0
+
+        retailjl = 0
+
+        jewel = 0
+
+        personal = 0
+
+        mortgage = 0
+
+        education = 0
+
+        liquirent = 0
+
+        totalretail = 0
+
+        totalsme = 0
+
+        otherretail = 0
+
+        jloans = 0
+
+        govschemes = 0
+
+        otherschematic = 0
+
+        npaos = 0
+
+       
+
+        '1. MUDRA-START-----------------------------
+
+        For k = 0 To 3
+
+            mudra = mudra + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), mud(k))
+
+        Next k
+
+        'MUDRA-END----------------------------------
+
+       
+
+        '2. HOUSING-START---------------------------
+
+        For k = 0 To 29
+
+            housing = housing + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), hl(k))
+
+        Next k
+
+        'HOUSING-END--------------------------------
+
+       
+
+        '3. VEHICLE-START---------------------------
+
+        For k = 0 To 6
+
+            vehicle = vehicle + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), vl(k))
+
+        Next k
+
+        'VEHICLE-END--------------------------------
+
+       
+
+        '4. AJL-START-------------------------------
+
+        For k = 0 To 4
+
+            agrijl = agrijl + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), ajl(k), ws2.Range("g:g"), "AGRI")
+
+        Next k
+
+        'AJL-END------------------------------------
+
+       
+
+        '5. Retail JL-START-------------------------
+
+        For k = 0 To 4
+
+            retailjl = retailjl + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), rjl(k), ws2.Range("g:g"), "RETAIL")
+
+        Next k
+
+        'Retail JL-END------------------------------
+
+        
+
+        '6. JL-START--------------------------------
+
+        For k = 0 To 14
+
+            jewel = jewel + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), jl(k))
+
+        Next k
+
+        'JL-END-------------------------------------
+
+       
+
+        '7. Personal Loan-START---------------------
+
+        For k = 0 To 3
+
+            personal = personal + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), pl(k))
+
+        Next k
+
+        'Personal Loan-END--------------------------
+
+       
+
+        '7. Mortgage Loan-START---------------------
+
+        For k = 0 To 1
+
+            mortgage = mortgage + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), mtg(k))
+
+        Next k
+
+        'Mortgage Loan-END--------------------------
+
+       
+
+        '8. Education Loan-START--------------------
+
+        For k = 0 To 12
+
+            education = education + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), edu(k))
+
+        Next k
+
+        'Education Loan-END-------------------------
+
+       
+
+        '9. Liquirent-START-------------------------
+
+        For k = 0 To 0
+
+            liquirent = liquirent + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), liq(k))
+
+        Next k
+
+        'Liquirent-END------------------------------
+
+               
+
+        '10. Total Retail-START-------------------------
+
+        For k = 0 To 0
+
+            totalretail = Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("g:g"), "RETAIL")
+
+        Next k
+
+        'Core Retail-END------------------------------
+
+       
+
+        '11. Other Retail-START-------------------------
+
+        For k = 0 To 62
+
+            otherretail = otherretail + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), othret(k), ws2.Range("g:g"), "RETAIL")
+
+        Next k
+
+        'Other Retail-END------------------------------
+
+       
+
+        '11. JL Schemes-START-------------------------
+
+        For k = 0 To 2
+
+            jloans = jloans + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), jlsch(k), ws2.Range("g:g"), "SME") + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("i:i"), jlsch(k), ws2.Range("g:g"), "SME_NP")
+
+        Next k
+
+        'JL Schemes-END------------------------------
+
+       
+
+        '11. gov sch-START-------------------------
+
+        For k = 0 To 8
+
+            govschemes = govschemes + Application.WorksheetFunction.SumIfs(ws3.Range("e:e"), ws3.Range("k:k"), ws1.Range("b" & l), ws3.Range("b:b"), govsch(k))
+
+        Next k
+
+        'gov sch-END------------------------------
+
+       
+
+                
+
+        '11. gov sch-START-------------------------
+
+        For k = 0 To 23
+
+            otherschematic = otherschematic + Application.WorksheetFunction.SumIfs(ws3.Range("e:e"), ws3.Range("k:k"), ws1.Range("b" & l), ws3.Range("b:b"), othsch(k))
+
+        Next k
+
+        'gov sch-END------------------------------
+
+       
+
+         '4. NPA-START-------------------------------
+
+        For k = 0 To 3
+
+            npaos = npaos + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("j:j"), NPA(k))
+
+        Next k
+
+        'NPA-END------------------------------------
+
+       
+
+        ws1.Range("d" & l) = -mudra / 100000
+
+        ws1.Range("h" & l) = -housing / 100000
+
+        ws1.Range("i" & l) = -vehicle / 100000
+
+        ws1.Range("e" & l) = -agrijl / 100000
+
+        ws1.Range("f" & l) = -retailjl / 100000
+
+        ws1.Range("g" & l) = -jewel / 100000
+
+        ws1.Range("j" & l) = -personal / 100000
+
+        ws1.Range("k" & l) = -mortgage / 100000
+
+        ws1.Range("l" & l) = -education / 100000
+
+        ws1.Range("m" & l) = -liquirent / 100000
+
+        ws1.Range("n" & l) = -otherretail / 100000
+
+        ws1.Range("o" & l) = -totalretail / 100000
+
+        ws1.Range("p" & l) = -(Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("g:g"), "SME") + Application.WorksheetFunction.SumIfs(ws2.Range("m:m"), ws2.Range("d:d"), ws1.Range("b" & l), ws2.Range("g:g"), "SME_NP") - jloans) / 100000
+
+        ws1.Range("q" & l) = -Application.WorksheetFunction.SumIfs(ws3.Range("e:e"), ws3.Range("k:k"), ws1.Range("b" & l), ws3.Range("h:h"), "B.SHG LOANS") * 100
+
+        ws1.Range("r" & l) = -Application.WorksheetFunction.SumIfs(ws3.Range("e:e"), ws3.Range("k:k"), ws1.Range("b" & l), ws3.Range("h:h"), "A.KCC-CROP LOANS") * 100
+
+        ws1.Range("s" & l) = -govschemes * 100
+
+        ws1.Range("t" & l) = -otherschematic * 100
+
+        ws1.Range("u" & l) = -Application.WorksheetFunction.SumIf(ws3.Range("k:k"), ws1.Range("b" & l), ws3.Range("e:e")) * 100
+
+        ws1.Range("v" & l) = -npaos / 100000
+
+        ws1.Range("w" & l) = Application.WorksheetFunction.SumIf(ws4.Range("b:b"), ws1.Range("b" & l), ws4.Range("f:f")) * 100
+
+        ws1.Range("x" & l) = Application.WorksheetFunction.SumIf(ws4.Range("b:b"), ws1.Range("b" & l), ws4.Range("g:g")) * 100
+
+        ws1.Range("y" & l) = Application.WorksheetFunction.SumIf(ws4.Range("b:b"), ws1.Range("b" & l), ws4.Range("h:h")) * 100
+
+        ws1.Range("z" & l) = Application.WorksheetFunction.SumIf(ws4.Range("b:b"), ws1.Range("b" & l), ws4.Range("i:i")) * 100
+
+       
+
+        
+
+    Next l
+
+   
+
+    ws1.Range("d2") = Application.WorksheetFunction.Sum(ws1.Range("d3:d" & l)) / 100
+
+    ws1.Range("h2") = Application.WorksheetFunction.Sum(ws1.Range("h3:h" & l)) / 100
+
+    ws1.Range("i2") = Application.WorksheetFunction.Sum(ws1.Range("i3:i" & l)) / 100
+
+    ws1.Range("e2") = Application.WorksheetFunction.Sum(ws1.Range("e3:e" & l)) / 100
+
+    ws1.Range("f2") = Application.WorksheetFunction.Sum(ws1.Range("f3:f" & l)) / 100
+
+    ws1.Range("g2") = Application.WorksheetFunction.Sum(ws1.Range("g3:g" & l)) / 100
+
+    ws1.Range("j2") = Application.WorksheetFunction.Sum(ws1.Range("j3:j" & l)) / 100
+
+    ws1.Range("k2") = Application.WorksheetFunction.Sum(ws1.Range("k3:k" & l)) / 100
+
+    ws1.Range("l2") = Application.WorksheetFunction.Sum(ws1.Range("l3:l" & l)) / 100
+
+    ws1.Range("m2") = Application.WorksheetFunction.Sum(ws1.Range("m3:m" & l)) / 100
+
+    ws1.Range("n2") = Application.WorksheetFunction.Sum(ws1.Range("n3:n" & l)) / 100
+
+    ws1.Range("o2") = Application.WorksheetFunction.Sum(ws1.Range("o3:o" & l)) / 100
+
+    ws1.Range("p2") = Application.WorksheetFunction.Sum(ws1.Range("p3:p" & l)) / 100
+
+    ws1.Range("q2") = Application.WorksheetFunction.Sum(ws1.Range("q3:q" & l)) / 100
+
+    ws1.Range("r2") = Application.WorksheetFunction.Sum(ws1.Range("r3:r" & l)) / 100
+
+    ws1.Range("s2") = Application.WorksheetFunction.Sum(ws1.Range("s3:s" & l)) / 100
+
+    ws1.Range("t2") = Application.WorksheetFunction.Sum(ws1.Range("t3:t" & l)) / 100
+
+    ws1.Range("u2") = Application.WorksheetFunction.Sum(ws1.Range("u3:u" & l)) / 100
+
+    ws1.Range("v2") = Application.WorksheetFunction.Sum(ws1.Range("v3:v" & l)) / 100
+
+    ws1.Range("w2") = Application.WorksheetFunction.Sum(ws1.Range("w3:w" & l)) / 100
+
+   ws1.Range("x2") = Application.WorksheetFunction.Sum(ws1.Range("x3:x" & l)) / 100
+
+    ws1.Range("y2") = Application.WorksheetFunction.Sum(ws1.Range("y3:y" & l)) / 100
+
+    ws1.Range("z2") = Application.WorksheetFunction.Sum(ws1.Range("z3:z" & l)) / 100
+
+end sub

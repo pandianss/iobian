@@ -1,0 +1,239 @@
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-03T07:00:19.559Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-03T07:00:19.560Z]  > DB ROLE: RO
+[2026-01-03T07:00:19.560Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-03T07:17:56.304Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-03T07:17:56.305Z]  > DB ROLE: RO
+[2026-01-03T07:17:56.305Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-03T15:07:01.450Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-03T15:07:01.450Z]  > DB ROLE: RO
+[2026-01-03T15:07:01.451Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-03T15:17:45.535Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-03T15:17:45.537Z]  > DB ROLE: RO
+[2026-01-03T15:17:45.538Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T03:52:31.339Z] LOGIN SUCCEEDED: Krishna Kumar S (59111)
+[2026-01-04T03:52:31.340Z]  > DB ROLE: RO
+[2026-01-04T03:52:31.340Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T05:10:50.735Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T05:10:50.736Z]  > DB ROLE: SuperAdmin
+[2026-01-04T05:10:50.737Z]  > SENT ROLE: SuperAdmin
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T07:07:26.429Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T07:07:26.430Z]  > DB ROLE: SuperAdmin
+[2026-01-04T07:07:26.431Z]  > SENT ROLE: SuperAdmin
+[2026-01-04T07:14:07.625Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T07:14:07.626Z]  > DB ROLE: SuperAdmin
+[2026-01-04T07:14:07.627Z]  > SENT ROLE: SuperAdmin
+[2026-01-04T07:17:03.047Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-04T07:17:03.048Z]  > DB ROLE: RO
+[2026-01-04T07:17:03.049Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T07:26:50.593Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T07:26:50.594Z]  > DB ROLE: SuperAdmin
+[2026-01-04T07:26:50.595Z]  > SENT ROLE: SuperAdmin
+[2026-01-04T07:30:43.119Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T07:30:43.119Z]  > DB ROLE: SuperAdmin
+[2026-01-04T07:30:43.120Z]  > SENT ROLE: SuperAdmin
+[2026-01-04T07:33:53.256Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-04T07:33:53.257Z]  > DB ROLE: RO
+[2026-01-04T07:33:53.258Z]  > SENT ROLE: RO
+[2026-01-04T07:48:02.219Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-04T07:48:02.221Z]  > DB ROLE: RO
+[2026-01-04T07:48:02.221Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T14:54:21.185Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T14:54:21.186Z]  > DB ROLE: SuperAdmin
+[2026-01-04T14:54:21.186Z]  > SENT ROLE: SuperAdmin
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T16:42:12.828Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-04T16:42:12.831Z]  > DB ROLE: RO
+[2026-01-04T16:42:12.831Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-04T16:54:45.549Z] Org Fetch Error: Cannot access 'sortStaff' before initialization 
+Stack: ReferenceError: Cannot access 'sortStaff' before initialization
+    at C:\Users\Acer\Videos\iobian_v1\iobian\server\index.js:1494:22
+    at Layer.handleRequest (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\index.js:295:15
+    at processParams (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\index.js:582:12)
+    at next (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\router\index.js:291:5)
+    at read (C:\Users\Acer\Videos\iobian_v1\iobian\server\node_modules\body-parser\lib\read.js:54:5)
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-04T17:01:37.664Z] [HANDLER] dindigul-org called. OrgMaster Length: 55
+[2026-01-04T17:01:37.665Z] [HANDLER] Check 0174: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-04T17:01:37.665Z] [HANDLER] Check 3165: {"branch_code":"3165","branch_name":"Ponnagaram","region_code":3933,"state":"Tamil Nadu","district":"Dindigul","taluk":"","revenue_centre":"","locality":"","latitude":10.342671,"longitude":77.991681,"pincode":624003,"category":"SEMI URBAN","type":"General Branch","is_deleted":false}
+[2026-01-04T17:01:37.666Z] Branch Theni Allinagaram (0174) matched region but deleted.
+[2026-01-04T17:01:37.666Z] Branch Theni Allinagaram (174) MATCHED!
+[2026-01-04T17:01:37.666Z] Branch Ayakudi (175) MATCHED!
+[2026-01-04T17:01:37.667Z] Branch Cumbum (176) MATCHED!
+[2026-01-04T17:01:37.667Z] Branch Vedasandur (230) MATCHED!
+[2026-01-04T17:01:37.667Z] Branch Pannaikadu (232) MATCHED!
+[2026-01-04T17:01:37.667Z] Branch Sithayamkottai (237) MATCHED!
+[2026-01-04T17:01:37.667Z] Branch Pattiveeranpatti (243) MATCHED!
+[2026-01-04T17:01:37.668Z] Branch Dindigul Main (332) MATCHED!
+[2026-01-04T17:01:37.668Z] Branch Palani (376) MATCHED!
+[2026-01-04T17:01:37.668Z] Branch Rasingapuram (883) MATCHED!
+[2026-01-04T17:01:37.668Z] Branch Sembatti (910) MATCHED!
+[2026-01-04T17:01:37.668Z] Branch Kalwarpatti (911) MATCHED!
+[2026-01-04T17:01:37.669Z] Branch Puduchatram (924) MATCHED!
+[2026-01-04T17:01:37.669Z] Branch Reddiapatti (1013) MATCHED!
+[2026-01-04T17:01:37.670Z] Branch Lakshmipuram (1044) MATCHED!
+[2026-01-04T17:01:37.670Z] Branch Nagayakottai (1112) MATCHED!
+[2026-01-04T17:01:37.670Z] Branch Narikkalpatti (1152) MATCHED!
+[2026-01-04T17:01:37.671Z] Branch Salaiyur (1220) MATCHED!
+[2026-01-04T17:01:37.672Z] Branch Marambadi (1221) MATCHED!
+[2026-01-04T17:01:37.672Z] Branch Oddanchatram (1258) MATCHED!
+[2026-01-04T17:01:37.672Z] Branch Dindigul Fort (1314) MATCHED!
+[2026-01-04T17:01:37.673Z] Branch Palayam (1316) MATCHED!
+[2026-01-04T17:01:37.674Z] Branch N Paraipatti (1317) MATCHED!
+[2026-01-04T17:01:37.674Z] Branch Silukkuwarpatti (1401) MATCHED!
+[2026-01-04T17:01:37.675Z] Branch Chinnamanur (1560) MATCHED!
+[2026-01-04T17:01:37.675Z] Branch Tamaraikulam (1789) MATCHED!
+[2026-01-04T17:01:37.675Z] Branch Dindigul Collectorate (1830) MATCHED!
+[2026-01-04T17:01:37.676Z] Branch Theni Medical College (1896) MATCHED!
+[2026-01-04T17:01:37.676Z] Branch Uthamapalayam (1919) MATCHED!
+[2026-01-04T17:01:37.676Z] Branch Periyakulam (1931) MATCHED!
+[2026-01-04T17:01:37.677Z] Branch RM Colony (2098) MATCHED!
+[2026-01-04T17:01:37.677Z] Branch Batlagundu (2286) MATCHED!
+[2026-01-04T17:01:37.677Z] Branch Andipatti (2287) MATCHED!
+[2026-01-04T17:01:37.677Z] Branch Natham (2288) MATCHED!
+[2026-01-04T17:01:37.678Z] Branch Vadamadurai (2461) MATCHED!
+[2026-01-04T17:01:37.678Z] Branch Nilakottai (2464) MATCHED!
+[2026-01-04T17:01:37.678Z] Branch Bodinayakanur (2574) MATCHED!
+[2026-01-04T17:01:37.678Z] Branch Silapadi (2685) MATCHED!
+[2026-01-04T17:01:37.678Z] Branch Chinnalapatti (2686) MATCHED!
+[2026-01-04T17:01:37.679Z] Branch KK Patti (2702) MATCHED!
+[2026-01-04T17:01:37.679Z] Branch PC Patti (2703) MATCHED!
+[2026-01-04T17:01:37.679Z] Branch T Subbulapuram (2704) MATCHED!
+[2026-01-04T17:01:37.679Z] Branch V Gopalpatti (2705) MATCHED!
+[2026-01-04T17:01:37.679Z] Branch K Reddiarchatram (2706) MATCHED!
+[2026-01-04T17:01:37.680Z] Branch Sendurai (3164) MATCHED!
+[2026-01-04T17:01:37.680Z] Branch Ponnagaram (3165) MATCHED!
+[2026-01-04T17:01:37.680Z] Branch Thadikombu (3166) MATCHED!
+[2026-01-04T17:01:37.680Z] Branch Vangamanuthu (3346) MATCHED!
+[2026-01-04T17:01:37.680Z] Branch Anaipatti (3347) MATCHED!
+[2026-01-04T17:01:37.681Z] Branch Kodaikanal (3436) MATCHED!
+[2026-01-04T17:01:37.681Z] Branch Dharumathupatti (3437) MATCHED!
+[2026-01-04T17:01:37.681Z] Branch Boothipuram (3548) MATCHED!
+[2026-01-04T17:01:37.681Z] Branch Ambilikai (3549) MATCHED!
+[2026-01-04T17:01:37.682Z] Branch Balakrishnapuram (3920) MATCHED!
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-04T18:28:15.846Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-04T18:28:15.847Z]  > DB ROLE: SuperAdmin
+[2026-01-04T18:28:15.847Z]  > SENT ROLE: SuperAdmin
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}

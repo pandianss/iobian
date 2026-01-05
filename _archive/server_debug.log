@@ -1,0 +1,149 @@
+[2025-12-29T15:17:01.934Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2025-12-29T15:17:01.935Z]  > DB ROLE: SuperAdmin
+[2025-12-29T15:17:01.936Z]  > SENT ROLE: SuperAdmin
+[2025-12-30T04:04:54.421Z] LOGIN SUCCEEDED: Krishna Kumar S (59111)
+[2025-12-30T04:04:54.423Z]  > DB ROLE: RO
+[2025-12-30T04:04:54.424Z]  > SENT ROLE: RO
+[2025-12-30T06:22:34.275Z] LOGIN SUCCEEDED: Krishna Kumar S (59111)
+[2025-12-30T06:22:34.282Z]  > DB ROLE: RO
+[2025-12-30T06:22:34.283Z]  > SENT ROLE: RO
+[2025-12-30T06:30:34.227Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T06:30:34.227Z]  > DB ROLE: RO
+[2025-12-30T06:30:34.229Z]  > SENT ROLE: RO
+[2025-12-30T08:40:26.925Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T08:40:26.936Z]  > DB ROLE: RO
+[2025-12-30T08:40:26.937Z]  > SENT ROLE: RO
+[2025-12-30T09:57:52.066Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T09:57:52.071Z]  > DB ROLE: RO
+[2025-12-30T09:57:52.071Z]  > SENT ROLE: RO
+[2025-12-30T10:29:19.623Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T10:29:19.624Z]  > DB ROLE: RO
+[2025-12-30T10:29:19.625Z]  > SENT ROLE: RO
+[2025-12-30T12:41:32.146Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T12:41:32.147Z]  > DB ROLE: RO
+[2025-12-30T12:41:32.148Z]  > SENT ROLE: RO
+[2025-12-30T14:08:07.522Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2025-12-30T14:08:07.523Z]  > DB ROLE: RO
+[2025-12-30T14:08:07.524Z]  > SENT ROLE: RO
+[2026-01-02T07:24:45.320Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-02T07:24:45.321Z]  > DB ROLE: RO
+[2026-01-02T07:24:45.322Z]  > SENT ROLE: RO
+[2026-01-02T07:32:06.329Z] Sanctions Sync: Processed 7 files. Total Records: 161731
+[2026-01-02T07:35:18.092Z] Sanctions Sync: Processed 7 files. Total Records: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-02T07:57:28.031Z] Sanctions Sync: Processed 7 files. Total Records: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-02T08:15:51.601Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-02T08:15:51.602Z]  > DB ROLE: RO
+[2026-01-02T08:15:51.603Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-02T08:44:52.248Z] Sanctions Sync: Processed 7 files. Total Records: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-02T09:33:47.024Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-02T09:33:47.025Z]  > DB ROLE: RO
+[2026-01-02T09:33:47.026Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-02T09:34:07.222Z] Sanctions Sync: Processed 7 files. Total Records: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 0
+[2026-01-02T09:48:02.842Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-02T09:48:02.843Z]  > DB ROLE: SuperAdmin
+[2026-01-02T09:48:02.843Z]  > SENT ROLE: SuperAdmin
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Synced sanctions. Count: 0
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[2026-01-02T23:42:50.544Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-02T23:42:50.546Z]  > DB ROLE: RO
+[2026-01-02T23:42:50.546Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-03T01:51:02.904Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-03T01:51:02.905Z]  > DB ROLE: RO
+[2026-01-03T01:51:02.906Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.

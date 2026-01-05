@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import { INDIAN_STATES } from '../../constants/geoData';
 import BranchMap from './BranchMap';
 
+import './BranchManager.css';
+
 const BranchManager = ({ user }) => {
     const [branches, setBranches] = useState([]);
     const [regions, setRegions] = useState([]);
@@ -366,24 +368,25 @@ const BranchManager = ({ user }) => {
     return (
         <div>
             {/* Import Section */}
-            <div className="card" style={{ marginBottom: '2rem' }}>
+            <div className="card import-section">
                 <h4>Branch Network Management / Import</h4>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+                <div className="import-controls">
                     <input
                         type="file"
                         id="file-upload"
                         accept=".xlsx, .xls"
                         onChange={handleFileUpload}
+                        className="file-input"
                     />
 
-                    <div style={{ marginTop: '1rem' }}>
+                    <div style={{ marginTop: '1rem', width: '100%' }}>
                         {headerStats && headerStats.columnsFound && (
-                            <div style={{ background: 'rgba(37, 74, 160, 0.2)', padding: '1rem', borderRadius: '4px', marginBottom: '1rem', border: '1px solid var(--border-color)' }}>
+                            <div className="import-analysis">
                                 <h5 style={{ marginBottom: '0.5rem' }}>Import Analysis</h5>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.5rem', fontSize: '0.85rem' }}>
+                                <div className="analysis-grid">
                                     {headerStats.columnsFound.map((col, idx) => (
-                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: col.status === 'ok' ? 'var(--success-color)' : 'var(--error-color)' }}></div>
+                                        <div key={idx} className="analysis-item">
+                                            <div className={`analysis-dot ${col.status === 'ok' ? 'dot-ok' : 'dot-missing'}`}></div>
                                             <span><strong>{col.system}</strong>: {col.excel}</span>
                                         </div>
                                     ))}
@@ -391,7 +394,7 @@ const BranchManager = ({ user }) => {
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div className="import-actions">
                             <button
                                 onClick={handleBulkCreate}
                                 disabled={importedData.length === 0}
@@ -407,33 +410,33 @@ const BranchManager = ({ user }) => {
                     </div>
                 </div>
 
-                {importMsg && <p style={{ marginTop: '0.5rem', color: importMsg.includes('skipped') ? 'orange' : 'green' }}>{importMsg}</p>}
+                {importMsg && <p className={`import-message ${importMsg.includes('skipped') ? 'msg-warning' : 'msg-success'}`}>{importMsg}</p>}
 
                 {importedData.length > 0 && (
-                    <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem', fontSize: '0.85rem' }}>
+                    <div className="import-table-container">
+                        <table className="data-table">
                             <thead>
-                                <tr style={{ background: 'var(--surface-color)', textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
-                                    <th style={{ padding: '0.5rem' }}><input type="checkbox" onChange={toggleSelectAllImports} checked={selectedImports.size === importedData.length && importedData.length > 0} /></th>
-                                    <th style={{ padding: '0.5rem' }}>SOL</th>
-                                    <th style={{ padding: '0.5rem' }}>Branch</th>
-                                    <th style={{ padding: '0.5rem' }}>Category</th>
-                                    <th style={{ padding: '0.5rem' }}>Size</th>
-                                    <th style={{ padding: '0.5rem' }}>Type</th>
-                                    <th style={{ padding: '0.5rem' }}>State</th>
-                                    <th style={{ padding: '0.5rem' }}>District</th>
+                                <tr className="table-header">
+                                    <th className="table-th"><input type="checkbox" onChange={toggleSelectAllImports} checked={selectedImports.size === importedData.length && importedData.length > 0} /></th>
+                                    <th className="table-th">SOL</th>
+                                    <th className="table-th">Branch</th>
+                                    <th className="table-th">Category</th>
+                                    <th className="table-th">Size</th>
+                                    <th className="table-th">Type</th>
+                                    <th className="table-th">State</th>
+                                    <th className="table-th">District</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {importedData.map((row, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)', background: selectedImports.has(idx) ? 'rgba(37, 74, 160, 0.1)' : 'transparent' }}>
-                                        <td style={{ padding: '0.5rem' }}><input type="checkbox" checked={selectedImports.has(idx)} onChange={() => toggleImportSelection(idx)} /></td>
-                                        <td style={{ padding: '0.5rem' }}>{row.branch_code}</td>
-                                        <td style={{ padding: '0.5rem' }}>{row.branch_name}</td>
-                                        <td style={{ padding: '0.5rem' }}>{row.category}</td>
-                                        <td style={{ padding: '0.5rem' }}>{row.size}</td>
-                                        <td style={{ padding: '0.5rem' }}>{row.type}</td>
-                                        <td style={{ padding: '0.5rem' }}>
+                                    <tr key={idx} className={`table-row ${selectedImports.has(idx) ? 'row-selected' : ''}`}>
+                                        <td className="table-td"><input type="checkbox" checked={selectedImports.has(idx)} onChange={() => toggleImportSelection(idx)} /></td>
+                                        <td className="table-td">{row.branch_code}</td>
+                                        <td className="table-td">{row.branch_name}</td>
+                                        <td className="table-td">{row.category}</td>
+                                        <td className="table-td">{row.size}</td>
+                                        <td className="table-td">{row.type}</td>
+                                        <td className="table-td">
                                             <select
                                                 value={row.state}
                                                 onChange={(e) => {
@@ -442,13 +445,13 @@ const BranchManager = ({ user }) => {
                                                     newD[idx].district = '';
                                                     setImportedData(newD);
                                                 }}
-                                                style={{ border: '1px solid #ddd', padding: '2px', width: '100%' }}
+                                                className="form-select-sm"
                                             >
                                                 <option value="">Select State</option>
                                                 {Object.keys(INDIAN_STATES).map(s => <option key={s} value={s}>{s}</option>)}
                                             </select>
                                         </td>
-                                        <td style={{ padding: '0.5rem' }}>
+                                        <td className="table-td">
                                             <select
                                                 value={row.district}
                                                 onChange={(e) => {
@@ -457,7 +460,7 @@ const BranchManager = ({ user }) => {
                                                     setImportedData(newD);
                                                 }}
                                                 disabled={!row.state}
-                                                style={{ border: '1px solid #ddd', padding: '2px', width: '100%' }}
+                                                className="form-select-sm"
                                             >
                                                 <option value="">Select District</option>
                                                 {row.state && INDIAN_STATES[row.state]?.map(d => <option key={d} value={d}>{d}</option>)}
@@ -484,39 +487,36 @@ const BranchManager = ({ user }) => {
 
                 {/* Modal Form */}
                 {showForm && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                        background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
-                    }}>
-                        <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', background: 'white' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div className="branch-form-overlay">
+                        <div className="card branch-form-modal">
+                            <div className="modal-header">
                                 <h4>{form.branch_code && branches.find(b => b.branch_code === form.branch_code) ? 'Edit Branch' : 'Add New Service Outlet'}</h4>
-                                <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                                <button onClick={() => setShowForm(false)} className="close-btn">×</button>
                             </div>
                             <form onSubmit={handleSubmit}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="form-grid">
                                     <div>
                                         <label>SOL ID</label>
-                                        <input value={form.branch_code} onChange={e => setForm({ ...form, branch_code: e.target.value })} required placeholder="e.g. 0174" />
+                                        <input value={form.branch_code} onChange={e => setForm({ ...form, branch_code: e.target.value })} required placeholder="e.g. 0174" className="form-input" />
                                     </div>
                                     <div>
                                         <label>Branch Name</label>
-                                        <input value={form.branch_name} onChange={e => setForm({ ...form, branch_name: e.target.value })} required placeholder="Branch Name" />
+                                        <input value={form.branch_name} onChange={e => setForm({ ...form, branch_name: e.target.value })} required placeholder="Branch Name" className="form-input" />
                                     </div>
                                 </div>
-                                <label style={{ marginTop: '1rem', display: 'block' }}>Region</label>
-                                <select value={form.region_code} onChange={e => setForm({ ...form, region_code: e.target.value })} style={{ width: '100%', padding: '0.5rem' }}>
+                                <label className="form-label">Region</label>
+                                <select value={form.region_code} onChange={e => setForm({ ...form, region_code: e.target.value })} className="form-select">
                                     <option value="">Select Region</option>
-                                    {regions.map(r => <option key={r.region_code} value={r.region_code}>{r.region_name}</option>)}
+                                    {regions.map(r => <option key={r.region_code} value={r.region_code}>{r.region_code} - {r.region_name}</option>)}
                                 </select>
 
-                                <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="form-grid">
                                     <div>
                                         <label>State</label>
                                         <select
                                             value={form.state}
                                             onChange={e => setForm({ ...form, state: e.target.value, district: '' })}
-                                            style={{ width: '100%', padding: '0.5rem' }}
+                                            className="form-select"
                                             required
                                         >
                                             <option value="">Select State</option>
@@ -528,7 +528,7 @@ const BranchManager = ({ user }) => {
                                         <select
                                             value={form.district}
                                             onChange={e => setForm({ ...form, district: e.target.value })}
-                                            style={{ width: '100%', padding: '0.5rem' }}
+                                            className="form-select"
                                             required
                                             disabled={!form.state}
                                         >
@@ -539,10 +539,10 @@ const BranchManager = ({ user }) => {
 
                                 </div>
 
-                                <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="form-grid">
                                     <div>
                                         <label>Category</label>
-                                        <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={{ width: '100%', padding: '0.5rem' }}>
+                                        <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="form-select">
                                             <option value="">Select Category</option>
                                             <option value="METROPOLITAN">Metropolitan</option>
                                             <option value="URBAN">Urban</option>
@@ -552,7 +552,7 @@ const BranchManager = ({ user }) => {
                                     </div>
                                     <div>
                                         <label>Size</label>
-                                        <select value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} style={{ width: '100%', padding: '0.5rem' }}>
+                                        <select value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} className="form-select">
                                             <option value="">Select Size</option>
                                             <option value="Large">Large</option>
                                             <option value="Medium">Medium</option>
@@ -562,34 +562,35 @@ const BranchManager = ({ user }) => {
                                     </div>
                                 </div>
 
-                                <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="form-grid">
                                     <div>
                                         <label>Type</label>
-                                        <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={{ width: '100%', padding: '0.5rem' }}>
+                                        <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="form-select">
                                             <option value="">Select Type</option>
-                                            <option value="Branch">Branch</option>
-                                            <option value="ATM">ATM</option>
-                                            <option value="Special Branch">Special Branch</option>
-                                            <option value="Other">Other</option>
+                                            <option value="General Branch">General Branch</option>
+                                            <option value="Captive Branch">Captive Branch</option>
+                                            <option value="Specialised MSME Branch">Specialised MSME Branch</option>
+                                            <option value="Specialised Agri Branch">Specialised Agri Branch</option>
+                                            <option value="Specialised Retail Branch">Specialised Retail Branch</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label>Pincode</label>
-                                        <input value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value })} placeholder="e.g. 600002" style={{ width: '100%', padding: '0.5rem' }} />
+                                        <input value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value })} placeholder="e.g. 600002" className="form-input" />
                                     </div>
                                 </div>
 
                                 <div style={{ marginTop: '1rem' }}>
                                     <label>Taluk</label>
-                                    <input value={form.taluk} onChange={e => setForm({ ...form, taluk: e.target.value })} placeholder="Taluk" style={{ width: '100%', padding: '0.5rem' }} />
+                                    <input value={form.taluk} onChange={e => setForm({ ...form, taluk: e.target.value })} placeholder="Taluk" className="form-input" />
                                 </div>
 
-                                <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <input value={form.latitude} onChange={e => setForm({ ...form, latitude: e.target.value })} placeholder="Latitude (Optional)" />
-                                    <input value={form.longitude} onChange={e => setForm({ ...form, longitude: e.target.value })} placeholder="Longitude (Optional)" />
+                                <div className="form-grid">
+                                    <input value={form.latitude} onChange={e => setForm({ ...form, latitude: e.target.value })} placeholder="Latitude (Optional)" className="form-input" />
+                                    <input value={form.longitude} onChange={e => setForm({ ...form, longitude: e.target.value })} placeholder="Longitude (Optional)" className="form-input" />
                                 </div>
 
-                                <button className="btn btn-primary" style={{ width: '100%', marginTop: '1.5rem' }}>
+                                <button className="btn btn-primary submit-btn">
                                     {form.branch_code && branches.find(b => b.branch_code === form.branch_code) ? 'Update Service Outlet' : 'Create Service Outlet'}
                                 </button>
                             </form>
@@ -599,33 +600,19 @@ const BranchManager = ({ user }) => {
                 )}
 
                 <div className="card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="branch-directory-header">
+                        <div className="directory-controls">
                             <h4>Branch Directory</h4>
-                            <div style={{ display: 'flex', background: 'var(--border-color)', padding: '2px', borderRadius: '4px' }}>
+                            <div className="view-mode-toggle">
                                 <button
                                     onClick={() => setViewMode('list')}
-                                    style={{
-                                        padding: '4px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                                        background: viewMode === 'list' ? 'var(--primary-color)' : 'transparent',
-                                        color: viewMode === 'list' ? 'white' : 'var(--text-secondary)',
-                                        boxShadow: viewMode === 'list' ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
-                                        fontWeight: viewMode === 'list' ? 'bold' : 'normal',
-                                        transition: 'all 0.2s'
-                                    }}
+                                    className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}
                                 >
                                     List
                                 </button>
                                 <button
                                     onClick={() => setViewMode('map')}
-                                    style={{
-                                        padding: '4px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                                        background: viewMode === 'map' ? 'var(--primary-color)' : 'transparent',
-                                        color: viewMode === 'map' ? 'white' : 'var(--text-secondary)',
-                                        boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
-                                        fontWeight: viewMode === 'map' ? 'bold' : 'normal',
-                                        transition: 'all 0.2s'
-                                    }}
+                                    className={`view-mode-btn ${viewMode === 'map' ? 'active' : ''}`}
                                 >
                                     Map
                                 </button>
@@ -634,7 +621,7 @@ const BranchManager = ({ user }) => {
                         {selectedBranches.size > 0 && !isReadOnly && (
                             <button
                                 onClick={handleDeleteSelectedBranches}
-                                style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                                className="delete-selected-btn"
                             >
                                 Delete Selected ({selectedBranches.size})
                             </button>
@@ -642,32 +629,32 @@ const BranchManager = ({ user }) => {
                     </div>
 
                     {viewMode === 'list' ? (
-                        <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                        <table className="branch-table data-table">
                             <thead>
-                                <tr style={{ background: 'var(--surface-color)', textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
-                                    <th style={{ padding: '0.5rem' }}><input type="checkbox" onChange={toggleSelectAllBranches} checked={selectedBranches.size === branches.length && branches.length > 0} /></th>
-                                    <th style={{ padding: '0.5rem' }}>SOL</th>
-                                    <th style={{ padding: '0.5rem' }}>Branch</th>
-                                    <th style={{ padding: '0.5rem' }}>Region</th>
-                                    <th style={{ padding: '0.5rem' }}>Category</th>
-                                    <th style={{ padding: '0.5rem' }}>Size</th>
-                                    <th style={{ padding: '0.5rem' }}>Type</th>
-                                    <th style={{ padding: '0.5rem' }}>Actions</th>
+                                <tr className="table-header">
+                                    <th className="table-th"><input type="checkbox" onChange={toggleSelectAllBranches} checked={selectedBranches.size === branches.length && branches.length > 0} /></th>
+                                    <th className="table-th">SOL</th>
+                                    <th className="table-th">Branch</th>
+                                    <th className="table-th">Region</th>
+                                    <th className="table-th">Category</th>
+                                    <th className="table-th">Size</th>
+                                    <th className="table-th">Type</th>
+                                    <th className="table-th">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {branches.map(b => (
-                                    <tr key={b.branch_code} style={{ borderBottom: '1px solid var(--border-color)', background: selectedBranches.has(b.branch_code) ? 'rgba(37, 74, 160, 0.2)' : 'transparent' }}>
-                                        <td style={{ padding: '0.5rem' }}><input type="checkbox" checked={selectedBranches.has(b.branch_code)} onChange={() => toggleBranchSelection(b.branch_code)} /></td>
-                                        <td style={{ padding: '0.5rem' }}><strong>{b.branch_code}</strong></td>
-                                        <td style={{ padding: '0.5rem' }}>{b.branch_name}</td>
-                                        <td style={{ padding: '0.5rem' }}>{regions.find(r => r.region_code === b.region_code)?.region_name || b.region_code}</td>
-                                        <td style={{ padding: '0.5rem' }}>{b.category}</td>
-                                        <td style={{ padding: '0.5rem' }}>{b.size}</td>
-                                        <td style={{ padding: '0.5rem' }}>{b.type}</td>
-                                        <td style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEdit(b)} style={{ color: '#0284c7', background: 'none', border: 'none', cursor: 'pointer' }}>Edit</button>
-                                            <button onClick={() => handleDelete(b.branch_code)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                                    <tr key={b.branch_code} className={`table-row ${selectedBranches.has(b.branch_code) ? 'row-selected' : ''}`}>
+                                        <td className="table-td"><input type="checkbox" checked={selectedBranches.has(b.branch_code)} onChange={() => toggleBranchSelection(b.branch_code)} /></td>
+                                        <td className="table-td"><strong>{b.branch_code}</strong></td>
+                                        <td className="table-td">{b.branch_name}</td>
+                                        <td className="table-td">{b.region_code}</td>
+                                        <td className="table-td">{b.category}</td>
+                                        <td className="table-td">{b.size}</td>
+                                        <td className="table-td">{b.type}</td>
+                                        <td className="table-td branch-actions">
+                                            <button onClick={() => handleEdit(b)} className="action-btn-edit">Edit</button>
+                                            <button onClick={() => handleDelete(b.branch_code)} className="action-btn-delete">Delete</button>
                                         </td>
                                     </tr>
                                 ))}
