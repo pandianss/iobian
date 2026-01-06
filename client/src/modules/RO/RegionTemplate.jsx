@@ -41,14 +41,7 @@ const RegionTemplate = () => {
 
     // Org Data State
     const [orgData, setOrgData] = useState({ head: null, team: [], branches: [] });
-    const [expandedBranches, setExpandedBranches] = useState({});
-
-    const toggleBranch = (code) => {
-        setExpandedBranches(prev => ({
-            ...prev,
-            [code]: !prev[code]
-        }));
-    };
+    const [selectedBranch, setSelectedBranch] = useState(null);
 
     // Login Modal State
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -517,130 +510,98 @@ const RegionTemplate = () => {
                             </div>
                         )}
 
-                        {/* Branches Section */}
-                        <div className="ml-8 pl-8 border-l-2 border-dashed border-gray-300">
-                            <h4 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                <span className="w-3 h-3 rounded-full bg-orange-500"></span>
-                                Branches ({orgData.branches?.length || 0})
-                            </h4>
+                        {/* Branch Heads Section */}
+                        {orgData.branches && orgData.branches.length > 0 && (
+                            <div className="w-full max-w-7xl mx-auto pb-12 mt-8">
+                                <h4 className="text-xl font-bold text-gray-800 mb-8 text-center">Branch Heads</h4>
 
-                            <div className="space-y-6">
-                                {orgData.branches && orgData.branches.map(branch => {
-                                    const isExpanded = expandedBranches[branch.branch_code];
-                                    return (
-                                        <div key={branch.branch_code} className="relative">
-                                            {/* Branch Node */}
-                                            <div
-                                                onClick={() => toggleBranch(branch.branch_code)}
-                                                className={`bg-white p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between group ${isExpanded ? 'border-orange-500 shadow-md ring-2 ring-orange-100' : 'border-gray-200 shadow-sm hover:border-orange-300'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`p-3 rounded-lg ${isExpanded ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-orange-100 group-hover:text-orange-600'} transition-colors`}>
-                                                        <Landmark size={20} />
-                                                    </div>
-                                                    <div>
-                                                        <h5 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                                                            {branch.branch_name}
-                                                            <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">Code: {branch.branch_code}</span>
-                                                        </h5>
-                                                        {branch.head && (
-                                                            <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                                                Head: <span className="font-medium text-gray-700">{branch.head.full_name}</span>
-                                                            </p>
+                                <div className="flex justify-center gap-12 flex-wrap">
+                                    {orgData.branches.map((branch) => (
+                                        <div
+                                            key={branch.branch_code}
+                                            className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+                                            onClick={() => setSelectedBranch(branch)}
+                                        >
+                                            {/* Branch Head Avatar */}
+                                            <div className="flex flex-col items-center">
+                                                <div className="relative">
+                                                    <div className="w-24 h-24 rounded-full border-4 border-orange-500 overflow-hidden bg-white shadow-lg">
+                                                        {branch.head?.photo ? (
+                                                            <img src={branch.head.photo} alt={branch.head.full_name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 text-orange-700 text-2xl font-bold">
+                                                                {branch.head ? branch.head.full_name.charAt(0) : 'B'}
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4">
+                                                <div className="mt-3 text-center max-w-[150px]">
+                                                    <div className="font-semibold text-sm text-gray-900">{branch.branch_name}</div>
+                                                    <div className="text-xs text-gray-500">Code: {branch.branch_code}</div>
                                                     {branch.head && (
-                                                        <a href={`tel:${branch.head.mobile}`} onClick={(e) => e.stopPropagation()} className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors" title="Call Branch Head">
-                                                            <Phone size={18} />
-                                                        </a>
+                                                        <div className="text-xs text-gray-600 mt-1">{branch.head.full_name}</div>
                                                     )}
-                                                    <ChevronDown className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                                                 </div>
                                             </div>
-
-                                            {/* Branch Children (Staff) - Organic Tree */}
-                                            {isExpanded && (
-                                                <div className="mt-6 ml-8 animate-fadeIn relative">
-                                                    {/* Branch Head - Highlighted */}
-                                                    {branch.head && (
-                                                        <div className="mb-4">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <div className="h-px flex-1 bg-gradient-to-r from-orange-400 to-transparent"></div>
-                                                                <span className="text-xs font-bold text-orange-700 uppercase tracking-wider bg-orange-100 px-3 py-1 rounded-full border-2 border-orange-300">Branch Head</span>
-                                                                <div className="h-px flex-1 bg-gradient-to-l from-orange-400 to-transparent"></div>
-                                                            </div>
-                                                            {renderStaffCard(branch.head, true)}
-                                                        </div>
-                                                    )}
-
-                                                    {/* Other Staff - Branching from Head like Tree Roots */}
-                                                    {branch.team.length > 0 && (
-                                                        <div className="relative pl-16">
-                                                            {/* Tree Root SVG - Central trunk with organic branches */}
-                                                            <svg className="absolute left-0 top-0" width="64" height="100%" style={{ minHeight: `${branch.team.length * 80}px` }}>
-                                                                <defs>
-                                                                    <linearGradient id={`trunk-${branch.branch_code}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                                                        <stop offset="0%" style={{ stopColor: '#d97706', stopOpacity: 0.7 }} />
-                                                                        <stop offset="100%" style={{ stopColor: '#b45309', stopOpacity: 0.3 }} />
-                                                                    </linearGradient>
-                                                                    <linearGradient id={`branch-${branch.branch_code}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                                                                        <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 0.6 }} />
-                                                                        <stop offset="100%" style={{ stopColor: '#fb923c', stopOpacity: 0.2 }} />
-                                                                    </linearGradient>
-                                                                </defs>
-
-                                                                {/* Central trunk */}
-                                                                <path
-                                                                    d={`M 8 0 Q 8 15, 10 30 L 10 ${branch.team.length * 80 - 30} Q 10 ${branch.team.length * 80 - 15}, 8 ${branch.team.length * 80}`}
-                                                                    stroke={`url(#trunk-${branch.branch_code})`}
-                                                                    strokeWidth="3"
-                                                                    fill="none"
-                                                                />
-
-                                                                {/* Organic branches to each staff member */}
-                                                                {branch.team.map((_, idx) => {
-                                                                    const yPos = idx * 80 + 40;
-                                                                    const side = idx % 2; // Alternate sides
-
-                                                                    // Create organic branching path
-                                                                    const branchPath = side === 0
-                                                                        ? `M 10 ${yPos - 8} Q 18 ${yPos - 4}, 25 ${yPos} Q 38 ${yPos + 3}, 52 ${yPos + 5}`
-                                                                        : `M 10 ${yPos + 8} Q 18 ${yPos + 5}, 26 ${yPos + 3} Q 40 ${yPos + 1}, 56 ${yPos}`;
-
-                                                                    return (
-                                                                        <path
-                                                                            key={idx}
-                                                                            d={branchPath}
-                                                                            stroke={`url(#branch-${branch.branch_code})`}
-                                                                            strokeWidth="2.5"
-                                                                            fill="none"
-                                                                            opacity="0.7"
-                                                                        />
-                                                                    );
-                                                                })}
-                                                            </svg>
-                                                            <div className="flex items-center gap-2 mb-3">
-                                                                <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide bg-orange-50 px-2 py-1 rounded">Staff Members</span>
-                                                            </div>
-                                                            <div className="space-y-3">
-                                                                {branch.team.map(member => renderStaffCard(member))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {!branch.head && branch.team.length === 0 && (
-                                                        <p className="text-gray-400 italic text-sm py-2">No staff members assigned.</p>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
-                                    );
-                                })}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Floating Panel for Branch Details */}
+                        {selectedBranch && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedBranch(null)}>
+                                <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                    {/* Panel Header */}
+                                    <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-t-2xl">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-2xl font-bold">{selectedBranch.branch_name}</h3>
+                                                <p className="text-orange-100 text-sm mt-1">Branch Code: {selectedBranch.branch_code}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedBranch(null)}
+                                                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                                            >
+                                                <X size={24} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Panel Content */}
+                                    <div className="p-6">
+                                        {/* Branch Head */}
+                                        {selectedBranch.head && (
+                                            <div className="mb-6">
+                                                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                                                    Branch Head
+                                                </h4>
+                                                {renderStaffCard(selectedBranch.head, true)}
+                                            </div>
+                                        )}
+
+                                        {/* Staff Members */}
+                                        {selectedBranch.team && selectedBranch.team.length > 0 && (
+                                            <div>
+                                                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                                    <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                                    Staff Members ({selectedBranch.team.length})
+                                                </h4>
+                                                <div className="grid md:grid-cols-2 gap-4">
+                                                    {selectedBranch.team.map(member => renderStaffCard(member))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {!selectedBranch.head && (!selectedBranch.team || selectedBranch.team.length === 0) && (
+                                            <p className="text-gray-400 italic text-center py-8">No staff members assigned to this branch.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
