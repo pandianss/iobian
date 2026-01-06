@@ -554,6 +554,11 @@ const RegionTemplate = () => {
                                                             <div className="mt-3 text-center max-w-[150px]">
                                                                 <div className="font-semibold text-sm text-gray-900">{branch.branch_name}</div>
                                                                 <div className="text-xs text-gray-500">Code: {branch.branch_code}</div>
+                                                                {branch.business_value && (
+                                                                    <div className="text-xs font-bold text-green-600 mt-1">
+                                                                        ₹{(branch.business_value / 10000000).toFixed(2)} Cr
+                                                                    </div>
+                                                                )}
                                                                 {branch.head && (
                                                                     <>
                                                                         <div className="text-xs text-gray-800 font-medium mt-2">{branch.head.full_name}</div>
