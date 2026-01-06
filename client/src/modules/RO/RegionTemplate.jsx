@@ -616,11 +616,11 @@ const RegionTemplate = () => {
                                     <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-2xl">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
+                                                <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
                                                     {selectedStaff.photo ? (
                                                         <img src={selectedStaff.photo} alt={selectedStaff.full_name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 text-xl font-bold">
+                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 text-3xl font-bold">
                                                             {selectedStaff.full_name.charAt(0)}
                                                         </div>
                                                     )}
