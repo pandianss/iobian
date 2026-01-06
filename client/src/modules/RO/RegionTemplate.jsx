@@ -490,47 +490,86 @@ const RegionTemplate = () => {
                             </div>
                         )}
 
-                        {/* Branch Heads Section */}
-                        {orgData.branches && orgData.branches.length > 0 && (
-                            <div className="w-full max-w-7xl mx-auto pb-12 mt-8">
-                                <h4 className="text-xl font-bold text-gray-800 mb-8 text-center">Branch Heads</h4>
+                        {/* Branch Heads Section - Grouped by Category */}
+                        {orgData.branches && orgData.branches.length > 0 && (() => {
+                            // Group branches by category
+                            const branchGroups = {};
+                            orgData.branches.forEach(branch => {
+                                const category = branch.category || 'Uncategorized';
+                                if (!branchGroups[category]) {
+                                    branchGroups[category] = [];
+                                }
+                                branchGroups[category].push(branch);
+                            });
 
-                                <div className="flex justify-center gap-12 flex-wrap">
-                                    {orgData.branches.map((branch) => (
-                                        <div
-                                            key={branch.branch_code}
-                                            className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
-                                            onClick={() => setSelectedBranch(branch)}
-                                        >
-                                            {/* Branch Head Avatar */}
-                                            <div className="flex flex-col items-center">
-                                                <div className="relative">
-                                                    <div className="w-24 h-24 rounded-full border-4 border-orange-500 overflow-hidden bg-white shadow-lg">
-                                                        {branch.head?.photo ? (
-                                                            <img src={branch.head.photo} alt={branch.head.full_name} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 text-orange-700 text-2xl font-bold">
-                                                                {branch.head ? branch.head.full_name.charAt(0) : 'B'}
+                            // Sort branches within each category by business value (descending)
+                            Object.keys(branchGroups).forEach(category => {
+                                branchGroups[category].sort((a, b) => (b.business_value || 0) - (a.business_value || 0));
+                            });
+
+                            // Define category order
+                            const categoryOrder = ['METRO', 'URBAN', 'SEMI URBAN', 'RURAL', 'Uncategorized'];
+                            const sortedCategories = Object.keys(branchGroups).sort((a, b) => {
+                                const indexA = categoryOrder.indexOf(a);
+                                const indexB = categoryOrder.indexOf(b);
+                                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                            });
+
+                            return (
+                                <div className="w-full max-w-7xl mx-auto pb-12 mt-8">
+                                    <h4 className="text-2xl font-bold text-gray-800 mb-12 text-center">Branch Heads</h4>
+
+                                    {sortedCategories.map(category => (
+                                        <div key={category} className="mb-12">
+                                            {/* Category Header */}
+                                            <div className="flex items-center gap-4 mb-6">
+                                                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-orange-300"></div>
+                                                <h5 className="text-lg font-bold text-orange-600 uppercase tracking-wider px-4 py-2 bg-orange-50 rounded-full border-2 border-orange-200">
+                                                    {category} ({branchGroups[category].length})
+                                                </h5>
+                                                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-orange-300"></div>
+                                            </div>
+
+                                            {/* Branches in this category */}
+                                            <div className="flex justify-center gap-12 flex-wrap">
+                                                {branchGroups[category].map((branch) => (
+                                                    <div
+                                                        key={branch.branch_code}
+                                                        className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+                                                        onClick={() => setSelectedBranch(branch)}
+                                                    >
+                                                        {/* Branch Head Avatar */}
+                                                        <div className="flex flex-col items-center">
+                                                            <div className="relative">
+                                                                <div className="w-24 h-24 rounded-full border-4 border-orange-500 overflow-hidden bg-white shadow-lg">
+                                                                    {branch.head?.photo ? (
+                                                                        <img src={branch.head.photo} alt={branch.head.full_name} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 text-orange-700 text-2xl font-bold">
+                                                                            {branch.head ? branch.head.full_name.charAt(0) : 'B'}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                        )}
+                                                            <div className="mt-3 text-center max-w-[150px]">
+                                                                <div className="font-semibold text-sm text-gray-900">{branch.branch_name}</div>
+                                                                <div className="text-xs text-gray-500">Code: {branch.branch_code}</div>
+                                                                {branch.head && (
+                                                                    <>
+                                                                        <div className="text-xs text-gray-800 font-medium mt-2">{branch.head.full_name}</div>
+                                                                        <div className="text-[10px] text-gray-500">{branch.head.designation}</div>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="mt-3 text-center max-w-[150px]">
-                                                    <div className="font-semibold text-sm text-gray-900">{branch.branch_name}</div>
-                                                    <div className="text-xs text-gray-500">Code: {branch.branch_code}</div>
-                                                    {branch.head && (
-                                                        <>
-                                                            <div className="text-xs text-gray-800 font-medium mt-2">{branch.head.full_name}</div>
-                                                            <div className="text-[10px] text-gray-500">{branch.head.designation}</div>
-                                                        </>
-                                                    )}
-                                                </div>
+                                                ))}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Floating Panel for Branch Details */}
                         {selectedBranch && (
