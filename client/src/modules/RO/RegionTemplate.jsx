@@ -42,6 +42,7 @@ const RegionTemplate = () => {
     // Org Data State
     const [orgData, setOrgData] = useState({ head: null, team: [], branches: [] });
     const [selectedBranch, setSelectedBranch] = useState(null);
+    const [selectedStaff, setSelectedStaff] = useState(null);
 
     // Login Modal State
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -357,32 +358,8 @@ const RegionTemplate = () => {
                         <p className="text-gray-600">Organizational Hierarchy & Contact Directory</p>
                     </div>
 
-                    {/* Tree Root: Regional Office */}
+                    {/* Organization Chart Container */}
                     <div className="relative">
-                        {/* Vertical Line for hierarchy */}
-                        <div className="absolute left-8 top-12 bottom-0 w-0.5 bg-gray-300 border-l border-dashed border-gray-400"></div>
-
-                        {/* Node: Regional Head */}
-                        <div className="relative z-10 mb-8">
-                            <div className="bg-white rounded-2xl shadow-lg border-l-4 border-orange-500 p-6 flex flex-col md:flex-row items-center gap-6 transform hover:-translate-y-1 transition-transform duration-300">
-                                <div className="w-24 h-24 rounded-full border-4 border-orange-100 shadow-inner overflow-hidden">
-                                    <img
-                                        src={orgData.head?.photo ? `http://localhost:5000${orgData.head.photo}` : generateAvatarSVG(orgData.head?.full_name || 'Head')}
-                                        alt="Regional Head"
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div className="text-center md:text-left flex-1">
-                                    <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-2 inline-block">REGIONAL HEAD</span>
-                                    <h3 className="text-2xl font-bold text-gray-900">{orgData.head?.full_name || 'Not Assigned'}</h3>
-                                    <p className="text-gray-600 font-medium">{orgData.head?.designation}</p>
-                                    <div className="mt-3 flex items-center justify-center md:justify-start gap-4 text-sm text-gray-500">
-                                        <span className="flex items-center gap-1"><MapPin size={16} /> Regional Office</span>
-                                        <a href={`tel:${orgData.head?.mobile}`} className="flex items-center gap-1 text-green-600 font-bold hover:bg-green-50 px-2 py-1 rounded-md transition-colors"><Phone size={16} /> {orgData.head?.mobile}</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Hierarchical Organization Chart */}
                         {(heads.length > 0 || officers.length > 0) && (
@@ -395,7 +372,7 @@ const RegionTemplate = () => {
                                         <div className="flex flex-col items-center">
                                             <div className="flex flex-col items-center">
                                                 {/* Circular Avatar */}
-                                                <div className="relative">
+                                                <div className="relative cursor-pointer hover:scale-105 transition-transform" onClick={() => setSelectedStaff(orgData.head)}>
                                                     <div className="w-32 h-32 rounded-full border-4 border-red-500 overflow-hidden bg-white shadow-lg">
                                                         {orgData.head.photo ? (
                                                             <img src={orgData.head.photo} alt={orgData.head.full_name} className="w-full h-full object-cover" />
@@ -436,7 +413,7 @@ const RegionTemplate = () => {
                                                             <div className="w-px h-8 bg-gray-400"></div>
 
                                                             {/* Department Head Avatar */}
-                                                            <div className="flex flex-col items-center">
+                                                            <div className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => setSelectedStaff(head)}>
                                                                 <div className="relative">
                                                                     <div className="w-24 h-24 rounded-full border-4 border-blue-500 overflow-hidden bg-white shadow-lg">
                                                                         {head.photo ? (
@@ -478,7 +455,7 @@ const RegionTemplate = () => {
                                                     }}></div>
 
                                                     {/* Officer Avatar */}
-                                                    <div className="flex flex-col items-center">
+                                                    <div className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => setSelectedStaff(officer)}>
                                                         <div className="relative">
                                                             <div className="w-20 h-20 rounded-full border-4 border-cyan-500 overflow-hidden bg-white shadow-md">
                                                                 {officer.photo ? (
@@ -601,6 +578,99 @@ const RegionTemplate = () => {
                                         {!selectedBranch.head && (!selectedBranch.team || selectedBranch.team.length === 0) && (
                                             <p className="text-gray-400 italic text-center py-8">No staff members assigned to this branch.</p>
                                         )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Staff Detail Modal */}
+                        {selectedStaff && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedStaff(null)}>
+                                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                                    {/* Modal Header */}
+                                    <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-2xl">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
+                                                    {selectedStaff.photo ? (
+                                                        <img src={selectedStaff.photo} alt={selectedStaff.full_name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 text-xl font-bold">
+                                                            {selectedStaff.full_name.charAt(0)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold">{selectedStaff.full_name}</h3>
+                                                    <p className="text-blue-100 text-sm">{selectedStaff.designation}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedStaff(null)}
+                                                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                                            >
+                                                <X size={24} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Modal Content */}
+                                    <div className="p-6 space-y-4">
+                                        {/* Contact Information */}
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Contact Information</h4>
+                                            <div className="space-y-2">
+                                                <a href={`tel:${selectedStaff.mobile}`} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                                                    <Phone size={18} className="text-green-600" />
+                                                    <span className="text-gray-800 font-medium">{selectedStaff.mobile}</span>
+                                                </a>
+                                                {selectedStaff.email && (
+                                                    <a href={`mailto:${selectedStaff.email}`} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                                        <Mail size={18} className="text-blue-600" />
+                                                        <span className="text-gray-800 text-sm">{selectedStaff.email}</span>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Department Information */}
+                                        {selectedStaff.departments && selectedStaff.departments.length > 0 && (
+                                            <div>
+                                                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Departments</h4>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {selectedStaff.departments.map((dept, idx) => (
+                                                        <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                                            {dept}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Additional Info */}
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Additional Information</h4>
+                                            <div className="space-y-2 text-sm">
+                                                {selectedStaff.branch_code && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Branch Code:</span>
+                                                        <span className="font-medium text-gray-800">{selectedStaff.branch_code}</span>
+                                                    </div>
+                                                )}
+                                                {selectedStaff.region_code && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Region Code:</span>
+                                                        <span className="font-medium text-gray-800">{selectedStaff.region_code}</span>
+                                                    </div>
+                                                )}
+                                                {selectedStaff.rank && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-600">Rank:</span>
+                                                        <span className="font-medium text-gray-800">{selectedStaff.rank}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
