@@ -1543,10 +1543,31 @@ app.get('/api/public/region/:code/org', (req, res) => {
             const branchHead = staff.find(u => u.is_head);
             const branchTeam = sortStaff(staff.filter(u => !u.is_head));
 
+            // Fetch business value from key_params data
+            let businessValue = 0;
+            if (mockData.key_params && mockData.key_params.length > 0) {
+                const branchData = mockData.key_params.find(row => {
+                    const solId = String(row['SOL ID'] || row['Sol Id'] || row['SOL'] || row['Branch Code'] || '');
+                    return solId === String(branch.branch_code);
+                });
+
+                if (branchData) {
+                    // Try to get Business value, or calculate from Deposits + Advances
+                    businessValue = parseFloat(branchData['Business'] || branchData['BUSINESS'] || 0);
+                    if (!businessValue) {
+                        const deposits = parseFloat(branchData['Deposits'] || branchData['DEPOSITS'] || 0);
+                        const advances = parseFloat(branchData['Advances'] || branchData['ADVANCES'] || 0);
+                        businessValue = deposits + advances;
+                    }
+                    // Convert from crores to actual value (multiply by 10 million)
+                    businessValue = businessValue * 10000000;
+                }
+            }
+
             return {
                 branch_code: branch.branch_code,
                 branch_name: branch.branch_name,
-                business_value: branch.business_value || 0,
+                business_value: businessValue,
                 latitude: branch.latitude,
                 longitude: branch.longitude,
                 district: branch.district,
