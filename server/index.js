@@ -1525,9 +1525,14 @@ app.get('/api/public/region/:code/org', (req, res) => {
                 departments: departments, // Array of department names
                 department_codes: departmentCodes, // Array of department codes
                 is_department_head: isDepartmentHead,
+                is_second_line_officer: u.is_second_line_officer || false,
                 photo: u.photo_url || null,
                 office: officeName || 'Branch Office',
                 mobile: u.mobile || 'N/A',
+                email: u.email || null,
+                branch_code: u.linked_branch_code || null,
+                region_code: u.linked_region_code || null,
+                rank: getRank(u.designation),
                 is_head: u.is_head
             };
         };

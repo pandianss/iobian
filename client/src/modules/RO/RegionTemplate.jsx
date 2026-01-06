@@ -611,10 +611,17 @@ const RegionTemplate = () => {
 
                                         {/* 2nd Line Officer */}
                                         {selectedBranch.team && selectedBranch.team.length > 0 && (() => {
-                                            // Sort team by rank to find 2nd line officer (highest rank)
-                                            const sortedTeam = [...selectedBranch.team].sort((a, b) => (b.rank || 0) - (a.rank || 0));
-                                            const secondLineOfficer = sortedTeam[0];
-                                            const otherStaff = sortedTeam.slice(1);
+                                            // Priority 1: Check for explicitly marked 2nd Line Officer
+                                            let secondLineOfficer = selectedBranch.team.find(member => member.is_second_line_officer === true);
+
+                                            // Priority 2: Fallback to highest rank if no checkbox is set
+                                            if (!secondLineOfficer) {
+                                                const sortedTeam = [...selectedBranch.team].sort((a, b) => (b.rank || 0) - (a.rank || 0));
+                                                secondLineOfficer = sortedTeam[0];
+                                            }
+
+                                            // Get other staff (exclude 2nd line officer)
+                                            const otherStaff = selectedBranch.team.filter(member => member !== secondLineOfficer);
 
                                             return (
                                                 <>

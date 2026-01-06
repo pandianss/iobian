@@ -20,7 +20,7 @@ const StaffManager = ({ user }) => {
         designation: '', designation_hindi: '',
         office_level: 'Branch', role: 'Branch', departments: [],
         linked_branch_code: '', linked_region_code: '', is_head: false,
-        photo_url: ''
+        is_second_line_officer: false, photo_url: ''
     });
     const [msg, setMsg] = useState('');
 
@@ -85,6 +85,7 @@ const StaffManager = ({ user }) => {
             linked_branch_code: user.linked_branch_code || '',
             linked_region_code: user.linked_region_code || '',
             is_head: user.is_head || false,
+            is_second_line_officer: user.is_second_line_officer || false,
             photo_url: user.photo_url || ''
         });
         setHistoryLogs(user.history || []);
@@ -99,7 +100,8 @@ const StaffManager = ({ user }) => {
             roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
             designation: '', designation_hindi: '',
             office_level: 'Branch', role: 'Branch', departments: [],
-            linked_branch_code: '', linked_region_code: '', is_head: false, photo_url: ''
+            linked_branch_code: '', linked_region_code: '', is_head: false,
+            is_second_line_officer: false, photo_url: ''
         });
         setMsg('');
     };
@@ -126,7 +128,8 @@ const StaffManager = ({ user }) => {
                         roll_number: '', full_name: '', full_name_hindi: '', mobile: '',
                         designation: '', designation_hindi: '',
                         office_level: 'Branch', role: 'Branch', departments: [],
-                        linked_branch_code: '', linked_region_code: '', is_head: false
+                        linked_branch_code: '', linked_region_code: '', is_head: false,
+                        is_second_line_officer: false, photo_url: ''
                     });
                 } else {
                     // Refresh history if editing
@@ -443,6 +446,19 @@ const StaffManager = ({ user }) => {
                             />
                             <label htmlFor="is_head" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 'bold' }}>
                                 Mark as Head of Office? (Branch/Region/Dept Head)
+                            </label>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <input
+                                type="checkbox"
+                                id="is_second_line_officer"
+                                checked={form.is_second_line_officer || false}
+                                onChange={e => setForm({ ...form, is_second_line_officer: e.target.checked })}
+                                style={{ width: 'auto' }}
+                            />
+                            <label htmlFor="is_second_line_officer" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 'bold' }}>
+                                Mark as 2nd Line Officer? (Next level of authority)
                             </label>
                         </div>
 
