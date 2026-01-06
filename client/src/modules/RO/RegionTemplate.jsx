@@ -626,7 +626,7 @@ const RegionTemplate = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-xl font-bold">{selectedStaff.full_name}</h3>
+                                                    <h3 className="text-xl font-bold text-white">{selectedStaff.full_name}</h3>
                                                     <p className="text-blue-100 text-sm">{selectedStaff.designation}</p>
                                                 </div>
                                             </div>
@@ -643,16 +643,16 @@ const RegionTemplate = () => {
                                     <div className="p-6 space-y-4">
                                         {/* Contact Information */}
                                         <div>
-                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Contact Information</h4>
+                                            <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Contact Information</h4>
                                             <div className="space-y-2">
                                                 <a href={`tel:${selectedStaff.mobile}`} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                                                     <Phone size={18} className="text-green-600" />
-                                                    <span className="text-gray-800 font-medium">{selectedStaff.mobile}</span>
+                                                    <span className="text-gray-900 font-semibold">{selectedStaff.mobile}</span>
                                                 </a>
                                                 {selectedStaff.email && (
                                                     <a href={`mailto:${selectedStaff.email}`} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                                                         <Mail size={18} className="text-blue-600" />
-                                                        <span className="text-gray-800 text-sm">{selectedStaff.email}</span>
+                                                        <span className="text-gray-900 font-medium text-sm">{selectedStaff.email}</span>
                                                     </a>
                                                 )}
                                             </div>
@@ -661,10 +661,10 @@ const RegionTemplate = () => {
                                         {/* Department Information */}
                                         {selectedStaff.departments && selectedStaff.departments.length > 0 && (
                                             <div>
-                                                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Departments</h4>
+                                                <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Departments</h4>
                                                 <div className="flex flex-wrap gap-2">
                                                     {selectedStaff.departments.map((dept, idx) => (
-                                                        <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                                        <span key={idx} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
                                                             {dept}
                                                         </span>
                                                     ))}
@@ -674,24 +674,24 @@ const RegionTemplate = () => {
 
                                         {/* Additional Info */}
                                         <div>
-                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Additional Information</h4>
+                                            <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Additional Information</h4>
                                             <div className="space-y-2 text-sm">
                                                 {selectedStaff.branch_code && (
                                                     <div className="flex justify-between">
-                                                        <span className="text-gray-600">Branch Code:</span>
-                                                        <span className="font-medium text-gray-800">{selectedStaff.branch_code}</span>
+                                                        <span className="text-gray-700 font-medium">Branch Code:</span>
+                                                        <span className="font-semibold text-gray-900">{selectedStaff.branch_code}</span>
                                                     </div>
                                                 )}
                                                 {selectedStaff.region_code && (
                                                     <div className="flex justify-between">
-                                                        <span className="text-gray-600">Region Code:</span>
-                                                        <span className="font-medium text-gray-800">{selectedStaff.region_code}</span>
+                                                        <span className="text-gray-700 font-medium">Region Code:</span>
+                                                        <span className="font-semibold text-gray-900">{selectedStaff.region_code}</span>
                                                     </div>
                                                 )}
                                                 {selectedStaff.rank && (
                                                     <div className="flex justify-between">
-                                                        <span className="text-gray-600">Rank:</span>
-                                                        <span className="font-medium text-gray-800">{selectedStaff.rank}</span>
+                                                        <span className="text-gray-700 font-medium">Rank:</span>
+                                                        <span className="font-semibold text-gray-900">{selectedStaff.rank}</span>
                                                     </div>
                                                 )}
                                             </div>
