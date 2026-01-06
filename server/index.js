@@ -1546,6 +1546,7 @@ app.get('/api/public/region/:code/org', (req, res) => {
             return {
                 branch_code: branch.branch_code,
                 branch_name: branch.branch_name,
+                business_value: branch.business_value || 0,
                 latitude: branch.latitude,
                 longitude: branch.longitude,
                 district: branch.district,
