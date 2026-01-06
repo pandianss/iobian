@@ -1547,7 +1547,7 @@ app.get('/api/public/region/:code/org', (req, res) => {
             let businessValue = 0;
             if (mockData.key_params && mockData.key_params.length > 0) {
                 const branchData = mockData.key_params.find(row => {
-                    const solId = String(row['SOL ID'] || row['Sol Id'] || row['SOL'] || row['Branch Code'] || '');
+                    const solId = String(row['Branch Code'] || row['SOL ID'] || row['Sol Id'] || row['SOL'] || '');
                     return solId === String(branch.branch_code);
                 });
 

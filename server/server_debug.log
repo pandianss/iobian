@@ -272,3 +272,8 @@ Stack: ReferenceError: Cannot access 'sortStaff' before initialization
 [STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
 [STARTUP] GET Sanctions: Serving 161731 records.
 [STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
