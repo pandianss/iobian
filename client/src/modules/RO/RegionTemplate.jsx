@@ -539,7 +539,10 @@ const RegionTemplate = () => {
                                                     <div className="font-semibold text-sm text-gray-900">{branch.branch_name}</div>
                                                     <div className="text-xs text-gray-500">Code: {branch.branch_code}</div>
                                                     {branch.head && (
-                                                        <div className="text-xs text-gray-600 mt-1">{branch.head.full_name}</div>
+                                                        <>
+                                                            <div className="text-xs text-gray-800 font-medium mt-2">{branch.head.full_name}</div>
+                                                            <div className="text-[10px] text-gray-500">{branch.head.designation}</div>
+                                                        </>
                                                     )}
                                                 </div>
                                             </div>
