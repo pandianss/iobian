@@ -259,3 +259,6 @@ Stack: ReferenceError: Cannot access 'sortStaff' before initialization
 [2026-01-05T10:38:22.989Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
 [2026-01-05T10:38:22.991Z]  > DB ROLE: RO
 [2026-01-05T10:38:22.992Z]  > SENT ROLE: RO
+[2026-01-06T07:36:46.132Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-06T07:36:46.146Z]  > DB ROLE: SuperAdmin
+[2026-01-06T07:36:46.148Z]  > SENT ROLE: SuperAdmin

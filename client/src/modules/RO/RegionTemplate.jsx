@@ -345,6 +345,9 @@ const RegionTemplate = () => {
                 }
             });
 
+            // Sort officers by rank/class in descending order (higher rank first)
+            officers.sort((a, b) => (b.rank || 0) - (a.rank || 0));
+
             return { heads, officers };
         };
 
@@ -562,18 +565,40 @@ const RegionTemplate = () => {
                                             </div>
                                         )}
 
-                                        {/* Staff Members */}
-                                        {selectedBranch.team && selectedBranch.team.length > 0 && (
-                                            <div>
-                                                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                                    <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
-                                                    Staff Members ({selectedBranch.team.length})
-                                                </h4>
-                                                <div className="grid md:grid-cols-2 gap-4">
-                                                    {selectedBranch.team.map(member => renderStaffCard(member))}
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/* 2nd Line Officer */}
+                                        {selectedBranch.team && selectedBranch.team.length > 0 && (() => {
+                                            // Sort team by rank to find 2nd line officer (highest rank)
+                                            const sortedTeam = [...selectedBranch.team].sort((a, b) => (b.rank || 0) - (a.rank || 0));
+                                            const secondLineOfficer = sortedTeam[0];
+                                            const otherStaff = sortedTeam.slice(1);
+
+                                            return (
+                                                <>
+                                                    {secondLineOfficer && (
+                                                        <div className="mb-6">
+                                                            <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                                                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                                2nd Line Officer
+                                                            </h4>
+                                                            {renderStaffCard(secondLineOfficer, true)}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Other Staff Members */}
+                                                    {otherStaff.length > 0 && (
+                                                        <div>
+                                                            <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                                                <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                                                Other Staff ({otherStaff.length})
+                                                            </h4>
+                                                            <div className="grid md:grid-cols-2 gap-4">
+                                                                {otherStaff.map(member => renderStaffCard(member))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
 
                                         {!selectedBranch.head && (!selectedBranch.team || selectedBranch.team.length === 0) && (
                                             <p className="text-gray-400 italic text-center py-8">No staff members assigned to this branch.</p>
