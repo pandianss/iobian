@@ -391,84 +391,129 @@ const RegionTemplate = () => {
                             </div>
                         </div>
 
-                        {/* RO Staff Hierarchy - Organic Tree */}
+                        {/* Hierarchical Organization Chart */}
                         {(heads.length > 0 || officers.length > 0) && (
-                            <div className="ml-8 pb-8 relative">
-                                <h4 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                                    Regional Office Staff
-                                </h4>
+                            <div className="w-full max-w-7xl mx-auto pb-12">
+                                <h4 className="text-xl font-bold text-gray-800 mb-8 text-center">Regional Office Organization</h4>
 
-                                {/* Department Heads - Highlighted */}
-                                {heads.length > 0 && (
-                                    <div className="mb-6">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <div className="h-px flex-1 bg-gradient-to-r from-orange-300 to-transparent"></div>
-                                            <span className="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border-2 border-orange-300">Department Head{heads.length > 1 ? 's' : ''}</span>
-                                            <div className="h-px flex-1 bg-gradient-to-l from-orange-300 to-transparent"></div>
+                                <div className="flex flex-col items-center gap-12">
+                                    {/* Level 1: Regional Head */}
+                                    {orgData.head && (
+                                        <div className="flex flex-col items-center">
+                                            <div className="flex flex-col items-center">
+                                                {/* Circular Avatar */}
+                                                <div className="relative">
+                                                    <div className="w-32 h-32 rounded-full border-4 border-red-500 overflow-hidden bg-white shadow-lg">
+                                                        {orgData.head.photo ? (
+                                                            <img src={orgData.head.photo} alt={orgData.head.full_name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200 text-red-700 text-3xl font-bold">
+                                                                {orgData.head.full_name.charAt(0)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+                                                        Regional Head
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 text-center">
+                                                    <div className="font-bold text-lg text-gray-900">{orgData.head.full_name}</div>
+                                                    <div className="text-sm text-gray-600">{orgData.head.designation}</div>
+                                                </div>
+                                            </div>
+
+                                            {/* Connector down */}
+                                            {heads.length > 0 && (
+                                                <div className="w-px h-12 bg-gray-400"></div>
+                                            )}
                                         </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            {heads.map(member => renderStaffCard(member, true))}
+                                    )}
+
+                                    {/* Level 2: Department Heads */}
+                                    {heads.length > 0 && (
+                                        <div className="flex flex-col items-center w-full">
+                                            {/* Horizontal connector */}
+                                            <div className="relative w-full max-w-5xl">
+                                                <div className="absolute top-0 left-0 right-0 h-px bg-gray-400" style={{ left: `${100 / (heads.length * 2)}%`, right: `${100 / (heads.length * 2)}%` }}></div>
+
+                                                <div className="flex justify-center gap-16 relative">
+                                                    {heads.map((head, idx) => (
+                                                        <div key={idx} className="flex flex-col items-center">
+                                                            {/* Vertical connector from horizontal line */}
+                                                            <div className="w-px h-8 bg-gray-400"></div>
+
+                                                            {/* Department Head Avatar */}
+                                                            <div className="flex flex-col items-center">
+                                                                <div className="relative">
+                                                                    <div className="w-24 h-24 rounded-full border-4 border-blue-500 overflow-hidden bg-white shadow-lg">
+                                                                        {head.photo ? (
+                                                                            <img src={head.photo} alt={head.full_name} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 text-2xl font-bold">
+                                                                                {head.full_name.charAt(0)}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="mt-3 text-center max-w-[150px]">
+                                                                    <div className="font-semibold text-sm text-gray-900">{head.full_name}</div>
+                                                                    <div className="text-xs text-gray-600">{head.designation}</div>
+                                                                    {head.departments && head.departments.length > 0 && (
+                                                                        <div className="mt-1 flex flex-wrap gap-1 justify-center">
+                                                                            {head.departments.map((dept, di) => (
+                                                                                <span key={di} className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{dept}</span>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Officers - Branching from Heads like Tree Roots */}
-                                {officers.length > 0 && (
-                                    <div className="relative pl-16">
-                                        {/* Tree Root SVG - Central trunk with organic branches */}
-                                        <svg className="absolute left-0 top-0" width="64" height="100%" style={{ minHeight: `${Math.ceil(officers.length / 2) * 160}px` }}>
-                                            <defs>
-                                                <linearGradient id="trunk-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                    <stop offset="0%" style={{ stopColor: '#8b7355', stopOpacity: 0.8 }} />
-                                                    <stop offset="100%" style={{ stopColor: '#6b5444', stopOpacity: 0.4 }} />
-                                                </linearGradient>
-                                                <linearGradient id="branch-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                    <stop offset="0%" style={{ stopColor: '#8b7355', stopOpacity: 0.6 }} />
-                                                    <stop offset="100%" style={{ stopColor: '#a0826d', stopOpacity: 0.2 }} />
-                                                </linearGradient>
-                                            </defs>
+                                    {/* Level 3: Officers */}
+                                    {officers.length > 0 && (
+                                        <div className="flex justify-center gap-12 flex-wrap max-w-6xl">
+                                            {officers.map((officer, idx) => (
+                                                <div key={idx} className="flex flex-col items-center">
+                                                    {/* Vertical connector up */}
+                                                    <div className="w-px h-12 bg-gray-300" style={{
+                                                        backgroundImage: officer.departments && officer.departments.length > 1 ? 'repeating-linear-gradient(0deg, #cbd5e1, #cbd5e1 4px, transparent 4px, transparent 8px)' : undefined
+                                                    }}></div>
 
-                                            {/* Central trunk */}
-                                            <path
-                                                d={`M 8 0 Q 8 20, 10 40 L 10 ${Math.ceil(officers.length / 2) * 160 - 40} Q 10 ${Math.ceil(officers.length / 2) * 160 - 20}, 8 ${Math.ceil(officers.length / 2) * 160}`}
-                                                stroke="url(#trunk-grad)"
-                                                strokeWidth="3"
-                                                fill="none"
-                                            />
-
-                                            {/* Organic branches to each officer */}
-                                            {officers.map((_, idx) => {
-                                                const row = Math.floor(idx / 2);
-                                                const col = idx % 2;
-                                                const yPos = row * 160 + 80;
-                                                const xEnd = col === 0 ? 48 : 64;
-
-                                                // Create organic branching path
-                                                const branchPath = col === 0
-                                                    ? `M 10 ${yPos - 10} Q 15 ${yPos - 5}, 20 ${yPos} Q 30 ${yPos + 2}, ${xEnd} ${yPos + 5}`
-                                                    : `M 10 ${yPos + 10} Q 15 ${yPos + 8}, 22 ${yPos + 5} Q 35 ${yPos + 3}, ${xEnd} ${yPos}`;
-
-                                                return (
-                                                    <path
-                                                        key={idx}
-                                                        d={branchPath}
-                                                        stroke="url(#branch-grad)"
-                                                        strokeWidth="2.5"
-                                                        fill="none"
-                                                        opacity="0.7"
-                                                    />
-                                                );
-                                            })}
-                                        </svg>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide bg-blue-50 px-2 py-1 rounded">Officer{officers.length > 1 ? 's' : ''}</span>
+                                                    {/* Officer Avatar */}
+                                                    <div className="flex flex-col items-center">
+                                                        <div className="relative">
+                                                            <div className="w-20 h-20 rounded-full border-4 border-cyan-500 overflow-hidden bg-white shadow-md">
+                                                                {officer.photo ? (
+                                                                    <img src={officer.photo} alt={officer.full_name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-100 to-cyan-200 text-cyan-700 text-xl font-bold">
+                                                                        {officer.full_name.charAt(0)}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="mt-2 text-center max-w-[130px]">
+                                                            <div className="font-medium text-xs text-gray-900">{officer.full_name}</div>
+                                                            <div className="text-[10px] text-gray-600">{officer.designation}</div>
+                                                            {officer.departments && officer.departments.length > 0 && (
+                                                                <div className="mt-1 flex flex-wrap gap-1 justify-center">
+                                                                    {officer.departments.map((dept, di) => (
+                                                                        <span key={di} className="text-[9px] bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded-full">{dept}</span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            {officers.map(member => renderStaffCard(member))}
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         )}
 
