@@ -631,7 +631,10 @@ const RegionTemplate = () => {
                                                 </div>
                                             </div>
                                             <button
-                                                onClick={() => setSelectedStaff(null)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedStaff(null);
+                                                }}
                                                 className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
                                             >
                                                 <X size={24} />
