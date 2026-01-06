@@ -530,6 +530,14 @@ const StaffManager = ({ user }) => {
                                                     HEAD
                                                 </span>
                                             )}
+                                            {u.is_second_line_officer && (
+                                                <span style={{
+                                                    background: '#3b82f6', color: 'white',
+                                                    padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem'
+                                                }}>
+                                                    {u.office_level === 'RO' ? 'RO 2ND LINE' : 'BRANCH 2ND LINE'}
+                                                </span>
+                                            )}
                                         </div>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{u.full_name_hindi}</div>
                                     </td>
