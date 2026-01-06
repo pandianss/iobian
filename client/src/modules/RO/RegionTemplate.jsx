@@ -413,26 +413,53 @@ const RegionTemplate = () => {
                                     </div>
                                 )}
 
-                                {/* Officers - Branching from Heads */}
+                                {/* Officers - Branching from Heads like Tree Roots */}
                                 {officers.length > 0 && (
-                                    <div className="relative pl-8">
-                                        {/* Organic curved connectors */}
-                                        <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${Math.ceil(officers.length / 2) * 160}px` }}>
+                                    <div className="relative pl-16">
+                                        {/* Tree Root SVG - Central trunk with organic branches */}
+                                        <svg className="absolute left-0 top-0" width="64" height="100%" style={{ minHeight: `${Math.ceil(officers.length / 2) * 160}px` }}>
                                             <defs>
-                                                <linearGradient id="ro-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                    <stop offset="0%" style={{ stopColor: '#cbd5e1', stopOpacity: 1 }} />
-                                                    <stop offset="100%" style={{ stopColor: '#e2e8f0', stopOpacity: 0.3 }} />
+                                                <linearGradient id="trunk-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" style={{ stopColor: '#8b7355', stopOpacity: 0.8 }} />
+                                                    <stop offset="100%" style={{ stopColor: '#6b5444', stopOpacity: 0.4 }} />
+                                                </linearGradient>
+                                                <linearGradient id="branch-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" style={{ stopColor: '#8b7355', stopOpacity: 0.6 }} />
+                                                    <stop offset="100%" style={{ stopColor: '#a0826d', stopOpacity: 0.2 }} />
                                                 </linearGradient>
                                             </defs>
-                                            {officers.map((_, idx) => (
-                                                <path
-                                                    key={idx}
-                                                    d={`M 0 ${Math.floor(idx / 2) * 160 + 80} Q 16 ${Math.floor(idx / 2) * 160 + 80}, 32 ${Math.floor(idx / 2) * 160 + 80}`}
-                                                    stroke="url(#ro-grad)"
-                                                    strokeWidth="2"
-                                                    fill="none"
-                                                />
-                                            ))}
+
+                                            {/* Central trunk */}
+                                            <path
+                                                d={`M 8 0 Q 8 20, 10 40 L 10 ${Math.ceil(officers.length / 2) * 160 - 40} Q 10 ${Math.ceil(officers.length / 2) * 160 - 20}, 8 ${Math.ceil(officers.length / 2) * 160}`}
+                                                stroke="url(#trunk-grad)"
+                                                strokeWidth="3"
+                                                fill="none"
+                                            />
+
+                                            {/* Organic branches to each officer */}
+                                            {officers.map((_, idx) => {
+                                                const row = Math.floor(idx / 2);
+                                                const col = idx % 2;
+                                                const yPos = row * 160 + 80;
+                                                const xEnd = col === 0 ? 48 : 64;
+
+                                                // Create organic branching path
+                                                const branchPath = col === 0
+                                                    ? `M 10 ${yPos - 10} Q 15 ${yPos - 5}, 20 ${yPos} Q 30 ${yPos + 2}, ${xEnd} ${yPos + 5}`
+                                                    : `M 10 ${yPos + 10} Q 15 ${yPos + 8}, 22 ${yPos + 5} Q 35 ${yPos + 3}, ${xEnd} ${yPos}`;
+
+                                                return (
+                                                    <path
+                                                        key={idx}
+                                                        d={branchPath}
+                                                        stroke="url(#branch-grad)"
+                                                        strokeWidth="2.5"
+                                                        fill="none"
+                                                        opacity="0.7"
+                                                    />
+                                                );
+                                            })}
                                         </svg>
                                         <div className="flex items-center gap-2 mb-4">
                                             <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide bg-blue-50 px-2 py-1 rounded">Officer{officers.length > 1 ? 's' : ''}</span>
@@ -504,29 +531,54 @@ const RegionTemplate = () => {
                                                         </div>
                                                     )}
 
-                                                    {/* Other Staff - Branching from Head */}
+                                                    {/* Other Staff - Branching from Head like Tree Roots */}
                                                     {branch.team.length > 0 && (
-                                                        <div className="relative pl-8">
-                                                            {/* Organic curved connectors */}
-                                                            <svg className="absolute left-0 top-0" width="32" height="100%" style={{ minHeight: `${branch.team.length * 80}px` }}>
+                                                        <div className="relative pl-16">
+                                                            {/* Tree Root SVG - Central trunk with organic branches */}
+                                                            <svg className="absolute left-0 top-0" width="64" height="100%" style={{ minHeight: `${branch.team.length * 80}px` }}>
                                                                 <defs>
-                                                                    <linearGradient id={`branch-grad-${branch.branch_code}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                                                        <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 0.4 }} />
-                                                                        <stop offset="100%" style={{ stopColor: '#fb923c', stopOpacity: 0.1 }} />
+                                                                    <linearGradient id={`trunk-${branch.branch_code}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                                                                        <stop offset="0%" style={{ stopColor: '#d97706', stopOpacity: 0.7 }} />
+                                                                        <stop offset="100%" style={{ stopColor: '#b45309', stopOpacity: 0.3 }} />
+                                                                    </linearGradient>
+                                                                    <linearGradient id={`branch-${branch.branch_code}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                                                        <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 0.6 }} />
+                                                                        <stop offset="100%" style={{ stopColor: '#fb923c', stopOpacity: 0.2 }} />
                                                                     </linearGradient>
                                                                 </defs>
-                                                                {branch.team.map((_, idx) => (
-                                                                    <path
-                                                                        key={idx}
-                                                                        d={`M 0 ${idx * 80 + 40} Q 16 ${idx * 80 + 40}, 32 ${idx * 80 + 40}`}
-                                                                        stroke={`url(#branch-grad-${branch.branch_code})`}
-                                                                        strokeWidth="2.5"
-                                                                        fill="none"
-                                                                    />
-                                                                ))}
+
+                                                                {/* Central trunk */}
+                                                                <path
+                                                                    d={`M 8 0 Q 8 15, 10 30 L 10 ${branch.team.length * 80 - 30} Q 10 ${branch.team.length * 80 - 15}, 8 ${branch.team.length * 80}`}
+                                                                    stroke={`url(#trunk-${branch.branch_code})`}
+                                                                    strokeWidth="3"
+                                                                    fill="none"
+                                                                />
+
+                                                                {/* Organic branches to each staff member */}
+                                                                {branch.team.map((_, idx) => {
+                                                                    const yPos = idx * 80 + 40;
+                                                                    const side = idx % 2; // Alternate sides
+
+                                                                    // Create organic branching path
+                                                                    const branchPath = side === 0
+                                                                        ? `M 10 ${yPos - 8} Q 18 ${yPos - 4}, 25 ${yPos} Q 38 ${yPos + 3}, 52 ${yPos + 5}`
+                                                                        : `M 10 ${yPos + 8} Q 18 ${yPos + 5}, 26 ${yPos + 3} Q 40 ${yPos + 1}, 56 ${yPos}`;
+
+                                                                    return (
+                                                                        <path
+                                                                            key={idx}
+                                                                            d={branchPath}
+                                                                            stroke={`url(#branch-${branch.branch_code})`}
+                                                                            strokeWidth="2.5"
+                                                                            fill="none"
+                                                                            opacity="0.7"
+                                                                        />
+                                                                    );
+                                                                })}
                                                             </svg>
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded">Staff Members</span>
+                                                                <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide bg-orange-50 px-2 py-1 rounded">Staff Members</span>
                                                             </div>
                                                             <div className="space-y-3">
                                                                 {branch.team.map(member => renderStaffCard(member))}
