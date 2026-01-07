@@ -342,9 +342,9 @@ const LetterForm = ({ onBack, initialData }) => {
 
                                             <div style={{ marginBottom: '2rem', whiteSpace: 'pre-wrap', color: '#000' }}>
                                                 <strong>To:</strong><br />
-                                                {formData.toName && <div style={{ color: '#000' }}>{formData.toName}</div>}
-                                                {formData.toDesignation && <div style={{ color: '#000' }}>{formData.toDesignation}</div>}
-                                                <div style={{ color: '#000' }}>{formData.toAddress}</div>
+                                                <div style={{ color: '#000', fontWeight: 'bold' }}>{formData.toName || '[Recipient Name]'}</div>
+                                                <div style={{ color: '#000' }}>{formData.toDesignation || '[Designation]'}</div>
+                                                <div style={{ color: '#000' }}>{formData.toAddress || '[Address]'}</div>
                                             </div>
 
                                             <div style={{ marginBottom: '1.5rem' }}>
