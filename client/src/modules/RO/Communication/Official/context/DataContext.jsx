@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as idb from '../utils/idb';
-// You might want to import a default logo or handle it gracefully
-const defaultLogo = '';
+import iobLogo from '../../../../assets/iob_logo.svg';
+
+const defaultLogo = iobLogo;
 
 const DataContext = createContext();
 
