@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 // Lazy Load Modules
-const DocumentGenerator = React.lazy(() => import('../modules/CTE/DocumentGenerator'));
+
 const Scorecard = React.lazy(() => import('../modules/PMS/Scorecard'));
 const InventoryManager = React.lazy(() => import('../modules/Inventory/InventoryManager'));
 const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
@@ -98,8 +98,7 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                     </div>
                 );
             // ... strict cases ...
-            case 'cte':
-                return <DocumentGenerator branchCode={user.linked_branch_code || 'CO'} branchName={user.office_level} user={user} />;
+
             case 'pms':
                 return <Scorecard user={user} divisionId={user.dept_id} />;
             case 'inventory':
@@ -214,7 +213,7 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                         {[
                             { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [] },
                             { id: 'service_requests', label: 'Service Requests', icon: <Wrench size={20} />, roles: [] },
-                            { id: 'cte', label: 'Document Generator (CTE)', icon: <FileText size={20} />, roles: [] },
+
                             { id: 'pms', label: 'Performance (PMS)', icon: <LineChart size={20} />, roles: [] },
                             { id: 'inventory', label: 'Inventory', icon: <Package size={20} />, roles: [] },
                             { id: 'branch_opening_survey', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] }, // Renamed 'planning' to 'branch_opening_survey' and updated label
