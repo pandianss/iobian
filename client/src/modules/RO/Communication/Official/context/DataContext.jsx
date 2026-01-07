@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as idb from '../utils/idb';
-import iobLogo from '../../../../../assets/iob_logo.svg';
+import iobLogo from '../../../../../assets/iob_logo_opt.png';
 
 const defaultLogo = iobLogo;
 

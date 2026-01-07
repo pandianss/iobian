@@ -54,7 +54,9 @@ const LetterForm = ({ onBack, initialData }) => {
         if (!isLoading && settings && !formData.refNo && !initialData) {
             const nextSeq = letters.length + 1;
             const seqStr = nextSeq.toString().padStart(3, '0');
-            const ref = `LT/${settings.regionCode}/${settings.defaultBranchCode}/${seqStr}`;
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+            const ref = `LT/${settings.regionCode}/${settings.defaultBranchCode}/${dateStr}/${seqStr}`;
             setFormData(prev => ({ ...prev, refNo: ref }));
         }
     }, [settings, letters.length, initialData, isLoading]);
