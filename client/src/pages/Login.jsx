@@ -84,7 +84,7 @@ const Login = ({ onLoginSuccess }) => {
           ← Back
         </button>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '60px' }} />
+          <img src="/IOB_LOGO_2025.svg" alt="IOB" style={{ height: '80px', objectFit: 'contain' }} />
         </div>
         <h2 style={{ marginBottom: '1.5rem' }}>Secure Employee Login</h2>
 

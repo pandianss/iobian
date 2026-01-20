@@ -3,6 +3,10 @@ import { Printer, Upload, User, Calendar, FileText, BadgeCheck, Save, ArrowLeft,
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import * as pdfjsLib from 'pdfjs-dist';
+import Button from '../../components/Common/Button';
+import Card from '../../components/Common/Card';
+import ModuleLayout from '../../components/Common/ModuleLayout';
+import { Download as DownloadIcon, Edit2 as EditIcon } from 'lucide-react';
 
 // Config PDF.js Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -394,676 +398,299 @@ const RetirementGenerator = ({ user }) => {
     };
 
     // --- RENDER LIST VIEW ---
-    if (view === 'list') {
-        return (
-            <div className="retirement-list-container fade-in">
-                <div className="list-header">
-                    <div>
-                        <h2>Retirement Relieving Orders</h2>
-                        <p>Manage and generate superannuation orders</p>
-                    </div>
-                    <button className="btn btn-primary" onClick={startNew}>
-                        <Plus size={18} /> Create New Letter
-                    </button>
-                </div>
+    const actions = view === 'editor' && (
+        <div className="flex gap-2">
+            <Button variant="secondary" icon={Save} onClick={() => handleSave()}>Save Letter</Button>
+            {form.mode === 'view' && <Button variant="gold" icon={DownloadIcon} onClick={handlePrint}>Download PDF</Button>}
+        </div>
+    );
 
-                <div className="table-wrapper">
-                    <table className="modern-table">
-                        <thead>
-                            <tr>
-                                <th>Ref No</th>
-                                <th>Employee</th>
-                                <th>Roll No</th>
-                                <th>Branch / SOL</th>
-                                <th>Retirement Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {savedLetters.length === 0 ? (
-                                <tr>
-                                    <td colSpan="6" className="empty-state">
-                                        No letters found. Create one to get started.
-                                    </td>
+    return (
+        <ModuleLayout
+            title="Retirement Orders"
+            icon={BadgeCheck}
+            viewMode={view}
+            onViewModeChange={(val) => val === 'new' ? startNew() : setView(val)}
+            isLoading={isLoading}
+            actions={actions}
+        >
+            {view === 'list' ? (
+                <Card noPadding>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50 border-b-2 border-slate-200">
+                                    <th className="p-4 font-semibold text-slate-700">Ref No</th>
+                                    <th className="p-4 font-semibold text-slate-700">Employee</th>
+                                    <th className="p-4 font-semibold text-slate-700">Roll No</th>
+                                    <th className="p-4 font-semibold text-slate-700">SOL</th>
+                                    <th className="p-4 font-semibold text-slate-700">Retirement Date</th>
+                                    <th className="p-4 text-right font-semibold text-slate-700">Actions</th>
                                 </tr>
-                            ) : (
-                                savedLetters.map(l => (
-                                    <tr key={l.id} onClick={() => viewLetter(l)} className="clickable-row">
-                                        <td><span className="badge-ref">{l.refNo}</span></td>
-                                        <td>{l.name}</td>
-                                        <td>{l.rollNo}</td>
-                                        <td>{getBranchDisplay(l.sol)}</td>
-                                        <td>{new Date(l.retirementDate).toLocaleDateString('en-GB')}</td>
-                                        <td>
-                                            <div className="actions-cell">
-                                                <button className="icon-btn" title="View/Download" onClick={(e) => { e.stopPropagation(); viewLetter(l, true); }}>
-                                                    <Download size={16} />
-                                                </button>
-                                                <button className="icon-btn edit" title="Edit" onClick={(e) => { e.stopPropagation(); editLetter(l); }}>
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button className="icon-btn delete" onClick={(e) => handleDelete(e, l.id)} title="Delete">
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
+                            </thead>
+                            <tbody>
+                                {savedLetters.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="p-8 text-center text-slate-400">
+                                            No letters found. Create one to get started.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                <style>{`
-                    .retirement-list-container {
-                        padding: 2rem;
-                        max-width: 1200px;
-                        margin: 0 auto;
-                    }
-                    .list-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 2rem;
-                    }
-                    .list-header h2 { font-size: 1.5rem; font-weight: bold; color: #1e293b; margin: 0; }
-                    .list-header p { color: #64748b; margin: 0.25rem 0 0; }
-
-                    .btn-primary {
-                        background: #2563eb;
-                        color: white;
-                        border: none;
-                        padding: 0.75rem 1.5rem;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        transition: background 0.2s;
-                    }
-                    .btn-primary:hover { background: #1d4ed8; }
-
-                    .table-wrapper {
-                        background: white;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                        overflow: hidden;
-                    }
-                    .modern-table { width: 100%; border-collapse: collapse; text-align: left; }
-                    .modern-table th { background: #f8fafc; padding: 1rem; color: #475569; font-weight: 600; font-size: 0.9rem; }
-                    .modern-table td { padding: 1rem; border-bottom: 1px solid #e2e8f0; color: #1e293b; }
-                    .clickable-row { cursor: pointer; transition: background 0.1s; }
-                    .clickable-row:hover { background: #f1f5f9; }
-                    .badge-ref { background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 500; }
-                    .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
-                    
-                    .actions-cell { display: flex; gap: 0.5rem; }
-                    .icon-btn { border: none; background: transparent; padding: 6px; border-radius: 4px; cursor: pointer; color: #64748b; transition: color 0.2s; }
-                    .icon-btn:hover { background: #e2e8f0; color: #0f172a; }
-                    .icon-btn.delete:hover { background: #fee2e2; color: #ef4444; }
-
-                    .gender-options { display: flex; gap: 1rem; margin-top: 0.5rem; }
-                    .gender-options label { font-weight: normal !important; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
-                `}</style>
-            </div>
-        );
-    }
-
-    // --- RENDER EDITOR VIEW ---
-    return (
-        <div className="retirement-generator-container fade-in">
-            {/* Control Panel / Form - Hidden when printing via CSS, but removing class to debug */}
-            <div className="control-panel">
-                <div className="panel-header">
-                    <button className="back-btn" onClick={() => setView('list')}><ArrowLeft size={18} /> Back</button>
-                    <h2>
-                        <FileText className="icon" />
-                        {form.mode === 'view' ? 'Letter Preview' : 'Letter Details'} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>({form.mode})</span>
-                        {form.mode === 'view' && <span className="badge-readonly">READ ONLY</span>}
-                    </h2>
-                </div>
-
-                {form.mode === 'view' && (
-                    <div className="readonly-info">
-                        <p><strong><Eye size={16} /> Read Only Mode</strong></p>
-                        <p>You are viewing a generated letter. To edit details, go back and click the pencil icon.</p>
-                    </div>
-                )}
-
-                <div className={`form-grid ${form.mode === 'view' ? 'disabled-form' : ''}`}>
-                    <div className="form-group">
-                        <label>Document Date</label>
-                        <div className="input-wrapper">
-                            <Calendar size={16} />
-                            <input
-                                type="date"
-                                value={form.documentDate}
-                                onChange={e => setForm({ ...form, documentDate: e.target.value })}
-                                disabled={form.mode === 'view'}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Employee Name</label>
-                        <div className="input-wrapper">
-                            <User size={16} />
-                            <input
-                                placeholder="e.g. John Doe"
-                                value={form.name}
-                                onChange={e => setForm({ ...form, name: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Designation</label>
-                        <input
-                            placeholder="e.g. Chief Manager"
-                            value={form.designation}
-                            onChange={e => setForm({ ...form, designation: e.target.value })}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>SOL Code</label>
-                        <input
-                            placeholder="e.g. 0123"
-                            value={form.sol}
-                            onChange={e => setForm({ ...form, sol: e.target.value })}
-                            maxLength={4}
-                        />
-                        {form.sol && (
-                            <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>
-                                Preview: {getBranchDisplay(form.sol)}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>Gender</label>
-                        <div className="gender-options">
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="Male"
-                                    checked={form.gender === 'Male'}
-                                    onChange={() => setForm({ ...form, gender: 'Male' })}
-                                /> Male
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="Female"
-                                    checked={form.gender === 'Female'}
-                                    onChange={() => setForm({ ...form, gender: 'Female' })}
-                                /> Female
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Roll Number</label>
-                        <div className="input-wrapper">
-                            <BadgeCheck size={16} />
-                            <input
-                                placeholder="e.g. 12345"
-                                value={form.rollNo}
-                                onChange={e => setForm({ ...form, rollNo: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Date of Joining</label>
-                        <div className="input-wrapper">
-                            <Calendar size={16} />
-                            <input
-                                type="date"
-                                value={form.joiningDate}
-                                onChange={e => setForm({ ...form, joiningDate: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-
-
-                    <div className="form-group">
-                        <label>Date of Retirement</label>
-                        <div className="input-wrapper">
-                            <Calendar size={16} />
-                            <input
-                                type="date"
-                                value={form.retirementDate}
-                                onChange={e => setForm({ ...form, retirementDate: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group full-width">
-                        <label>Employee Photo</label>
-                        <div className={`file-upload ${form.mode === 'view' ? 'disabled' : ''}`}>
-                            <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={form.mode === 'view'} />
-                            <div className="upload-placeholder">
-                                {form.photo ? (
-                                    <img src={form.photo} alt="Preview" className="msg-photo-preview" />
                                 ) : (
-                                    <>
-                                        <Upload size={20} />
-                                        <span>Upload Passport Size Photo</span>
-                                    </>
+                                    savedLetters.map(l => (
+                                        <tr key={l.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => viewLetter(l)}>
+                                            <td className="p-4"><span className="px-2 py-1 text-xs font-semibold rounded bg-blue-50 text-blue-600 border border-blue-100">{l.refNo}</span></td>
+                                            <td className="p-4 font-semibold text-slate-700">{l.name}</td>
+                                            <td className="p-4 text-slate-500">{l.rollNo}</td>
+                                            <td className="p-4 text-slate-500">{getBranchDisplay(l.sol)}</td>
+                                            <td className="p-4 text-slate-500">{new Date(l.retirementDate).toLocaleDateString('en-GB')}</td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); viewLetter(l, true); }} icon={DownloadIcon} title="Download" />
+                                                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); editLetter(l); }} icon={EditIcon} title="Edit" />
+                                                    <Button variant="ghost" size="sm" className="text-error-color hover:bg-red-50" onClick={(e) => handleDelete(e, l.id)} icon={Trash2} title="Delete" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
                                 )}
-                            </div>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <div className="form-group full-width">
-                        <label>Signatory Details (Regional Manager)</label>
-                        <div style={{ display: 'grid', gap: '0.5rem', background: '#f8fafc', padding: '0.8rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                            <input
-                                placeholder="Signatory Name"
-                                value={form.signatoryName || ''}
-                                onChange={e => setForm({ ...form, signatoryName: e.target.value })}
-                                style={{ fontSize: '0.85rem', width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                            />
-                            <input
-                                placeholder="Designation"
-                                value={form.signatoryDesignation || ''}
-                                onChange={e => setForm({ ...form, signatoryDesignation: e.target.value })}
-                                style={{ fontSize: '0.85rem', width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                            />
-                            <input
-                                placeholder="Region Name"
-                                value={form.signatoryRegion || ''}
-                                onChange={e => setForm({ ...form, signatoryRegion: e.target.value })}
-                                style={{ fontSize: '0.85rem', width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="action-bar">
-                    {form.mode === 'edit' && (
-                        <button className="btn btn-primary full-width" onClick={handleSaveAndPrint} disabled={isLoading}>
-                            {isLoading ? 'Saving...' : <><Save size={18} /> Save & Update</>}
-                        </button>
-                    )}
-
-                    <button className="btn btn-secondary full-width" onClick={downloadPDF} style={{ marginTop: '0.5rem', background: '#475569', color: 'white' }}>
-                        <Download size={18} /> {form.mode === 'view' ? 'Download PDF' : 'Save & Download'}
-                    </button>
-
-                    {form.refNo !== 'DRAFT' && (
-                        <div style={{ marginTop: '0.5rem', textAlign: 'center', fontSize: '0.8rem', color: 'green' }}>
-                            Ref: {form.refNo}
-                        </div>
-                    )}
-                </div>
-            </div >
-
-            {/* Preview / Print Area */}
-            < div className="letter-preview-container" >
-                <div className="a4-page" ref={letterRef}>
-
-                    {/* PDF Background */}
-                    {/* PDF Background (Canvas) */}
-                    <div className="pdf-background">
-                        <canvas ref={canvasRef} />
-                    </div>
-
-                    {/* Content Layer */}
-                    <div className="content-layer" style={{ paddingTop: '55mm' }}>
-                        {/* Reference & Date */}
-                        <div className="letter-meta">
-                            <p><strong>Ref:</strong> {form.refNo}</p>
-                            <p><strong>Date:</strong> {form.documentDate ? form.documentDate.split('-').reverse().join('/') : new Date().toLocaleDateString('en-GB')}</p>
-                        </div>
-
-                        {/* Photo */}
-                        {form.photo && (
-                            <div className="letter-photo">
-                                <img src={form.photo} alt="Employee" />
+                </Card>
+            ) : (
+                <div className="flex flex-col md:flex-row gap-6 h-full min-h-0 overflow-hidden">
+                    {/* Form Controls */}
+                    <Card className="w-full md:w-[450px] overflow-y-auto h-full flex-shrink-0 scrollbar-hide">
+                        {form.mode === 'view' && (
+                            <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-sm italic">
+                                <p className="flex items-center gap-2"><Eye size={16} /> Read Only Mode</p>
                             </div>
                         )}
 
-                        {/* Content */}
-                        <div className="letter-body">
-                            <p className="recipient">
-                                To,<br />
-                                <strong>{form.name || '[Employee Name]'}</strong><br />
-                                {form.designation || '[Designation]'}, Roll No: {form.rollNo || '[Roll No]'}<br />
-                                {getBranchDisplay(form.sol) || 'Branch [XXXX]'}
-                            </p>
+                        <div className={`flex flex-col gap-5 ${form.mode === 'view' ? 'opacity-60 pointer-events-none' : ''}`}>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Document Date</label>
+                                    <input
+                                        type="date"
+                                        className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                        value={form.documentDate}
+                                        onChange={e => setForm({ ...form, documentDate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gender</label>
+                                    <div className="flex gap-4 p-2 bg-slate-50 rounded-md border border-slate-100">
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                            <input type="radio" name="gender" value="Male" checked={form.gender === 'Male'} onChange={() => setForm({ ...form, gender: 'Male' })} /> Male
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                            <input type="radio" name="gender" value="Female" checked={form.gender === 'Female'} onChange={() => setForm({ ...form, gender: 'Female' })} /> Female
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <p style={{ marginTop: '35mm', fontWeight: 'bold' }}>
-                                {form.gender === 'Female' ? 'Madam,' : 'Sir,'}
-                            </p>
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Employee Name</label>
+                                <input
+                                    className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                    placeholder="Full Name as per records"
+                                    value={form.name}
+                                    onChange={e => setForm({ ...form, name: e.target.value })}
+                                />
+                            </div>
 
-                            <p>
-                                In recognition of your <strong>{calculateYears()}</strong> years of dedicated service since <strong>{form.joiningDate ? new Date(form.joiningDate).toLocaleDateString('en-GB') : '[Date]'}</strong>, we wish to express our sincere thanks and gratitude on this occasion of your superannuation.
-                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Roll No</label>
+                                    <input
+                                        className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                        placeholder="e.g. 123456"
+                                        value={form.rollNo}
+                                        onChange={e => setForm({ ...form, rollNo: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">SOL Code</label>
+                                    <input
+                                        className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                        placeholder="4 Digits"
+                                        value={form.sol}
+                                        onChange={e => setForm({ ...form, sol: e.target.value })}
+                                        maxLength={4}
+                                    />
+                                    {form.sol && <div className="text-[10px] text-slate-400 mt-1 italic">{getBranchDisplay(form.sol)}</div>}
+                                </div>
+                            </div>
 
-                            <p>
-                                As you turn the page to a new chapter, we celebrate your accomplishments and honor your incredible journey.
-                            </p>
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Designation</label>
+                                <input
+                                    className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                    placeholder="e.g. Senior Manager"
+                                    value={form.designation}
+                                    onChange={e => setForm({ ...form, designation: e.target.value })}
+                                />
+                            </div>
 
-                            <p>
-                                All IOBians join me in wishing you good health, happiness and peaceful retired life ahead.
-                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date of Joining</label>
+                                    <input
+                                        type="date"
+                                        className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                        value={form.joiningDate}
+                                        onChange={e => setForm({ ...form, joiningDate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group flex flex-col gap-1">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date of Retirement</label>
+                                    <input
+                                        type="date"
+                                        className="p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                        value={form.retirementDate}
+                                        onChange={e => setForm({ ...form, retirementDate: e.target.value })}
+                                    />
+                                </div>
+                            </div>
 
-                            <p>With kind regards,</p>
-                            <p>Yours faithfully,</p>
-                        </div>
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Employee Photo</label>
+                                <div className="relative group overflow-hidden rounded-lg border-2 border-dashed border-slate-200 hover:border-primary-color transition-colors aspect-video flex items-center justify-center bg-slate-50">
+                                    {form.photo ? (
+                                        <>
+                                            <img src={form.photo} alt="Preview" className="h-full w-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                <Button size="sm" variant="ghost" className="text-white" onClick={() => setForm({ ...form, photo: null })}>Remove</Button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2 text-slate-400">
+                                            <Upload size={24} />
+                                            <span className="text-xs font-semibold">Upload Photo</span>
+                                            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={handlePhotoUpload} />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                        {/* Footer */}
-                        <div className="letter-footer">
-                            <div className="signature-block">
-                                <div className="signature-space" style={{
-                                    background: 'rgba(255, 255, 255, 0.6)',
-                                    borderRadius: '15px',
-                                    backdropFilter: 'blur(2px)',
-                                    height: '70px',
-                                    marginBottom: '5px',
-                                    width: '100%'
-                                }}></div>
-                                <p style={{ marginBottom: '2px' }}><i>({form.signatoryName})</i></p>
-                                <p><strong>{form.signatoryDesignation}</strong></p>
-                                <p>{form.signatoryRegion}</p>
+                            <div className="form-group flex flex-col gap-2 mt-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Regional Manager (Signatory)</label>
+                                <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex flex-col gap-3">
+                                    <input
+                                        placeholder="Name of Signatory"
+                                        className="p-1.5 border border-indigo-200 rounded text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={form.signatoryName || ''}
+                                        onChange={e => setForm({ ...form, signatoryName: e.target.value })}
+                                    />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                            placeholder="Designation"
+                                            className="p-1.5 border border-indigo-200 rounded text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            value={form.signatoryDesignation || ''}
+                                            onChange={e => setForm({ ...form, signatoryDesignation: e.target.value })}
+                                        />
+                                        <input
+                                            placeholder="Region Name"
+                                            className="p-1.5 border border-indigo-200 rounded text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            value={form.signatoryRegion || ''}
+                                            onChange={e => setForm({ ...form, signatoryRegion: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Years of Service Overlay */}
-                        <div className="years-overlay">
-                            {calculateYears()}
+                        {form.refNo !== 'DRAFT' && (
+                            <div className="mt-8 pt-4 border-t border-slate-100 text-center">
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Document Reference</span>
+                                <div className="text-lg font-bold text-primary-color mt-1">{form.refNo}</div>
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Preview Area */}
+                    <div className="flex-1 bg-slate-800 p-8 flex justify-center overflow-y-auto rounded-lg shadow-inner">
+                        <div className="a4-page shadow-2xl origin-top scale-90 xxl:scale-100 flex-shrink-0" ref={letterRef} style={{ width: '210mm', height: '297mm', background: 'white', position: 'relative' }}>
+                            {/* PDF Background (Canvas) */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+                                <canvas ref={canvasRef} className="w-full h-full object-contain" />
+                            </div>
+
+                            {/* Content Layer */}
+                            <div className="relative z-10 p-[20mm] pt-[55mm] h-full flex flex-col" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                                <div className="flex justify-between items-start text-[11pt] text-slate-800 mb-12">
+                                    <div>
+                                        <div className="font-bold text-slate-400 text-xs mb-1 uppercase tracking-wider">Ref No:</div>
+                                        <div className="font-bold">{form.refNo}</div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="font-bold text-slate-400 text-xs mb-1 uppercase tracking-wider">Date:</div>
+                                        <div className="font-bold">{form.documentDate ? form.documentDate.split('-').reverse().join('/') : new Date().toLocaleDateString('en-GB')}</div>
+                                    </div>
+                                </div>
+
+                                {form.photo && (
+                                    <div className="absolute top-[65mm] right-[20mm] w-[35mm] h-[45mm] border-2 border-slate-200 overflow-hidden bg-slate-50 shadow-md">
+                                        <img src={form.photo} alt="Employee" className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+
+                                <div className="text-[12pt] leading-relaxed text-slate-900">
+                                    <div className="mb-8">
+                                        To,<br />
+                                        <strong className="text-[13pt]">{form.name || '[Employee Name]'}</strong><br />
+                                        {form.designation || '[Designation]'}, Roll No: {form.rollNo || '[Roll No]'}<br />
+                                        {getBranchDisplay(form.sol) || 'Branch [XXXX]'}
+                                    </div>
+
+                                    <div className="font-bold mb-6">
+                                        {form.gender === 'Female' ? 'Madam,' : 'Sir,'}
+                                    </div>
+
+                                    <div className="text-justify flex flex-col gap-6">
+                                        <p>
+                                            In recognition of your <strong>{calculateYears()}</strong> years of dedicated service since <strong>{form.joiningDate ? new Date(form.joiningDate).toLocaleDateString('en-GB') : '[Date]'}</strong>, we wish to express our sincere thanks and gratitude on this occasion of your superannuation.
+                                        </p>
+
+                                        <p>
+                                            As you turn the page to a new chapter, we celebrate your accomplishments and honor your incredible journey.
+                                        </p>
+
+                                        <p>
+                                            All IOBians join me in wishing you good health, happiness and peaceful retired life ahead.
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-12">
+                                        <p>With kind regards,</p>
+                                        <p>Yours faithfully,</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-auto flex justify-end">
+                                    <div className="w-[80mm] text-center">
+                                        <div className="h-[25mm] w-full flex items-center justify-center italic text-slate-300 pointer-events-none select-none">
+                                            Signature Placeholder
+                                        </div>
+                                        <div className="text-[11pt]">
+                                            <p className="font-bold">({form.signatoryName || 'Chandramouliswar R'})</p>
+                                            <p className="font-bold">{form.signatoryDesignation || 'Senior Regional Manager'}</p>
+                                            <p className="text-[10pt] text-slate-600">{form.signatoryRegion || 'Dindigul Region'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="absolute bottom-[20mm] left-[20mm] text-[48pt] font-black text-slate-100 -rotate-12 pointer-events-none select-none uppercase tracking-tighter opacity-50">
+                                    {calculateYears()} Years
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div >
-
-            {/* Styles */}
-            < style > {`
-                .retirement-generator-container {
-                    display: flex;
-                    gap: 2rem;
-                    height: calc(100vh - 100px);
-                    padding: 1rem;
-                    background-color: #f1f5f9;
-                    position: relative;
-                }
-
-                .control-panel {
-                    width: 350px;
-                    min-width: 350px; /* Force min width */
-                    flex-shrink: 0; 
-                    background: white;
-                    padding: 1.5rem;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                    display: flex !important; /* Force display */
-                    flex-direction: column;
-                    overflow-y: auto;
-                    margin-left: 0; 
-                    z-index: 100; /* High z-index */
-                    border-right: 2px solid #e2e8f0; /* Visible separator */
-                }
-                
-                .panel-header {
-                    margin-bottom: 1rem;
-                    border-bottom: 1px solid #e2e8f0;
-                    padding-bottom: 0.5rem;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-                .back-btn { align-self: flex-start; background: none; border: none; font-size: 0.85rem; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; }
-                .back-btn:hover { color: #2563eb; }
-
-                .panel-header h2 { font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; margin: 0; color: #1e293b; }
-
-                .form-grid {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.8rem;
-                    flex: 1;
-                }
-
-                .form-group label {
-                    display: block;
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                    color: #475569;
-                    margin-bottom: 0.2rem;
-                }
-
-                .input-wrapper {
-                    display: flex;
-                    align-items: center;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 6px;
-                    padding: 0 0.5rem;
-                    background: #fff;
-                    transition: border-color 0.2s;
-                }
-                .input-wrapper:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
-                .input-wrapper .icon { color: #94a3b8; }
-                
-                .form-group input {
-                    width: 100%;
-                    padding: 0.5rem;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 6px;
-                    font-size: 0.9rem;
-                    outline: none;
-                }
-                .input-wrapper input { border: none; padding: 0.4rem; }
-
-                .file-upload {
-                    border: 2px dashed #cbd5e1;
-                    border-radius: 6px;
-                    padding: 1rem;
-                    text-align: center;
-                    position: relative;
-                    cursor: pointer;
-                    transition: border-color 0.2s;
-                }
-                .file-upload:hover { border-color: #3b82f6; }
-                .file-upload input { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor: pointer; }
-                .upload-placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.8rem; }
-                .msg-photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; }
-
-                .btn-primary {
-                    background: #2563eb;
-                    color: white;
-                    border: none;
-                    padding: 0.75rem;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 0.5rem;
-                    transition: background 0.2s;
-                    margin-top: 1rem;
-                }
-                .btn-primary:hover { background: #1d4ed8; }
-
-                .letter-preview-container {
-                    flex: 1;
-                    overflow-y: auto;
-                    display: flex;
-                    justify-content: center;
-                    padding: 1rem;
-                    background: #cbd5e1;
-                }
-
-                .a4-page {
-                    width: 210mm;
-                    min-height: 297mm;
-                    background: white;
-                    padding: 0; 
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                    position: relative;
-                    overflow: hidden; 
-                    transform-origin: top center;
-                }
-
-                .pdf-background {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 1;
-                    opacity: 1;
-                    pointer-events: none;
-                }
-                .pdf-background canvas {
-                    width: 100%;
-                    height: 100%;
-                }
-
-                .content-layer {
-                    position: relative;
-                    z-index: 2;
-                    padding: 20mm;
-                    width: 100%;
-                    height: 100%;
-                    font-family: 'Times New Roman', Times, serif;
-                    color: #000;
-                    line-height: 1.6;
-                }
-
-                /* REFINED LETTER META - Stacked */
-                .letter-meta { 
-                    display: flex; 
-                    flex-direction: column; /* Stack vertically */
-                    gap: 0.5rem;
-                    margin-bottom: 2rem; 
-                    width: 60%; /* Limit width so it doesn't touch photo area */
-                    position: relative;
-                }
-                
-                /* Gender Radio Alignment */
-                .gender-options label { 
-                    font-weight: normal !important; 
-                    display: flex; 
-                    align-items: center !important; 
-                    gap: 0.5rem; 
-                    cursor: pointer; 
-                }
-                .gender-options input[type="radio"] { margin: 0; }
-                .letter-photo {
-                    position: absolute;
-                    top: 55mm; 
-                    right: 20mm;
-                    width: 35mm;
-                    height: 45mm;
-                    border: 1px solid #ccc;
-                    padding: 0; 
-                    background: white;
-                    overflow: hidden;
-                }
-                .letter-photo img { 
-                    width: 100%; 
-                    height: 100%; 
-                    object-fit: cover; 
-                    object-position: top; /* Focus on face */
-                }
-
-                .letter-body { margin-top: 2rem; font-size: 12pt; text-align: justify; }
-                .recipient { margin-bottom: 2rem; }
-                .subject { text-align: center; text-decoration: underline; margin: 2rem 0; font-weight: bold; }
-                .letter-body p { margin-bottom: 1rem; }
-
-                .letter-footer { margin-top: 4rem; display: flex; justify-content: flex-start; }
-                .signature-block { text-align: left; width: auto; min-width: 200px; }
-                .signature-space { height: 60px; }
-
-                /* YEARS OVERLAY STYLES */
-                .years-overlay {
-                    position: absolute;
-                    bottom: 35mm; 
-                    left: 50%;
-                    transform: translateX(-50%);
-                    font-size: 5rem;
-                    font-weight: 900; /* Extra bold */
-                    color: #D4AF37; /* Gold color */
-                    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-                    z-index: 10;
-                    text-align: center;
-                    width: 150px; /* Ensure it centers properly */
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    line-height: 1;
-                }
-
-                /* View Mode Styles */
-                .disabled-form {
-                    opacity: 0.5;
-                    pointer-events: none;
-                    filter: grayscale(1);
-                }
-                .readonly-info {
-                    background: #f1f5f9;
-                    border: 1px solid #cbd5e1;
-                    padding: 1rem;
-                    border-radius: 6px;
-                    margin-bottom: 1rem;
-                    color: #475569;
-                    font-size: 0.9rem;
-                    text-align: center;
-                }
-                .readonly-info p { margin: 0.2rem 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-                .badge-readonly {
-                    font-size: 0.7rem;
-                    background: #e2e8f0;
-                    color: #475569;
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    border: 1px solid #cbd5e1;
-                    margin-left: auto;
-                }
-
-                @media print {
-                    @page { margin: 0; size: A4; }
-                    body * { visibility: hidden; }
-                    .letter-preview-container, .letter-preview-container * {
-                        visibility: visible;
-                    }
-                .letter-preview-container {
-                    flex: 1;
-                    background: #333;
-                    padding: 2rem;
-                    display: flex;
-                    justify-content: center;
-                    overflow-y: auto;
-                }
-                .a4-page {
-                    background: white;
-                    width: 210mm;
-                    height: 297mm;
-                    position: relative;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-                    flex-shrink: 0;
-                }
-                        height: 100%;
-                    }
-                    .pdf-background {
-                        opacity: 1; /* Full visibility for print */
-                    }
-                    .no-print { display: none !important; }
-                }
-                
-                @media print {
-                     .control-panel { display: none !important; }
-                }
-            `}</style >
-        </div >
+            )}
+        </ModuleLayout>
     );
 };
 

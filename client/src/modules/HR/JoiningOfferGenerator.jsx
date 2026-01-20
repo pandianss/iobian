@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import iobLogo from '../../assets/iob_logo.svg';
+// Replaced old logo import with direct public path
 import { formatDate } from '../../utils/formatters';
 
 const JoiningOfferGenerator = () => {
@@ -126,9 +126,9 @@ const JoiningOfferGenerator = () => {
                             body { -webkit-print-color-adjust: exact; }
                             .page-break { page-break-before: always; }
                         }
-                        .letter-content { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: black; max-width: 210mm; margin: 0 auto; padding: 10mm; }
+                        .letter-content { font-family: 'Century Gothic', sans-serif; font-size: 11pt; line-height: 1.3; color: black; max-width: 210mm; margin: 0 auto; padding: 10mm; }
                         .letter-header { display: flex; align-items: flex-start; gap: 1rem; border-bottom: 2px dashed #999; padding-bottom: 10px; margin-bottom: 1rem; }
-                        .logo-section img { height: 60px; }
+                        .logo-section img { height: 120px; }
                         .address-section { font-size: 9pt; flex: 1; }
                         .contact-section { font-size: 9pt; text-align: right; }
                         .highlight { background-color: yellow; font-weight: bold; }
@@ -142,10 +142,8 @@ const JoiningOfferGenerator = () => {
                     <div className="letter-content">
                         {/* Header */}
                         <div className="letter-header">
-                            <div className="logo-section"><img src={iobLogo} alt="IOB" /></div>
+                            <div className="logo-section"><img src="/logo_center.svg" alt="IOB" /></div>
                             <div className="address-section">
-                                <b>इण्डियन ओवरसीज़ बैंक</b><br />
-                                Indian Overseas Bank<br />
                                 केंद्रीय कार्यालय, पी.बी.नं 3765, 763 अण्णा सालै, चेन्नई 600 002<br />
                                 Central Office, P.B.No.3765, 763, Anna Salai, Chennai 600 002<br />
                                 मानव संसाधन प्रबंधन विभाग Human Resources Management Department<br />

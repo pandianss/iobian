@@ -41,6 +41,8 @@ const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentMa
 const InterestRateManager = React.lazy(() => import('../modules/Planning/InterestRateManager'));
 const InterestWorksheet = React.lazy(() => import('../modules/Planning/InterestWorksheet'));
 const DindigulLanding = React.lazy(() => import('../modules/RO/DindigulRegion/DindigulLanding'));
+const DocumentGenerator = React.lazy(() => import('../modules/CTE/DocumentGenerator'));
+const ConductDashboard = React.lazy(() => import('../modules/Conduct/ConductDashboard'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
@@ -67,8 +69,6 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
     const renderContent = () => {
         switch (activeView) {
             // ... existing cases ...
-            case 'department_manager':
-                return <DepartmentManager />;
             // ...
             case 'dashboard':
                 return (
@@ -131,6 +131,10 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <InterestWorksheet user={user} />;
             case 'dindigul_region':
                 return <DindigulLanding />;
+            case 'document_generator':
+                return <DocumentGenerator user={user} branchCode={user.linked_branch_code} branchName={user.branch_name} />;
+            case 'conduct':
+                return <ConductDashboard />;
             default:
                 return <div>Module Under Construction</div>;
         }
@@ -141,28 +145,29 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             {/* Top Navigation */}
             <header style={{
                 height: 'var(--header-height, 60px)',
-                background: 'var(--surface-color)',
-                borderBottom: '1px solid var(--border-color)',
-                color: 'var(--text-on-light)',
+                background: 'linear-gradient(to right, var(--primary-color), #3b82f6)',
+                borderBottom: '4px solid var(--secondary-color)',
+                color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 2rem',
                 justifyContent: 'space-between',
-                flexShrink: 0 // Prevent header shrinking
+                flexShrink: 0,
+                boxShadow: 'var(--shadow-md)'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '45px', objectFit: 'contain' }} />
-                    <div style={{ fontSize: '0.9rem', opacity: 0.8, borderLeft: '1px solid #e2e8f0', paddingLeft: '1rem', color: 'var(--text-on-light)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <img src="/IOB_LOGO_2025.svg" alt="IOBIAN" style={{ height: '50px', objectFit: 'contain' }} />
+                    <div style={{ fontSize: '0.9rem', opacity: 0.9, borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1.5rem', color: 'white' }}>
                         {user.office_level === 'CO' ? 'Central Office' : user.office_level === 'RO' ? 'Regional Office' : user.office_level} Workspace
                     </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: '#f1f5f9', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem', color: 'var(--text-on-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(255,255,255,0.2)' }}>
                         <Clock size={14} />
                         {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                     </div>
-                    <span style={{ color: 'var(--text-on-light)' }}>{user.full_name}</span>
-                    <button onClick={onLogout} style={{ background: '#ef4444', border: 'none', color: 'white', padding: '0.4rem 1rem', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ color: 'white', fontWeight: 'bold' }}>{user.full_name}</span>
+                    <button onClick={onLogout} style={{ background: 'white', border: 'none', color: 'var(--primary-color)', padding: '0.4rem 1rem', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold' }}>
                         <LogOut size={16} /> Logout
                     </button>
                 </div>
@@ -228,6 +233,8 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                             { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
                             // { id: 'retirement_generator', label: 'Retirement Relieving', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'CO', 'CO_HRD'] }, // Moved to Document Generator
                             { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] },
+                            { id: 'document_generator', label: 'Document Generator', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] },
+                            { id: 'conduct', label: 'Conduct & Discipline', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'RO', 'Branch', 'CO'] },
                             { id: 'dindigul_region', label: 'Dindigul Region', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] }
                         ].map(item => {
                             if (item.roles.length > 0 && !item.roles.includes(user.role)) return null;

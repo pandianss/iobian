@@ -298,3 +298,58 @@ Stack: ReferenceError: Cannot access 'sortStaff' before initialization
 [STARTUP] Branches Count: undefined
 [STARTUP] OrgMaster Count: 55
 [STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-14T13:44:13.952Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-14T13:44:13.954Z]  > DB ROLE: RO
+[2026-01-14T13:44:13.955Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-19T05:36:58.990Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T05:36:58.991Z]  > DB ROLE: SuperAdmin
+[2026-01-19T05:36:58.991Z]  > SENT ROLE: SuperAdmin
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-19T05:56:21.423Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T05:56:21.424Z]  > DB ROLE: SuperAdmin
+[2026-01-19T05:56:21.425Z]  > SENT ROLE: SuperAdmin
+[2026-01-19T07:57:36.445Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T07:57:36.447Z]  > DB ROLE: SuperAdmin
+[2026-01-19T07:57:36.447Z]  > SENT ROLE: SuperAdmin
+[2026-01-19T08:28:11.549Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T08:28:11.550Z]  > DB ROLE: SuperAdmin
+[2026-01-19T08:28:11.550Z]  > SENT ROLE: SuperAdmin
+[2026-01-19T09:45:49.593Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T09:45:49.606Z]  > DB ROLE: SuperAdmin
+[2026-01-19T09:45:49.607Z]  > SENT ROLE: SuperAdmin
+[2026-01-19T10:25:58.435Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-19T10:25:58.437Z]  > DB ROLE: SuperAdmin
+[2026-01-19T10:25:58.438Z]  > SENT ROLE: SuperAdmin
+[2026-01-19T11:58:13.888Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-19T11:58:13.890Z]  > DB ROLE: RO
+[2026-01-19T11:58:13.890Z]  > SENT ROLE: RO
+[2026-01-19T13:10:15.442Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-19T13:10:15.446Z]  > DB ROLE: RO
+[2026-01-19T13:10:15.446Z]  > SENT ROLE: RO
+[2026-01-19T13:16:15.661Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-19T13:16:15.662Z]  > DB ROLE: RO
+[2026-01-19T13:16:15.663Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-20T07:21:05.474Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-20T07:21:05.502Z]  > DB ROLE: RO
+[2026-01-20T07:21:05.503Z]  > SENT ROLE: RO

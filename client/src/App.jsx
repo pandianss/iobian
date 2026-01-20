@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import PublicHome from './pages/PublicHome';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ConductDashboard from './modules/Conduct/ConductDashboard';
 import DindigulLanding from './modules/RO/DindigulRegion/DindigulLanding';
 import RegionTemplate from './modules/RO/RegionTemplate';
 import ChangePassword from './pages/ChangePassword';
@@ -115,6 +116,13 @@ function App() {
               ) : (
                 <Navigate to="/login" replace />
               )
+            }
+          />
+
+          <Route
+            path="/conduct"
+            element={
+              user ? <ConductDashboard /> : <Navigate to="/login" replace />
             }
           />
 

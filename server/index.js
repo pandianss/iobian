@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const persistence = require('./persistence');
 const { v4: uuidv4 } = require('uuid');
+const puppeteer = require('puppeteer');
 
 // Load initial data
 let mockData = persistence.loadData();
@@ -1792,12 +1793,55 @@ app.get('/api/public/dindigul-org', (req, res) => {
             success: true,
             head: head ? formatUser(head, 'Regional Office') : null,
             team: team.map(u => formatUser(u, 'Regional Office')),
-            branches: branchHierarchy
         });
 
     } catch (error) {
         console.error("Org Fetch Error:", error);
         res.status(500).json({ success: false, message: 'Failed to fetch organization structure' });
+    }
+});
+
+// --- 11. PDF Generation Endpoint ---
+app.post('/api/generate-pdf', async (req, res) => {
+    const { html } = req.body;
+
+    if (!html) {
+        return res.status(400).json({ success: false, message: 'HTML content required' });
+    }
+
+    try {
+        const browser = await puppeteer.launch({
+            headless: 'new',
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+
+        // Use A4 dimensions
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+
+        const pdfBuffer = await page.pdf({
+            format: 'A4',
+            margin: {
+                top: '10mm',
+                bottom: '10mm',
+                left: '10mm',
+                right: '10mm'
+            },
+            printBackground: true,
+            displayHeaderFooter: false
+        });
+
+        await browser.close();
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Length': pdfBuffer.length
+        });
+        res.send(pdfBuffer);
+
+    } catch (error) {
+        console.error('PDF Generation Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to generate PDF' });
     }
 });
 

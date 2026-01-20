@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import iobLogo from '../../assets/iob_logo.svg';
+// Replaced old logo import with direct public path
 
 const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
-    const lh = { logo: iobLogo };
+    const lh = { logo: '/logo_center.svg' };
     const [viewMode, setViewMode] = useState('edit'); // 'edit' | 'preview'
     const [showWorksheet, setShowWorksheet] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
@@ -722,12 +722,8 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                         {/* Header from LetterForm */}
                         <div className="form-content">
 
-                            <div className="print-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid black', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-                                <div>{lh?.logo && <img src={lh.logo} alt="Logo" style={{ height: '80px' }} />}</div>
-                                <div style={{ textAlign: 'right', color: logoColor }}>
-                                    <h1 style={{ fontSize: '16pt', fontWeight: 'bold', margin: '0 0 2px 0', lineHeight: '1.2', color: logoColor }}>क्षेत्रीय कार्यालय {currentRegion.hindi || currentRegion.name}</h1>
-                                    <h2 style={{ fontSize: '15pt', fontFamily: 'Arial', fontWeight: 'bold', margin: 0, textDecoration: 'none', color: logoColor }}>Regional Office {currentRegion.english || currentRegion.name}</h2>
-                                </div>
+                            <div className="print-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '2px solid black', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+                                <div>{lh?.logo && <img src={lh.logo} alt="Logo" style={{ height: '160px', objectFit: 'contain' }} />}</div>
                             </div>
 
                             <div className="center bold" style={{ fontSize: '1.2rem', textDecoration: 'underline', marginBottom: '1.5rem' }}>
@@ -738,7 +734,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                 Region: {formData.regionName || 'Dindigul'}
                             </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', fontFamily: 'Arial, sans-serif' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', fontFamily: 'Century Gothic, sans-serif' }}>
                                 <div>
                                     <div style={{ fontWeight: 'bold' }}>To:</div>
                                     <div style={{ marginLeft: '0px', fontWeight: 'bold' }}>

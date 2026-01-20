@@ -10,10 +10,10 @@ const PublicHome = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)'
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
         }}>
-            <div className="glass-panel" style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center', maxWidth: '1000px', width: '90%' }}>
-                <img src="/src/assets/iob_logo.svg" alt="IOB" style={{ height: '80px', marginBottom: '1.5rem' }} />
+            <div className="glass-panel" style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center', maxWidth: '1000px', width: '90%', border: '1px solid rgba(37, 74, 160, 0.1)' }}>
+                <img src="/IOB_LOGO_2025.svg" alt="IOB" style={{ height: '120px', marginBottom: '1.5rem', objectFit: 'contain' }} />
                 <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Unified Banking Operations Portal</h1>
                 <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
                     Centralized coordination for seamless banking operations.
@@ -22,9 +22,9 @@ const PublicHome = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', justifyContent: 'center' }}>
 
                     {/* 1. IOB Online */}
-                    <div className="card hover-card" onClick={() => window.open('https://www.iob.in', '_blank')} style={cardStyleByColor('#0056b3')}>
-                        <Globe size={40} style={{ marginBottom: '1rem', color: '#0056b3' }} />
-                        <h4 style={{ marginBottom: '0.5rem', color: '#0056b3' }}>IOB Online</h4>
+                    <div className="card hover-card" onClick={() => window.open('https://www.iob.in', '_blank')} style={cardStyleByColor('var(--primary-color)')}>
+                        <Globe size={40} style={{ marginBottom: '1rem', color: 'var(--primary-color)' }} />
+                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--primary-color)' }}>IOB Online</h4>
                         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Internet Banking & Corporate Website</p>
                     </div>
 
