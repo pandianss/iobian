@@ -28,14 +28,14 @@ const Scorecard = React.lazy(() => import('../modules/PMS/Scorecard'));
 const InventoryManager = React.lazy(() => import('../modules/Inventory/InventoryManager'));
 const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
 const BranchManager = React.lazy(() => import('../modules/Admin/BranchManager'));
-const BranchOpeningSurvey = React.lazy(() => import('../modules/Planning/BranchOpeningSurvey')); // Added
+// BranchOpeningSurvey integrated into DocumentGenerator
 const CampaignManager = React.lazy(() => import('../modules/RO/CampaignManager'));
-const RoCommunication = React.lazy(() => import('../modules/RO/Communication/ROCommunication'));
+// RoCommunication integrated into DocumentGenerator
 const StaffManager = React.lazy(() => import('../modules/HR/StaffManager'));
 const RestorationVault = React.lazy(() => import('../modules/Admin/RestorationVault'));
 const DesignationManager = React.lazy(() => import('../modules/Admin/DesignationManager'));
 const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
-const JoiningOfferGenerator = React.lazy(() => import('../modules/HR/JoiningOfferGenerator'));
+// JoiningOfferGenerator integrated into DocumentGenerator
 // const RetirementGenerator = React.lazy(() => import('../modules/HR/RetirementGenerator')); // Integrated into DocumentGenerator
 const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentManager'));
 const InterestRateManager = React.lazy(() => import('../modules/Planning/InterestRateManager'));
@@ -115,14 +115,10 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <DesignationManager user={user} />;
             case 'planning':
                 return <PlanningDashboard user={user} />;
-            case 'branch_opening_survey': // Added case for BranchOpeningSurvey
-                return <PlanningDashboard user={user} />;
-            case 'joining_offer_letter':
-                return <JoiningOfferGenerator />;
+            // joining_offer_letter integrated into document_generator
             case 'campaign_manager':
                 return <CampaignManager user={user} />;
-            case 'communication':
-                return <RoCommunication />;
+            // communication integrated into document_generator
             case 'department_manager':
                 return <DepartmentManager />;
             case 'interest_rates':
@@ -221,16 +217,14 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
 
                             { id: 'pms', label: 'Performance (PMS)', icon: <LineChart size={20} />, roles: [] },
                             { id: 'inventory', label: 'Inventory', icon: <Package size={20} />, roles: [] },
-                            { id: 'branch_opening_survey', label: 'Branch Opening Survey', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] }, // Renamed 'planning' to 'branch_opening_survey' and updated label
                             { id: 'interest_rates', label: 'Interest Rates', icon: <Percent size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
                             { id: 'region_manager', label: 'Region Management', icon: <Globe size={20} />, roles: ['SuperAdmin', 'CO_Planning'] },
                             { id: 'branch_manager', label: 'Branch Network', icon: <Building2 size={20} />, roles: ['SuperAdmin', 'CO_Planning', 'RO', 'Branch'] },
                             { id: 'staff_manager', label: 'Staff Management', icon: <Users size={20} />, roles: ['SuperAdmin', 'RO', 'CO'] }, // Updated roles
                             { id: 'campaign_manager', label: 'Campaigns', icon: <Megaphone size={20} />, roles: ['SuperAdmin', 'RO'] },
-                            { id: 'communication', label: 'Communication', icon: <FileText size={20} />, roles: ['RO', 'SuperAdmin'] }, // Added Communication module
                             { id: 'repair_vault', label: 'Restoration & Vault', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'CO_Gad'] },
                             { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
-                            { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
+                            // { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] }, // Moved to Document Generator
                             // { id: 'retirement_generator', label: 'Retirement Relieving', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'CO', 'CO_HRD'] }, // Moved to Document Generator
                             { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] },
                             { id: 'document_generator', label: 'Document Generator', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] },

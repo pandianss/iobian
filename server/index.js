@@ -36,10 +36,18 @@ if (!mockData.interest_rates || mockData.interest_rates.length === 0) {
     persistence.saveData(mockData);
 }
 
-// Ensure PMS Data Structures Exist (Fix for legacy db.json)
-const pmsKeys = ['sanctions', 'sanctions_meta', 'downgraded_accounts', 'downgraded_meta', 'upgraded_accounts', 'upgraded_meta', 'key_params', 'key_params_meta', 'core_agri', 'core_agri_meta', 'bulk_deposit', 'bulk_deposit_meta', 'cash_data', 'cash_meta', 'recovery', 'recovery_meta', 'ots', 'ots_meta'];
-pmsKeys.forEach(k => { if (!mockData[k]) mockData[k] = (k.endsWith('_meta') ? {} : []); });
-persistence.saveData(mockData);
+// Ensure Bank Configuration exists
+if (!mockData.bank_config) {
+    mockData.bank_config = {
+        name_english: "INDIAN OVERSEAS BANK",
+        name_hindi: "इण्डियन ओवरसीज़ बैंक",
+        name_local: "இந்தியன் ஓவர்சீஸ் வங்கி",
+        dept_english: "Planning Department",
+        dept_hindi: "योजना विभाग",
+        dept_local: "திட்டமிடல் துறை"
+    };
+    persistence.saveData(mockData);
+}
 
 const app = express();
 const PORT = 5000;
@@ -75,10 +83,15 @@ const enhanceUser = (user) => {
 
     let branchName = '';
 
+    let regionDetails = null;
+
     // If user is RO, try to find region name from linked_region_code
     if (user.role === 'RO' && user.linked_region_code) {
         const region = mockData.regions.find(r => r.region_code === user.linked_region_code);
-        if (region) regionName = region.region_name.replace(' Region', '');
+        if (region) {
+            regionName = region.region_name.replace(' Region', '');
+            regionDetails = region;
+        }
     }
 
     // If user has linked_branch_code (Branch or potentially others), get Branch Name
@@ -89,12 +102,15 @@ const enhanceUser = (user) => {
             // Also try to get region from branch if not already set
             if (!regionName && branch.region_code) {
                 const region = mockData.regions.find(r => r.region_code === branch.region_code);
-                if (region) regionName = region.region_name.replace(' Region', '');
+                if (region) {
+                    regionName = region.region_name.replace(' Region', '');
+                    regionDetails = region;
+                }
             }
         }
     }
 
-    return { ...user, region_name: regionName, branch_name: branchName };
+    return { ...user, region_name: regionName, branch_name: branchName, region_details: regionDetails };
 };
 
 app.post('/api/auth/validate', (req, res) => {
@@ -109,7 +125,8 @@ app.post('/api/auth/validate', (req, res) => {
                 designation: user.designation,
                 office_level: user.office_level,
                 region_name: enhanced.region_name, // Explicitly sending this
-                branch_name: enhanced.branch_name  // Explicitly sending this
+                branch_name: enhanced.branch_name,  // Explicitly sending this
+                region_details: enhanced.region_details // Full trilingual details
             }
         });
     } else {
@@ -359,6 +376,31 @@ app.post('/api/admin/restore', (req, res) => {
     }
 });
 
+// --- 4.6 Bank Configuration ---
+app.get('/api/config/bank-name', (req, res) => {
+    res.json(mockData.bank_config || {
+        name_english: "INDIAN OVERSEAS BANK",
+        name_hindi: "इण्डियन ओवरसीज़ बैंक",
+        name_local: "இந்தியன் ஓவர்சீஸ் வங்கி"
+    });
+});
+
+app.put('/api/config/bank-name', (req, res) => {
+    const { name_english, name_hindi, name_local, dept_english, dept_hindi, dept_local } = req.body;
+
+    if (!mockData.bank_config) mockData.bank_config = {};
+
+    if (name_english) mockData.bank_config.name_english = name_english;
+    if (name_hindi) mockData.bank_config.name_hindi = name_hindi;
+    if (name_local) mockData.bank_config.name_local = name_local;
+    if (dept_english) mockData.bank_config.dept_english = dept_english;
+    if (dept_hindi) mockData.bank_config.dept_hindi = dept_hindi;
+    if (dept_local) mockData.bank_config.dept_local = dept_local;
+
+    persistence.saveData(mockData);
+    res.json({ success: true, data: mockData.bank_config });
+});
+
 // --- 5. Region Management ---
 app.get('/api/regions', (req, res) => {
     const regionsWithStates = mockData.regions.map(r => {
@@ -378,14 +420,32 @@ app.post('/api/regions', (req, res) => {
     if (exists) {
         return res.status(400).json({ success: false, message: 'Region Exists' });
     }
-    const newRegion = { region_code, region_name, region_name_hindi, head_office_code: 'CO', is_deleted: false };
+    const newRegion = {
+        region_code,
+        region_name,
+        region_name_hindi,
+        region_name_local: req.body.region_name_local,
+        region_address: req.body.region_address,
+        region_address_hindi: req.body.region_address_hindi,
+        region_address_local: req.body.region_address_local,
+        head_office_code: 'CO',
+        is_deleted: false
+    };
     mockData.regions.push(newRegion);
     persistence.saveData(mockData);
     res.json({ success: true, region: newRegion });
 });
 
 app.put('/api/regions/:code', (req, res) => {
-    const { region_code, region_name, region_name_hindi } = req.body;
+    const {
+        region_code,
+        region_name,
+        region_name_hindi,
+        region_name_local,
+        region_address,
+        region_address_hindi,
+        region_address_local
+    } = req.body;
     const oldCode = req.params.code;
     const region = mockData.regions.find(r => r.region_code === oldCode);
 
@@ -409,7 +469,11 @@ app.put('/api/regions/:code', (req, res) => {
         }
 
         if (region_name) region.region_name = region_name;
-        if (region_name_hindi) region.region_name_hindi = region_name_hindi;
+        if (region_name_hindi !== undefined) region.region_name_hindi = region_name_hindi;
+        if (region_name_local !== undefined) region.region_name_local = region_name_local;
+        if (region_address !== undefined) region.region_address = region_address;
+        if (region_address_hindi !== undefined) region.region_address_hindi = region_address_hindi;
+        if (region_address_local !== undefined) region.region_address_local = region_address_local;
 
         persistence.saveData(mockData);
         res.json({ success: true, region });
@@ -878,18 +942,35 @@ app.delete('/api/interest-rates/:id', (req, res) => {
 
 // Helper: Generate Document Ref No
 const generateDocRefNo = (type, db) => {
-    const year = new Date().getFullYear();
-    const prefix = 'IOB';
-    // Map nice type names to short codes if needed, or just use generic NOTE/LTR
-    // type example: 'office_note', 'letter' -> NOTE, LETTER
-    let typeCode = 'DOC';
-    if (type === 'office_note') typeCode = 'NOTE';
-    else if (type === 'letter') typeCode = 'LTR';
-    else if (type === 'circular') typeCode = 'CIR';
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-based, April is 3
 
-    // Find matching docs for this year/type to increment sequence
+    // Financial Year Logic (April to March)
+    let fy;
+    if (currentMonth >= 3) { // April onwards
+        fy = `${currentYear}-${(currentYear + 1).toString().slice(-2)}`;
+    } else {
+        fy = `${currentYear - 1}-${currentYear.toString().slice(-2)}`;
+    }
+
+    const prefix = 'IOB/PLN'; // Standard Prefix with Dept (Planning)
+
+    // Enhanced Sequence Mapping
+    const typeMapping = {
+        'office_note': 'NOTE',
+        'branch_code_request': 'BCR',
+        'branch_survey': 'BSR',
+        'joining_offer': 'JOL',
+        'communication': 'HUB',
+        'letter': 'LTR',
+        'circular': 'CIR'
+    };
+
+    let typeCode = typeMapping[type] || 'DOC';
+
     if (!db.documents) db.documents = [];
-    const pattern = `${prefix}/${typeCode}/${year}/`;
+    const pattern = `${prefix}/${typeCode}/${fy}/`;
 
     // Filter existing docs of same pattern
     const existing = db.documents.filter(d =>
@@ -900,11 +981,12 @@ const generateDocRefNo = (type, db) => {
     let maxSeq = 0;
     existing.forEach(d => {
         const parts = d.refNo.split('/');
-        const seq = parseInt(parts[parts.length - 1], 10);
+        const seqText = parts[parts.length - 1]; // Last part is sequence
+        const seq = parseInt(seqText, 10);
         if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
     });
 
-    const nextSeq = String(maxSeq + 1).padStart(3, '0');
+    const nextSeq = (maxSeq + 1).toString().padStart(3, '0');
     return `${pattern}${nextSeq}`;
 };
 

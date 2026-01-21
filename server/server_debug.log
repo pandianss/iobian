@@ -353,3 +353,132 @@ Stack: ReferenceError: Cannot access 'sortStaff' before initialization
 [2026-01-20T07:21:05.474Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
 [2026-01-20T07:21:05.502Z]  > DB ROLE: RO
 [2026-01-20T07:21:05.503Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-21T06:12:03.109Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T06:12:03.110Z]  > DB ROLE: RO
+[2026-01-21T06:12:03.110Z]  > SENT ROLE: RO
+[2026-01-21T06:17:09.808Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:17:09.810Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:17:09.811Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:21:39.475Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:21:39.478Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:21:39.481Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:23:31.112Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:23:31.114Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:23:31.116Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:26:08.322Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:26:08.330Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:26:08.331Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:29:48.834Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:29:48.846Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:29:48.846Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:32:36.578Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:32:36.580Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:32:36.581Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:35:17.597Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:35:17.598Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:35:17.599Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:38:21.193Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:38:21.194Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:38:21.194Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:40:09.189Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:40:09.190Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:40:09.191Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:41:59.044Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:41:59.045Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:41:59.045Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:44:17.480Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:44:17.480Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:44:17.481Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T06:46:53.568Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T06:46:53.569Z]  > DB ROLE: SuperAdmin
+[2026-01-21T06:46:53.570Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T07:56:46.905Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T07:56:46.910Z]  > DB ROLE: RO
+[2026-01-21T07:56:46.911Z]  > SENT ROLE: RO
+[2026-01-21T08:42:06.283Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T08:42:06.297Z]  > DB ROLE: SuperAdmin
+[2026-01-21T08:42:06.297Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T09:02:38.397Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T09:02:38.401Z]  > DB ROLE: RO
+[2026-01-21T09:02:38.401Z]  > SENT ROLE: RO
+[2026-01-21T09:03:08.485Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T09:03:08.486Z]  > DB ROLE: SuperAdmin
+[2026-01-21T09:03:08.486Z]  > SENT ROLE: SuperAdmin
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta, documents
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-21T09:28:53.548Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T09:28:53.550Z]  > DB ROLE: SuperAdmin
+[2026-01-21T09:28:53.550Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T09:31:12.616Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T09:31:12.617Z]  > DB ROLE: RO
+[2026-01-21T09:31:12.617Z]  > SENT ROLE: RO
+[2026-01-21T09:34:10.547Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T09:34:10.547Z]  > DB ROLE: SuperAdmin
+[2026-01-21T09:34:10.548Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T09:48:41.073Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T09:48:41.080Z]  > DB ROLE: RO
+[2026-01-21T09:48:41.080Z]  > SENT ROLE: RO
+[2026-01-21T09:49:26.177Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T09:49:26.178Z]  > DB ROLE: SuperAdmin
+[2026-01-21T09:49:26.178Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T09:50:00.073Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T09:50:00.073Z]  > DB ROLE: RO
+[2026-01-21T09:50:00.074Z]  > SENT ROLE: RO
+[2026-01-21T10:03:27.062Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T10:03:27.065Z]  > DB ROLE: RO
+[2026-01-21T10:03:27.065Z]  > SENT ROLE: RO
+[2026-01-21T10:09:49.444Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T10:09:49.445Z]  > DB ROLE: SuperAdmin
+[2026-01-21T10:09:49.446Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T10:10:10.621Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T10:10:10.621Z]  > DB ROLE: RO
+[2026-01-21T10:10:10.622Z]  > SENT ROLE: RO
+[2026-01-21T10:25:05.999Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T10:25:06.002Z]  > DB ROLE: RO
+[2026-01-21T10:25:06.003Z]  > SENT ROLE: RO
+[2026-01-21T10:25:47.178Z] LOGIN SUCCEEDED: Super Administrator (00000)
+[2026-01-21T10:25:47.178Z]  > DB ROLE: SuperAdmin
+[2026-01-21T10:25:47.179Z]  > SENT ROLE: SuperAdmin
+[2026-01-21T10:26:10.123Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T10:26:10.124Z]  > DB ROLE: RO
+[2026-01-21T10:26:10.124Z]  > SENT ROLE: RO
+[STARTUP] GET Sanctions: Serving 161731 records.
+[STARTUP] GET Sanctions: Serving 161731 records.
+[2026-01-21T10:26:31.082Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T10:26:31.083Z]  > DB ROLE: RO
+[2026-01-21T10:26:31.084Z]  > SENT ROLE: RO
+[2026-01-21T11:57:30.193Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T11:57:30.197Z]  > DB ROLE: RO
+[2026-01-21T11:57:30.197Z]  > SENT ROLE: RO
+[2026-01-21T11:58:06.178Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T11:58:06.178Z]  > DB ROLE: RO
+[2026-01-21T11:58:06.179Z]  > SENT ROLE: RO
+[2026-01-21T12:22:32.745Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T12:22:32.747Z]  > DB ROLE: RO
+[2026-01-21T12:22:32.748Z]  > SENT ROLE: RO
+[2026-01-21T12:35:42.455Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T12:35:42.459Z]  > DB ROLE: RO
+[2026-01-21T12:35:42.460Z]  > SENT ROLE: RO
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta, documents
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[STARTUP] Loaded MockData. Sanctions Count: 161731
+[STARTUP] MockData Keys: users, orgMaster, regions, divisions, systemConfig, designations, branch_surveys, departments, campaigns, interest_rates, retirement_letters, downgraded_accounts, downgraded_meta, upgraded_accounts, upgraded_meta, sanctions, sanctions_meta, key_params, key_params_meta, core_agri, core_agri_meta, retail_td, retail_td_meta, cash_data, cash_meta, bulk_deposit, bulk_deposit_meta, recovery, recovery_meta, ots, ots_meta, documents, bank_config
+[STARTUP] Branches Count: undefined
+[STARTUP] OrgMaster Count: 55
+[STARTUP] Sample OrgMaster Item: {"branch_code":"0174","branch_name":"Theni Allinagaram","category":"SEMI URBAN","region_code":"3933","state":"Tamil Nadu","district":"Theni","taluk":"Theni","revenue_centre":"Theni","campaigns":[],"locality":"Allinagaram","latitude":"10.009971","longitude":"77.478241","pincode":"625531","is_deleted":true,"type":"General Branch"}
+[2026-01-21T12:44:38.363Z] LOGIN SUCCEEDED: Satish Pandian S (63039)
+[2026-01-21T12:44:38.364Z]  > DB ROLE: RO
+[2026-01-21T12:44:38.365Z]  > SENT ROLE: RO

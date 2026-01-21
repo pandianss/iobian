@@ -98,9 +98,39 @@ module.exports = {
         }
     ],
     regions: [
-        { region_code: 'R01', region_name: 'Chennai Region', region_name_hindi: 'चेन्नई क्षेत्र', head_office_code: 'CO', is_deleted: false },
-        { region_code: 'R02', region_name: 'Mumbai Region', region_name_hindi: 'मुंबई क्षेत्र', head_office_code: 'CO', is_deleted: false },
-        { region_code: 'R05', region_name: 'Dindigul Region', region_name_hindi: 'डिंडीगुल क्षेत्र', head_office_code: 'CO', is_deleted: false }
+        {
+            region_code: 'R01',
+            region_name: 'Chennai Region',
+            region_name_hindi: 'चेन्नई क्षेत्र',
+            region_name_local: 'சென்னை மண்டலம்',
+            region_address: 'IOB Chennai Regional Office, Anna Salai, Chennai - 600002',
+            region_address_hindi: 'इओबी चेन्नई क्षेत्रीय कार्यालय, अन्ना सलै, चेन्नई - 600002',
+            region_address_local: 'ஐஓபி சென்னை மண்டல அலுவலகம், அண்ணா சாலை, சென்னை - 600002',
+            head_office_code: 'CO',
+            is_deleted: false
+        },
+        {
+            region_code: 'R02',
+            region_name: 'Mumbai Region',
+            region_name_hindi: 'मुंबई क्षेत्र',
+            region_name_local: 'மும்பை மண்டலம்',
+            region_address: 'IOB Mumbai Regional Office, Nariman Point, Mumbai - 400021',
+            region_address_hindi: 'इओबी मुंबई क्षेत्रीय कार्यालय, नरीमन पॉइंट, मुंबई - 400021',
+            region_address_local: 'ஐஓபி மும்பை மண்டல அலுவலகம், நரிமன் பாயிண்ட், மும்பை - 400021',
+            head_office_code: 'CO',
+            is_deleted: false
+        },
+        {
+            region_code: 'R05',
+            region_name: 'Dindigul Region',
+            region_name_hindi: 'डिंडीगुल क्षेत्र',
+            region_name_local: 'திண்டுக்கல் மண்டலம்',
+            region_address: '#17-i, First Floor, Pensioners Street, Palani Road, Dindigul – 624001',
+            region_address_hindi: '#17-i, पहली मंजिल, पेंशनर्स स्ट्रीट, पलानी रोड, डिंडीगुल - 624001',
+            region_address_local: '#17-i, முதல் தளம், ஓய்வூதியதாரர் தெரு, பழனி சாலை, திண்டுக்கல் – 624001',
+            head_office_code: 'CO',
+            is_deleted: false
+        }
     ],
     divisions: [
         { id: 1, name: 'Planning' },

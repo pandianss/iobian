@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import html2pdf from 'html2pdf.js';
 // Replaced old logo import with direct public path
 
 const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
-    const lh = { logo: '/logo_center.svg' };
     const [viewMode, setViewMode] = useState('edit'); // 'edit' | 'preview'
     const [showWorksheet, setShowWorksheet] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
@@ -17,43 +17,71 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
         { title: 'Logistics', icon: '🚚' }
     ];
 
-    const getRegionData = (user) => {
-        const defaultRegion = 'Dindigul';
-        // Extract logic similar to enhanceUser utility
-        let regionName = defaultRegion;
-        if (user?.region_name) {
-            regionName = user.region_name.replace(' Region', '');
-        }
+    const [lh, setLh] = useState({ logo: '/logo_center.svg' }); // Initialize with default logo path
+    const [bankConfig, setBankConfig] = useState({
+        name_english: 'INDIAN OVERSEAS BANK',
+        name_hindi: 'इण्डियन ओवरसीज़ बैंक',
+        name_local: 'இந்தியன் ஓவர்சீஸ் வங்கி'
+    });
 
-        const REGION_MAP = {
-            'Dindigul': { hindi: 'दिण्डुक्कल', english: 'Dindigul' },
-            'Madurai': { hindi: 'मदुरै', english: 'Madurai' },
-            'Chennai': { hindi: 'चेन्नई', english: 'Chennai' },
-            'Coimbatore': { hindi: 'कोयंबटूर', english: 'Coimbatore' },
-            'Trichy': { hindi: 'त्रिची', english: 'Trichy' },
-            'Thanjavur': { hindi: 'तंजावुर', english: 'Thanjavur' },
-            'Tirunelveli': { hindi: 'तिरुनेलवेली', english: 'Tirunelveli' },
-            'Salem': { hindi: 'सेलम', english: 'Salem' },
-            'Erode': { hindi: 'इरोड', english: 'Erode' },
-            'Vellore': { hindi: 'वेल्लोर', english: 'Vellore' },
-            'Kancheepuram': { hindi: 'कांचीपुरम', english: 'Kancheepuram' },
-            'Karaikudi': { hindi: 'कराईकुडी', english: 'Karaikudi' },
-            'Nagercoil': { hindi: 'नागरकोइल', english: 'Nagercoil' },
-            // Fallback for unknown
-            'Default': { hindi: '', english: '' }
+    useEffect(() => {
+        fetch('http://localhost:5000/api/config/bank-name')
+            .then(res => res.json())
+            .then(data => setBankConfig(data))
+            .catch(err => console.error('Error fetching bank name:', err));
+    }, []);
+
+    // We will now fetch region data dynamically
+    const [regionDetails, setRegionDetails] = useState(null);
+
+    useEffect(() => {
+        const fetchRegionData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/regions');
+                const data = await response.json();
+
+                // Identify current region based on user or form
+                const regionName = user?.region_name?.replace(' Region', '') || 'Dindigul';
+                const region = data.find(r => r.region_name.includes(regionName));
+
+                if (region) {
+                    setRegionDetails({
+                        name: region.region_name,
+                        hindi: region.region_name_hindi,
+                        local: region.region_name_local,
+                        address: region.region_address,
+                        addressHindi: region.region_address_hindi,
+                        addressLocal: region.region_address_local
+                    });
+
+                    // Update form data with fetched details if appropriate
+                    setFormData(prev => ({
+                        ...prev,
+                        regionName: region.region_name,
+                        regionNameHindi: region.region_name_hindi,
+                        regionNameLocal: region.region_name_local,
+                        regionAddress: region.region_address,
+                        regionAddressHindi: region.region_address_hindi,
+                        regionAddressLocal: region.region_address_local
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch regions", error);
+            }
         };
 
-        const data = REGION_MAP[regionName] || { hindi: regionName, english: regionName };
-        return { name: regionName, ...data };
-    };
+        fetchRegionData();
+    }, [user]);
 
-    const currentRegion = getRegionData(user);
     const logoColor = 'var(--primary-color)'; // #254aa0
 
     const [formData, setFormData] = useState(() => {
         if (initialData) return initialData;
+        // Use a placeholder for currentRegion until regionDetails is fetched
+        const currentRegionPlaceholder = regionDetails || { name: 'Dindigul' };
+
         return {
-            region: currentRegion.name,
+            region: currentRegionPlaceholder.name,
             date: new Date().toISOString().split('T')[0],
             status: 'draft', // 'draft' | 'final'
             applicationType: 'new', // 'new' | 'change'
@@ -65,7 +93,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
             surveyorName: user?.full_name || '',
             surveyorDesignation: user?.designation || '',
             surveyorBranch: (user?.office_level === 'Branch' ? user?.linked_branch_code :
-                (user?.office_level === 'RO' ? `Regional Office, ${currentRegion.name}` : user?.office_level)) || '',
+                (user?.office_level === 'RO' ? `Regional Office, ${currentRegionPlaceholder.name}` : user?.office_level)) || '',
 
             locationType: '', // 'Metropolitan' | 'Urban' | 'Semi-Urban' | 'Rural'
 
@@ -82,7 +110,12 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
             proposedPin: '', // 2(c)(v)
 
             // Header Fields
-            regionName: currentRegion.name,
+            regionName: user?.region_name || 'Dindigul',
+            regionNameHindi: '',
+            regionNameLocal: '',
+            regionAddress: '',
+            regionAddressHindi: '',
+            regionAddressLocal: '',
             reportDate: new Date().toLocaleDateString('en-GB'), // DD/MM/YYYY
 
             proposedStatus: 'Branch', // 2(d)
@@ -157,8 +190,69 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
         };
     });
 
+    // Update formData with regionDetails once it's available
+    useEffect(() => {
+        if (regionDetails) {
+            setFormData(prev => ({
+                ...prev,
+                region: regionDetails.name,
+                regionName: regionDetails.name,
+                regionNameHindi: regionDetails.hindi,
+                regionNameLocal: regionDetails.local,
+                regionAddress: regionDetails.address,
+                regionAddressHindi: regionDetails.addressHindi,
+                regionAddressLocal: regionDetails.addressLocal,
+                surveyorBranch: (user?.office_level === 'Branch' ? user?.linked_branch_code :
+                    (user?.office_level === 'RO' ? `Regional Office, ${regionDetails.name}` : user?.office_level)) || '',
+            }));
+        }
+    }, [regionDetails, user]);
+
+
     const handleChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleDownloadPDF = () => {
+        const element = document.getElementById('printable-content');
+        if (!element) return;
+
+        // Strip UI artifacts and force "Full Document" mode for capture
+        const originalStyle = element.getAttribute('style') || '';
+        const originalClass = element.className;
+
+        // Prepare element for high-quality capture
+        element.style.boxShadow = 'none';
+        element.style.border = 'none';
+        element.style.borderRadius = '0';
+        element.style.padding = '0';
+        element.style.margin = '0';
+        element.style.height = 'auto'; // Force full height capture
+        element.style.overflow = 'visible'; // Ensure no content is clipped
+        element.className = 'report-container-pdf'; // Switch to a clean print-only class
+
+        const opt = {
+            margin: [10, 10, 10, 20], // [top, left, bottom, right] -> Right margin (20mm) > Left margin (10mm)
+            filename: `IOB_Branch_Survey_${formData.refNo || 'Report'}.pdf`,
+            image: { type: 'jpeg', quality: 1.0 },
+            html2canvas: {
+                scale: 3,
+                useCORS: true,
+                logging: false,
+                letterRendering: true,
+                allowTaint: true,
+                scrollY: 0,
+                windowWidth: 1200 // Consistent width for layout
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Restore original UI styles
+            element.setAttribute('style', originalStyle);
+            element.className = originalClass;
+        });
     };
 
     const handleCompetitorChange = (index, field, value) => {
@@ -308,6 +402,27 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
 
     return (
         <div className="page-container" style={{ paddingBottom: '5rem' }}>
+            <style>
+                {`
+                    @media print {
+                        body, .page-container, #printable-content {
+                            height: auto !important;
+                            overflow: visible !important;
+                        }
+                        .noprint {
+                            display: none !important;
+                        }
+                        @page {
+                            size: A4 portrait;
+                            margin: 10mm 20mm 10mm 10mm; /* Top, Right, Bottom, Left -> Right > Left as requested */
+                        }
+                        /* Suppress browser header/footer */
+                        header, footer {
+                            display: none !important;
+                        }
+                    }
+                `}
+            </style>
             <div className="page-header noprint" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     {onBack && <button className="btn btn-outline" onClick={onBack}>← Back</button>}
@@ -326,7 +441,14 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                     <button className={`btn ${viewMode === 'edit' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setViewMode('edit')}>✏️ Edit Data</button>
                     <button className={`btn ${viewMode === 'preview' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setViewMode('preview')}>📄 Preview Report</button>
                     {viewMode === 'preview' && (
-                        <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ Print</button>
+                        <>
+                            <button className="btn btn-secondary" onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#4b5563', color: 'white', borderColor: '#4b5563' }}>
+                                <span>🖨️</span> Print / Vector PDF
+                            </button>
+                            <button className="btn btn-secondary" onClick={handleDownloadPDF} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#6366f1', color: 'white', borderColor: '#6366f1' }}>
+                                <span>📥</span> Download PDF (HD)
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
@@ -394,6 +516,10 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                             <option value="new">Open New Place</option>
                                             <option value="change">Change Location</option>
                                         </select>
+                                    </div>
+                                    <div className="form-group col-span-full">
+                                        <label className="label">Regional Office Address</label>
+                                        <input className="input" value={formData.regionAddress} onChange={e => handleChange('regionAddress', e.target.value)} placeholder="e.g. 123, Main Road, Anna Nagar" />
                                     </div>
                                 </div>
                             </div>
@@ -719,27 +845,101 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
 
                 {(viewMode === 'preview' || viewMode === 'split') && (
                     <div id="printable-content" className="card report-container" style={{ height: viewMode === 'split' ? '80vh' : 'auto', overflowY: viewMode === 'split' ? 'auto' : 'visible' }}>
-                        {/* Header from LetterForm */}
                         <div className="form-content">
+                            <div className="print-header" style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                borderBottom: '2pt solid #254aa0',
+                                paddingBottom: '12pt',
+                                marginBottom: '18pt',
+                                width: '100%'
+                            }}>
+                                {/* Top Section: Logo, Bank Name, and Regional Office */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '100px 1fr auto',
+                                    alignItems: 'center',
+                                    gap: '4pt 20pt',
+                                    width: '100%'
+                                }}>
+                                    {/* Column 1: Logo spans 3 rows */}
+                                    <div style={{ gridRow: '1 / span 3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <img src={lh?.logo || "/logo_center.svg"} alt="Logo" style={{ height: '24mm', maxWidth: '100%', objectFit: 'contain' }} />
+                                    </div>
 
-                            <div className="print-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '2px solid black', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
-                                <div>{lh?.logo && <img src={lh.logo} alt="Logo" style={{ height: '160px', objectFit: 'contain' }} />}</div>
+                                    {/* Row 1: Hindi */}
+                                    <div style={{ textAlign: 'left', fontSize: '13pt', fontWeight: 'bold', color: '#254aa0', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                                        {bankConfig?.name_hindi || 'इण्डियन ओवरसीज़ बैंक'}
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontSize: '10pt', fontWeight: 'bold', color: '#254aa0', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                                        {formData.regionNameHindi ? `क्षेत्रीय कार्यालय – ${formData.regionNameHindi}` : 'क्षेत्रीय कार्यालय'}
+                                    </div>
+
+                                    {/* Row 2: English - Same weight as others */}
+                                    <div style={{ textAlign: 'left', fontSize: '13pt', fontWeight: 'bold', color: '#254aa0', letterSpacing: '0.1pt', fontFamily: 'Arial, sans-serif', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                        {bankConfig?.name_english || 'INDIAN OVERSEAS BANK'}
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontSize: '10pt', fontWeight: 'bold', color: '#254aa0', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                                        Regional Office – {formData.region || formData.regionName || 'Dindigul'} {!(formData.region || formData.regionName || '').includes('Region') && 'Region'}
+                                    </div>
+
+                                    {/* Row 3: Local Language - Same weight as others */}
+                                    <div style={{ textAlign: 'left', fontSize: '13pt', fontWeight: 'bold', color: '#254aa0', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                                        {bankConfig?.name_local || 'இந்தியன் ஓவர்சீஸ் வங்கி'}
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontSize: '10pt', fontWeight: 'bold', color: '#254aa0', fontFamily: 'Arial, sans-serif' }}>
+                                        {formData.regionNameLocal ? `மண்டல அலுவலகம் – ${formData.regionNameLocal}` : 'மண்டல அலுவலகம்'}
+                                    </div>
+                                </div>
+
+                                {/* Row 4: Department - Full Width Row Below */}
+                                <div style={{
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    margin: '8pt 0 4pt 0',
+                                    fontSize: '10pt',
+                                    fontWeight: 'bold',
+                                    color: '#333',
+                                    borderTop: '1pt solid #254aa0',
+                                    paddingTop: '4pt'
+                                }}>
+                                    {bankConfig?.dept_hindi || 'योजना विभाग'} &nbsp;|&nbsp; {bankConfig?.dept_english || 'Planning Department'} &nbsp;|&nbsp; {bankConfig?.dept_local || 'திட்டமிடல் துறை'}
+                                </div>
+
+                                {/* Row 5: Address - Full Width Row Below */}
+                                <div style={{
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    fontSize: '8pt',
+                                    color: '#444',
+                                    lineHeight: '1.4',
+                                    fontFamily: 'Arial, sans-serif'
+                                }}>
+                                    {[
+                                        formData.regionAddressHindi,
+                                        formData.regionAddress,
+                                        formData.regionAddressLocal
+                                    ].filter(Boolean).map((addr, idx) => (
+                                        <span key={idx}>
+                                            {idx > 0 && ' | '}
+                                            {addr.startsWith('#') ? addr : `#${addr}`}
+                                        </span>
+                                    ))}
+                                    {!formData.regionAddress && <div>#17-i, First Floor, Pensioners Street, Palani Road, Dindigul – 624001</div>}
+                                </div>
                             </div>
 
-                            <div className="center bold" style={{ fontSize: '1.2rem', textDecoration: 'underline', marginBottom: '1.5rem' }}>
+                            <div className="center bold" style={{ fontSize: '1.2rem', textDecoration: 'underline', marginTop: '2rem', marginBottom: '1.5rem' }}>
                                 {formData.applicationType === 'new' ? 'SURVEY REPORT FOR OPENING OF A NEW BRANCH' : 'SURVEY REPORT FOR CHANGING THE LOCATION OF AN EXISTING BRANCH'}
                             </div>
 
-                            <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem', fontFamily: 'Arial, sans-serif' }}>
-                                Region: {formData.regionName || 'Dindigul'}
-                            </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', fontFamily: 'Century Gothic, sans-serif' }}>
                                 <div>
                                     <div style={{ fontWeight: 'bold' }}>To:</div>
                                     <div style={{ marginLeft: '0px', fontWeight: 'bold' }}>
                                         The General Manager<br />
-                                        Indian Overseas Bank<br />
+                                        {bankConfig?.name_english || 'Indian Overseas Bank'}<br />
                                         Planning Department<br />
                                         Central Office, Chennai
                                     </div>
@@ -782,7 +982,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                     <tr>
                                         <td className="serial-col">1.</td>
                                         <td width="45%">Name of the banking company</td>
-                                        <td width="50%"><strong>Indian Overseas Bank</strong></td>
+                                        <td width="50%"><strong>{bankConfig?.name_english || 'Indian Overseas Bank'}</strong></td>
                                     </tr>
 
                                     {/* Section 2 */}
@@ -853,18 +1053,18 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                     <tr>
                                         <td className="serial-col">2 (e)</td>
                                         <td>Name(s) of the Bank branch(es) functioning in the centre for which permission is applied for</td>
-                                        <td>{formData.existingBranches}</td>
+                                        <td style={{ whiteSpace: 'pre-wrap' }}>{formData.existingBranches || '-'}</td>
                                     </tr>
                                     <tr>
                                         <td className="serial-col">2 (f)</td>
                                         <td>The distance between the proposed office and the nearest existing commercial bank office together with the name of the bank and that of the Centre / locality</td>
-                                        <td>{formData.nearestBankDistance}</td>
+                                        <td style={{ whiteSpace: 'pre-wrap' }}>{formData.nearestBankDistance || '-'}</td>
                                     </tr>
                                 </tbody>
                             </table>
 
                             {/* Competitor Analysis Section */}
-                            <div className="report-section" style={{ position: 'relative', marginTop: '20px' }}>
+                            <div className="report-section" style={{ position: 'relative', marginTop: '20px', pageBreakBefore: 'always' }}>
                                 <h3 style={{ color: 'black', textAlign: 'left', textDecoration: 'underline' }}>2(g) Particulars of other Banks at the Centre:</h3>
 
                                 <div className="na-container">
@@ -1012,7 +1212,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                 </tbody>
                             </table>
 
-                            {/* Development & Prospects */}
+                            {/* Development Section */}
                             <table className="main-table">
                                 <tbody>
                                     <tr>
@@ -1025,26 +1225,34 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                                         <td>If the existing banking facilities are considered inadequate, give reasons</td>
                                         <td>{formData.inadequateReason}</td>
                                     </tr>
-                                    <tr>
-                                        <td className="serial-col">4 (vi)</td>
-                                        <td>
-                                            <strong>Prospects :</strong> (Give an estimate of the minimum business which the banking company expects to attract at the proposed place of business within 12 months)
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid black' }}>
-                                                <div style={{ borderRight: '1px solid black', textAlign: 'center' }}>
-                                                    <div style={{ borderBottom: '1px solid black', padding: '4px', background: '#f0f0f0', fontWeight: 'bold' }}>Deposits<br />Rs. (000s)</div>
-                                                    <div style={{ padding: '8px' }}>{formData.prospectsDeposits}</div>
-                                                </div>
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <div style={{ borderBottom: '1px solid black', padding: '4px', background: '#f0f0f0', fontWeight: 'bold' }}>Advances<br />Rs. (000s)</div>
-                                                    <div style={{ padding: '8px' }}>{formData.prospectsAdvances}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
+
+                            {/* Prospects Section - Page Break Before */}
+                            <div style={{ pageBreakBefore: 'always', marginTop: '20px' }}>
+                                <table className="main-table">
+                                    <tbody>
+                                        <tr>
+                                            <td className="serial-col">4 (vi)</td>
+                                            <td>
+                                                <strong>Prospects :</strong> (Give an estimate of the minimum business which the banking company expects to attract at the proposed place of business within 12 months)
+                                            </td>
+                                            <td>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid black' }}>
+                                                    <div style={{ borderRight: '1px solid black', textAlign: 'center' }}>
+                                                        <div style={{ borderBottom: '1px solid black', padding: '4px', background: '#f0f0f0', fontWeight: 'bold' }}>Deposits<br />Rs. (000s)</div>
+                                                        <div style={{ padding: '8px' }}>{formData.prospectsDeposits}</div>
+                                                    </div>
+                                                    <div style={{ textAlign: 'center' }}>
+                                                        <div style={{ borderBottom: '1px solid black', padding: '4px', background: '#f0f0f0', fontWeight: 'bold' }}>Advances<br />Rs. (000s)</div>
+                                                        <div style={{ padding: '8px' }}>{formData.prospectsAdvances}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             {/* Relocation & Expenditure */}
                             <table className="main-table">
@@ -1401,7 +1609,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                     .page-break { page-break-before: always !important; }
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 

@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Map, Plus, Edit2, Trash2, X, Globe, Building2, CheckCircle2, AlertCircle } from 'lucide-react';
 import Button from '../../components/Common/Button';
 import Card from '../../components/Common/Card';
@@ -5,7 +6,15 @@ import ModuleLayout from '../../components/Common/ModuleLayout';
 
 const RegionManager = () => {
     const [regions, setRegions] = useState([]);
-    const [form, setForm] = useState({ region_code: '', region_name: '', region_name_hindi: '' });
+    const [form, setForm] = useState({
+        region_code: '',
+        region_name: '',
+        region_name_hindi: '',
+        region_name_local: '',
+        region_address: '',
+        region_address_hindi: '',
+        region_address_local: ''
+    });
     const [originalCode, setOriginalCode] = useState(null);
     const [view, setView] = useState('list'); // 'list', 'form'
     const [msg, setMsg] = useState('');
@@ -32,7 +41,11 @@ const RegionManager = () => {
         setForm({
             region_code: r.region_code,
             region_name: r.region_name,
-            region_name_hindi: r.region_name_hindi || ''
+            region_name_hindi: r.region_name_hindi || '',
+            region_name_local: r.region_name_local || '',
+            region_address: r.region_address || '',
+            region_address_hindi: r.region_address_hindi || '',
+            region_address_local: r.region_address_local || ''
         });
         setOriginalCode(r.region_code);
         setView('form');
@@ -40,7 +53,15 @@ const RegionManager = () => {
     };
 
     const handleCancel = () => {
-        setForm({ region_code: '', region_name: '', region_name_hindi: '' });
+        setForm({
+            region_code: '',
+            region_name: '',
+            region_name_hindi: '',
+            region_name_local: '',
+            region_address: '',
+            region_address_hindi: '',
+            region_address_local: ''
+        });
         setOriginalCode(null);
         setView('list');
         setMsg('');
@@ -96,7 +117,7 @@ const RegionManager = () => {
     const actions = (
         <div className="flex gap-2">
             {view === 'list' ? (
-                <Button variant="primary" icon={Plus} onClick={() => { setOriginalCode(null); setForm({ region_code: '', region_name: '', region_name_hindi: '' }); setView('form'); }}>Add Region</Button>
+                <Button variant="primary" icon={Plus} onClick={() => { setOriginalCode(null); setForm({ region_code: '', region_name: '', region_name_hindi: '', region_name_local: '', region_address: '', region_address_hindi: '', region_address_local: '' }); setView('form'); }}>Add Region</Button>
             ) : (
                 <Button variant="ghost" icon={X} onClick={handleCancel}>Cancel</Button>
             )}
@@ -138,7 +159,7 @@ const RegionManager = () => {
                             </div>
 
                             <div className="form-group flex flex-col gap-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Name (Hindi/Local)</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Name (Hindi)</label>
                                 <input
                                     value={form.region_name_hindi}
                                     onChange={e => setForm({ ...form, region_name_hindi: e.target.value })}
@@ -147,10 +168,56 @@ const RegionManager = () => {
                                 />
                             </div>
 
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Name (Local)</label>
+                                <input
+                                    value={form.region_name_local}
+                                    onChange={e => setForm({ ...form, region_name_local: e.target.value })}
+                                    placeholder="Region Name (Local Language)"
+                                    className="p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                />
+                            </div>
+
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Address (English)</label>
+                                <textarea
+                                    value={form.region_address}
+                                    onChange={e => setForm({ ...form, region_address: e.target.value })}
+                                    placeholder="Full Address (English)"
+                                    className="p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                    rows="3"
+                                />
+                            </div>
+
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Address (Hindi)</label>
+                                <textarea
+                                    value={form.region_address_hindi}
+                                    onChange={e => setForm({ ...form, region_address_hindi: e.target.value })}
+                                    placeholder="पूरा पता (हिंदी)"
+                                    className="p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                    rows="3"
+                                />
+                            </div>
+
+                            <div className="form-group flex flex-col gap-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Region Address (Local)</label>
+                                <textarea
+                                    value={form.region_address_local}
+                                    onChange={e => setForm({ ...form, region_address_local: e.target.value })}
+                                    placeholder="Full Address (Local Language)"
+                                    className="p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-color outline-none text-sm"
+                                    rows="3"
+                                />
+                            </div>
+
                             <div className="flex flex-col gap-3 mt-4">
-                                <Button type="submit" variant="primary" className="py-3 h-auto text-base">
-                                    {originalCode ? 'Update Configuration' : 'Establish Region'}
-                                </Button>
+                                <button
+                                    type="submit"
+                                    className="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 text-base"
+                                >
+                                    {originalCode ? '✓ Update Configuration' : '+ Establish Region'}
+                                </button>
                                 <Button type="button" variant="ghost" onClick={handleCancel}>Discard Changes</Button>
                             </div>
 
@@ -177,6 +244,7 @@ const RegionManager = () => {
                             <div className="flex flex-col gap-1">
                                 <h4 className="text-xl font-bold text-slate-800 leading-tight">{r.region_name}</h4>
                                 <p className="text-sm font-medium text-slate-500">{r.region_name_hindi}</p>
+                                {r.region_address && <p className="text-xs text-slate-400 mt-1">{r.region_address}</p>}
                             </div>
 
                             <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-3">
@@ -202,7 +270,7 @@ const RegionManager = () => {
                     ))}
 
                     <button
-                        onClick={() => { setOriginalCode(null); setForm({ region_code: '', region_name: '', region_name_hindi: '' }); setView('form'); }}
+                        onClick={() => { setOriginalCode(null); setForm({ region_code: '', region_name: '', region_name_hindi: '', region_name_local: '', region_address: '', region_address_hindi: '', region_address_local: '' }); setView('form'); }}
                         className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 hover:border-primary-color hover:bg-blue-50/30 transition-all group min-h-[250px]"
                     >
                         <div className="p-4 bg-slate-50 text-slate-400 rounded-full group-hover:bg-primary-color group-hover:text-white transition-all shadow-sm">
@@ -216,8 +284,6 @@ const RegionManager = () => {
                 </div>
             )}
         </ModuleLayout>
-    );
-};
     );
 };
 

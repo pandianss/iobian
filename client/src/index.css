@@ -115,6 +115,18 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.btn-outline {
+  background: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-outline:hover {
+  background: rgba(37, 74, 160, 0.05);
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+
 .btn-secondary:hover {
   background: var(--primary-color);
   color: white;
@@ -250,12 +262,19 @@ input[type="radio"] {
 
   /* Reset overrides */
   html,
-  body {
+  body,
+  .app-container,
+  main,
+  div {
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     overflow: visible !important;
-    background: white;
+    position: static !important;
+    transform: none !important;
+    background: white !important;
   }
 
   /* Show Printable Content */

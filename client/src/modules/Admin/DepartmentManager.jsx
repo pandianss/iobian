@@ -225,7 +225,5 @@ const DepartmentManager = () => {
         </ModuleLayout>
     );
 };
-    );
-};
 
 export default DepartmentManager;

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Settings } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
 
-const BranchSurveyList = ({ onCreateNew, onSelect }) => {
+const BranchSurveyList = ({ onCreateNew, onSelect, onSettings }) => {
     const [branchSurveys, setBranchSurveys] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -42,17 +43,7 @@ const BranchSurveyList = ({ onCreateNew, onSelect }) => {
     };
 
     return (
-        <div className="page-container">
-            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                    <h1 className="page-title">Branch Opening Survey Reports</h1>
-                    <p className="text-neutral-500">Manage survey reports for new branches or location changes.</p>
-                </div>
-                <button className="btn btn-primary" onClick={onCreateNew}>
-                    + Create New Report
-                </button>
-            </div>
-
+        <div className="page-content">
             {/* Batch Operations Removed */}
 
             <div className="card">
