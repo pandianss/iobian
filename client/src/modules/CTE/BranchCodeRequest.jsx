@@ -335,10 +335,10 @@ const BranchCodeRequest = ({ user, bankConfig, onSave, onDownload, initialData, 
                 </div>
             )}
             <style>{`
-    .main - table td { border: 1px solid black!important; padding: 10px!important; }
+    .main-table td { border: 1px solid black!important; padding: 10px!important; }
 @media print {
                     .noprint { display: none!important; }
-    #pdf - content { padding: 0!important; border: none!important; box - shadow: none!important; color: black!important; }
+    #pdf-content { padding: 0!important; border: none!important; box-shadow: none!important; color: black!important; }
 }
 `}</style>
         </div>
