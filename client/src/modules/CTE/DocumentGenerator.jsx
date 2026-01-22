@@ -6,59 +6,54 @@ import {
     Zap,
     Star,
     Calendar,
-    ChevronRight,
-    Search,
-    Edit,
-    Trash2,
-    Upload,
-    X,
     Printer,
     Save
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import RetirementGenerator from '../HR/RetirementGenerator';
-import html2pdf from 'html2pdf.js';
-import PlanningDashboard from '../Planning/PlanningDashboard';
+import PlanningDashboard from '../../mis/Planning';
 const ROCommunication = React.lazy(() => import('../RO/Communication/ROCommunication'));
 const JoiningOfferGenerator = React.lazy(() => import('../HR/JoiningOfferGenerator'));
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 import BranchCodeRequest from './BranchCodeRequest';
+
+// New Components
+import DocumentMenu from './components/DocumentMenu';
+import DocumentList from './components/DocumentList';
+import DocumentEditor from './components/DocumentEditor';
+import PreviewModal from './components/PreviewModal';
 
 const DocumentGenerator = ({ branchCode, branchName, user }) => {
     const [activeCategory, setActiveCategory] = useState('office_note');
     const [officeNoteType, setOfficeNoteType] = useState('generic');
     const fileInputRef = React.useRef(null);
 
-
     // Form State
     const [formData, setFormData] = useState({
         recipient: 'The Regional Manager',
-        department: user?.department || 'Regional Office', // Auto-populated
-        letterType: 'internal', // internal | external
+        department: user?.department || 'Regional Office',
+        letterType: 'internal',
         officeNoteNo: '',
         subject: '',
         content: '',
         // Broken Period Specifics
         bpAccountName: '',
         bpAccountNo: '',
-        bpStatus: 'Open', // Open | Closed | Preclosed
-        bpOpenDate: '', // Account Opening Date for Contracted Rate
+        bpStatus: 'Open',
+        bpOpenDate: '',
         bpCreditAccount: '',
-        bpPeriods: [], // Array of { id, from, to, product, amount, rate, interest }
+        bpPeriods: [],
         // Time Barred Draft Specifics
-        currentEntry: { amount: '', payee: '' }, // Transient state for adding new entries
-        ddEntries: [], // Start empty, user adds entries
+        currentEntry: { amount: '', payee: '' },
+        ddEntries: [],
         ddReason: 'Validity period (3 months) expired',
         ddChecklist: {
-            // Section A
             originalPresented: false,
             signaturesVerified: false,
             circularAdhered: false,
             notPaidPreviously: false,
             indemnityObtained: false,
-            // Section B
             originalAvailable: false,
             staffSignatureMatched: false,
             requestLetterPayee: false,
@@ -67,7 +62,6 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             specialCrossingCancelled: false,
             guidelinesAdheredB: false,
             chargesCollectedB: false,
-            // Section C
             cautionMarkedC: false,
             requestLetterApplicant: false,
             identityApplicantEstablished: false,
@@ -75,7 +69,6 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             indemnityApplicant: false,
             guidelinesAdheredC: false,
             chargesCollectedC: false,
-            // Section D
             cautionMarkedD: false,
             requestLetterPayeeD: false,
             identityPayeeEstablishedD: false,
@@ -86,10 +79,10 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
         }
     });
     const [generated, setGenerated] = useState(false);
-    const [previewMode, setPreviewMode] = useState('note'); // 'note' | 'advise'
+    const [previewMode, setPreviewMode] = useState('note');
 
     // CRUD States
-    const [viewMode, setViewMode] = useState('new'); // 'new' | 'list'
+    const [viewMode, setViewMode] = useState('new');
     const [documents, setDocuments] = useState([]);
     const [currentDocId, setCurrentDocId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -140,10 +133,6 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             const nextNo = existingNos.length > 0 ? Math.max(...existingNos) + 1 : 1;
             const nextNoStr = nextNo.toString().padStart(2, '0');
 
-            // Only auto-fill if empty to avoid overwriting user edits
-            // We use a functional update to check the CURRENT state value to prevent closure staleness if needed,
-            // but here we can just depend on the fact that we want to run this calculation when context changes.
-            // Actually, better to only set if formData.officeNoteNo is falsy.
             setFormData(prev => {
                 if (!prev.officeNoteNo) {
                     return { ...prev, officeNoteNo: nextNoStr };
@@ -151,12 +140,14 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
                 return prev;
             });
         }
-    }, [documents.length, activeCategory, viewMode, currentDocId]); // Depend on documents.length to re-calc if a doc is added
+    }, [documents.length, activeCategory, viewMode, currentDocId]);
 
     const resetForm = () => {
         setFormData({
             category: 'office_note',
             type: 'generic',
+            department: user?.department || 'Regional Office',
+            recipient: 'The Regional Manager',
             officeNoteNo: '',
             subject: '',
             signatoryName: '',
@@ -167,9 +158,7 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             bpOpenDate: '',
             bpCreditAccount: '',
             bpPeriods: [],
-            ddEntries: [
-                { id: Date.now(), number: '', date: '', amount: '', payee: '', purchaser: '', purchaserAccount: '', issueBranch: '', draweeBranch: '' }
-            ],
+            ddEntries: [],
             ddReason: 'Validity period (3 months) expired',
             ddChecklist: {
                 originalPresented: false,
@@ -198,7 +187,7 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
                         'Untitled Document'
             ),
             content: dataToSave.content,
-            formData: dataToSave, // Save entire form state
+            formData: dataToSave,
             status: status
         };
 
@@ -218,13 +207,11 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             });
 
             if (res.ok) {
-                const savedDoc = await res.json(); // { success, document }
+                const savedDoc = await res.json();
                 alert(`Document saved as ${status}! Ref No: ${savedDoc.document.refNo}`);
                 setCurrentRefNo(savedDoc.document.refNo);
                 fetchDocuments();
                 if (!currentDocId) {
-                    // If new, switch to edit mode for this doc or just reset?
-                    // Let's stay in edit mode
                     setCurrentDocId(savedDoc.document.id);
                 }
             } else {
@@ -238,16 +225,11 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
         }
     };
 
-    // PDF Download Handler (Server-Side Vector Generation)
-    const handleDownloadPDF = async (targetId = 'pdf-content') => {
-        const element = document.getElementById(targetId);
+    const handleDownloadPDF = async () => {
+        const element = document.getElementById('pdf-content');
         if (!element) return alert("Content not found.");
 
         const filename = `IOB_Note_${formData.officeNoteNo || 'Draft'}.pdf`;
-
-        // Get inner HTML and wrap with basic styles for Puppeteer
-        // We need to inline some styles because Puppeteer context is new
-        // Also fix image paths to be absolute for Puppeteer
         const htmlToRender = element.innerHTML.replace(/src="\/logo_center.svg"/g, `src="${window.location.origin}/logo_center.svg"`);
 
         const htmlContent = `
@@ -294,13 +276,11 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
 
     const handleEdit = (doc) => {
         setFormData(doc.formData || {});
-        // Restore category selection logic
         setActiveCategory(doc.category);
         if (doc.category === 'office_note') setOfficeNoteType(doc.type);
-
         setCurrentDocId(doc.id);
-        setViewMode('new'); // Switch to editor
-        setGenerated(false); // Show the form, not the preview immediately
+        setViewMode('new');
+        setGenerated(false);
     };
 
     const handleDeleteDoc = async (id) => {
@@ -315,10 +295,6 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             alert('Failed to delete');
         }
     };
-
-    // Mock auto-filled data
-    const date = new Date().toLocaleDateString('en-GB');
-    const address = "123 Banking Street, Finance City";
 
     // Category Config
     const categories = [
@@ -358,10 +334,11 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
         }
     }, [officeNoteType, activeCategory]);
 
-    // State for Rates
-    const [rates, setRates] = useState([]);
+    // Data Helpers
+    const date = new Date().toLocaleDateString('en-GB');
 
-    // Fetch Rates on Component Mount
+    // Rates State & Logic
+    const [rates, setRates] = useState([]);
     useEffect(() => {
         fetch('http://localhost:5000/api/interest-rates')
             .then(res => res.json())
@@ -369,222 +346,65 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
             .catch(err => console.error("Failed to load rates", err));
     }, []);
 
-    // Helper: Check Amount Slab
     const isAmountInSlab = (rate, amount) => {
         if (rate.isAnyAmount) return true;
         const amt = parseFloat(amount || 0);
         const min = parseFloat(rate.amountFrom || 0);
         const max = parseFloat(rate.amountTo || Number.MAX_SAFE_INTEGER);
-
-        // Logic: > min AND <= max (matches "Amount >" and "Amount <=")
-        // Exception: If min is 0, we include 0 (>= 0)
         const lowerCheck = (min === 0) ? (amt >= min) : (amt > min);
-
         return lowerCheck && amt <= max;
     };
 
-    // Helper: Find applicable rate for a specific date
     const getRateForDate = (dateObj, product, amount, allRates) => {
-        // Filter by Product and Amount Slab
         const validProduct = product ? product.toLowerCase() : '';
         const candidates = allRates.filter(r =>
-            r.product.toLowerCase().includes(validProduct) && // Fix: Case-insensitive match on both sides
+            r.product.toLowerCase().includes(validProduct) &&
             isAmountInSlab(r, amount)
         );
-
-        // Filter: Effective Date <= current date
         const validRates = candidates.filter(r => {
             const effDate = new Date(r.effectiveDate || r.from);
             return effDate.getTime() <= dateObj.getTime();
         });
-
-        // Sort desc by effective date
         validRates.sort((a, b) => {
             const dateA = new Date(a.effectiveDate || a.from);
             const dateB = new Date(b.effectiveDate || b.from);
             return dateB - dateA;
         });
-
         return validRates.length > 0 ? parseFloat(validRates[0].rate) : 0;
     };
 
-    // Auto-Fetch Rate Logic for a specific row
     const fetchRowRate = (row, openDate, preclosed) => {
         if (!row.product || !row.amount) return row.rate;
-        // Use Open Date for Contracted Rate if available, else Period Start
         const effectiveDate = openDate ? new Date(openDate) : (row.from ? new Date(row.from) : null);
-
         if (!effectiveDate) return row.rate;
-
         const rateBase = getRateForDate(effectiveDate, row.product, row.amount, rates);
         const rate = preclosed ? Math.max(0, rateBase - 1) : rateBase;
         return rate > 0 ? rate.toString() : row.rate;
     };
 
-    // Row Management
-    // Broken Period Calculations
-    useEffect(() => {
-        // Ensure at least one period row exists only for broken_period type
-        if (activeCategory === 'office_note' && officeNoteType === 'broken_period') {
-            if (!formData.bpPeriods || formData.bpPeriods.length === 0) {
-                setFormData(prev => ({ ...prev, bpPeriods: [{ id: Date.now(), from: '', to: '', amount: '', rate: '', interest: '', product: '' }] }));
-            }
-        }
-    }, [formData.bpPeriods?.length, activeCategory, officeNoteType]);
-
-    const updateBpPeriod = (id, field, value) => {
-        setFormData(prev => {
-            const updatedPeriods = prev.bpPeriods.map(row => {
-                if (row.id !== id) return row;
-                const newRow = { ...row, [field]: value };
-
-                // Auto-Fetch Rate if relevant fields change
-                if (['product', 'from', 'amount'].includes(field)) {
-                    // Check if open date is available in parent state
-                    const autoRate = fetchRowRate(newRow, prev.bpOpenDate, prev.bpStatus === 'Preclosed');
-                    if (autoRate) newRow.rate = autoRate;
-                }
-
-                // Auto-Calculate Interest if all fields present
-                if (newRow.amount && newRow.from && newRow.to && newRow.rate) {
-                    const calc = calculateBrokenPeriodInterest(newRow.amount, newRow.from, newRow.to, newRow.product || '', rates, prev.bpStatus === 'Preclosed');
-                    if (calc) {
-                        newRow.interest = calc.totalInterest;
-                    }
-                }
-
-                return newRow;
-            });
-            return { ...prev, bpPeriods: updatedPeriods };
-        });
-    };
-
-    // DD Row Management
-    const addDDEntry = () => {
-        setFormData(prev => ({
-            ...prev,
-            ddEntries: [...prev.ddEntries, { id: Date.now() + Math.random(), number: '', date: '', amount: '', payee: '', purchaser: '', purchaserAccount: '', issueBranch: '', draweeBranch: '' }]
-        }));
-    };
-
-    const removeDDEntry = (id) => {
-        if (!formData.ddEntries || formData.ddEntries.length <= 1) return; // Keep at least one row
-        setFormData(prev => ({
-            ...prev,
-            ddEntries: prev.ddEntries.filter(entry => entry.id !== id)
-        }));
-    };
-
-    const updateDDEntry = (id, field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            ddEntries: prev.ddEntries.map(entry => entry.id === id ? { ...entry, [field]: value } : entry)
-        }));
-    };
-
-    const handleExcelUpload = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-            if (jsonData.length > 0) {
-                const newEntries = jsonData.map(row => {
-                    let formattedDate = '';
-                    const rawDate = row['Date'] || row['date'] || row['DD Date'] || '';
-
-                    if (rawDate instanceof Date) {
-                        // Correctly handle date objects from XLSX
-                        const year = rawDate.getFullYear();
-                        const month = String(rawDate.getMonth() + 1).padStart(2, '0');
-                        const day = String(rawDate.getDate()).padStart(2, '0');
-                        formattedDate = `${year}-${month}-${day}`;
-                    } else if (typeof rawDate === 'string' && rawDate.includes('/')) {
-                        const parts = rawDate.split('/');
-                        if (parts.length === 3) {
-                            if (parts[2].length === 4) { // DD/MM/YYYY
-                                formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-                            } else if (parts[0].length === 4) { // YYYY/MM/DD
-                                formattedDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
-                            }
-                        }
-                    } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
-                        const parts = rawDate.split('-');
-                        if (parts.length === 3 && parts[0].length === 4) {
-                            formattedDate = rawDate.substring(0, 10); // Already YYYY-MM-DD
-                        }
-                    }
-
-                    return {
-                        id: Date.now() + Math.random(),
-                        number: row['DD Number'] || row['number'] || row['DD No'] || '',
-                        date: formattedDate,
-                        amount: row['Amount'] || row['amount'] || '',
-                        payee: row['Payee'] || row['payee'] || '',
-                        purchaser: row['Purchaser Name'] || row['purchaser'] || '',
-                        purchaserAccount: row['Purchaser Account'] || row['purchaserAccount'] || row['Account No'] || '',
-                        issueBranch: row['Issue Branch'] || row['issueBranch'] || '',
-                        draweeBranch: row['Drawee Branch'] || row['draweeBranch'] || ''
-                    };
-                });
-
-                setFormData(prev => ({
-                    ...prev,
-                    ddEntries: newEntries
-                }));
-            }
-        };
-        reader.readAsArrayBuffer(file);
-        e.target.value = null;
-    };
-
-    // Advanced Calculation: Daily Basis with Quarterly Rests (Dynamic Rate)
     const calculateBrokenPeriodInterest = (principal, startDateStr, endDateStr, product, allRates, preclosed) => {
         let balance = parseFloat(principal);
         const start = new Date(startDateStr);
         const end = new Date(endDateStr);
-
         if (isNaN(balance) || !start || !end) return null;
-
         let totalInterest = 0;
         let accruedInterest = 0;
         let currentDate = new Date(start);
-
-        // Iterate day by day
         while (currentDate <= end) {
-            // Get rate for THIS day
             const dailyRateBase = getRateForDate(currentDate, product, principal, allRates);
             const dailyRate = preclosed ? Math.max(0, dailyRateBase - 1) : dailyRateBase;
-
-            // Daily Calculation: Balance * (Rate/100) / 365
             const dailyInt = (balance * dailyRate) / (365 * 100);
             accruedInterest += dailyInt;
             totalInterest += dailyInt;
-            // ... (rest of function same)
-
-            // Check if Quarter End (Mar 31, Jun 30, Sep 30, Dec 31)
             const d = currentDate.getDate();
-            const m = currentDate.getMonth(); // 0-indexed
-
-            // If accumulated interest needs to be compounded on Quarter End
+            const m = currentDate.getMonth();
             if ((d === 31 && m === 2) || (d === 30 && m === 5) || (d === 30 && m === 8) || (d === 31 && m === 11)) {
                 balance += accruedInterest;
                 accruedInterest = 0;
             }
-
-            // Next Day
             currentDate.setDate(currentDate.getDate() + 1);
         }
-
-        // Final accumulated interest at the end of the period is also payable/added
         balance += accruedInterest;
-
         return {
             maturityAmount: Math.round(balance),
             totalInterest: Math.round(totalInterest),
@@ -592,7 +412,7 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
         };
     };
 
-    // Broken Period Content is now handled via Structured Preview (not text blob)
+    // Broken Period Content Auto-Gen
     useEffect(() => {
         if (officeNoteType === 'broken_period') {
             const content = '';
@@ -600,15 +420,13 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
         }
     }, [formData.bpPeriods, formData.bpAccountName, formData.bpAccountNo, formData.bpStatus, formData.bpCreditAccount, formData.bpOpenDate, officeNoteType, formData.content]);
 
-    // Generate Content for Time Barred Draft Automatically
+    // Time Barred Draft Content Auto-Gen
     useEffect(() => {
         if (officeNoteType === 'time_barred_draft') {
             let ddList = formData.ddEntries.map((dd, idx) => {
                 const dateStr = dd.date ? new Date(dd.date).toLocaleDateString('en-GB') : '________________';
                 const amtStr = dd.amount ? Number(dd.amount).toLocaleString('en-IN') : '________________';
-                return `    ${idx + 1}. DD No: ${dd.number || '_______'} | Date: ${dateStr} | Amt: ₹${amtStr}
-       Issue Br: ${dd.issueBranch || '_______'} | Drawee Br: ${dd.draweeBranch || '_______'}
-       Payee: ${dd.payee || '_______'}`;
+                return `    ${idx + 1}. DD No: ${dd.number || '_______'} | Date: ${dateStr} | Amt: ₹${amtStr}\n       Issue Br: ${dd.issueBranch || '_______'} | Drawee Br: ${dd.draweeBranch || '_______'}\n       Payee: ${dd.payee || '_______'}`;
             }).join('\n\n');
 
             const sectionA = [
@@ -636,122 +454,31 @@ const DocumentGenerator = ({ branchCode, branchName, user }) => {
                 { key: 'indemnityPayee', label: 'Indemnity (F.286) signed' }
             ].map(i => `    [${formData.ddChecklist[i.key] ? 'X' : ' '}] ${i.label}`).join('\n');
 
-            const content = `We seek your approval for the cancellation of the following Demand Draft(s) which have become time-barred:
-
-${ddList}
-
-    Reason for Recommendation:
-    ${formData.ddReason}
-
-    Scrutiny Checklist Highlights:
-    Section A (Scrutiny):
-${sectionA}
-    
-    Section B (Surrendered):
-${sectionB}
-    
-    Section C (Lost by Applicant):
-${sectionC}
-    
-    Section D (Lost by Payee):
-${sectionD}
-
-    The draft(s) were not presented for payment within their validity period of 3 months. We have verified the records and confirm that the draft(s) haven't been paid or previously cancelled. All relevant documents (Indemnity/Request letters) are verified and held at the branch.
-    
-    We request your good selves to accord sanction for the cancellation of the said time-barred draft(s).`;
+            const content = `We seek your approval for the cancellation of the following Demand Draft(s) which have become time-barred:\n\n${ddList}\n\n    Reason for Recommendation:\n    ${formData.ddReason}\n\n    Scrutiny Checklist Highlights:\n    Section A (Scrutiny):\n${sectionA}\n    \n    Section B (Surrendered):\n${sectionB}\n    \n    Section C (Lost by Applicant):\n${sectionC}\n    \n    Section D (Lost by Payee):\n${sectionD}\n\n    The draft(s) were not presented for payment within their validity period of 3 months. We have verified the records and confirm that the draft(s) haven't been paid or previously cancelled. All relevant documents (Indemnity/Request letters) are verified and held at the branch.\n    \n    We request your good selves to accord sanction for the cancellation of the said time-barred draft(s).`;
 
             setFormData(prev => ({ ...prev, content }));
         }
     }, [formData.ddEntries, formData.ddReason, formData.ddChecklist, officeNoteType]);
 
-    const handleGenerate = () => setGenerated(true);
-
-    // If Retirement is active, render full page retirement generator
+    // Sub-Module Rendering
     if (activeCategory === 'retirement') {
-        return (
-            <div style={{ padding: '0', height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white' }}>
-                    <button onClick={() => setActiveCategory('office_note')} style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}>
-                        <ChevronRight style={{ transform: 'rotate(180deg)' }} /> Back to Generator
-                    </button>
-                    <span style={{ margin: '0 1rem', color: '#cbd5e1' }}>|</span>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Retirement Relieving Module</h3>
-                </div>
-                <RetirementGenerator user={user} />
-            </div>
-        );
+        return <div className="p-0 h-full"><div className="flex items-center px-8 py-4 border-b border-slate-200 bg-white"><button onClick={() => setActiveCategory('office_note')} className="border-none bg-none cursor-pointer flex items-center gap-2 text-sm text-slate-500">Back to Generator</button><span className="mx-4 text-slate-300">|</span><h3 className="m-0 text-lg">Retirement Relieving Module</h3></div><RetirementGenerator user={user} /></div>;
     }
-
     if (activeCategory === 'branch_survey') {
-        return (
-            <div style={{ padding: '0', height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white' }}>
-                    <button onClick={() => setActiveCategory('office_note')} style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}>
-                        <ChevronRight style={{ transform: 'rotate(180deg)' }} /> Back to Generator
-                    </button>
-                    <span style={{ margin: '0 1rem', color: '#cbd5e1' }}>|</span>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Branch Opening Survey</h3>
-                </div>
-                <PlanningDashboard user={user} />
-            </div>
-        );
+        return <div className="p-0 h-full"><div className="flex items-center px-8 py-4 border-b border-slate-200 bg-white"><button onClick={() => setActiveCategory('office_note')} className="border-none bg-none cursor-pointer flex items-center gap-2 text-sm text-slate-500">Back to Generator</button><span className="mx-4 text-slate-300">|</span><h3 className="m-0 text-lg">Branch Opening Survey</h3></div><PlanningDashboard user={user} /></div>;
     }
-
     if (activeCategory === 'communication_hub') {
-        return (
-            <div style={{ padding: '0', height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white' }}>
-                    <button onClick={() => setActiveCategory('office_note')} style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}>
-                        <ChevronRight style={{ transform: 'rotate(180deg)' }} /> Back to Generator
-                    </button>
-                    <span style={{ margin: '0 1rem', color: '#cbd5e1' }}>|</span>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Communication Hub</h3>
-                </div>
-                <ROCommunication />
-            </div>
-        );
+        return <div className="p-0 h-full"><div className="flex items-center px-8 py-4 border-b border-slate-200 bg-white"><button onClick={() => setActiveCategory('office_note')} className="border-none bg-none cursor-pointer flex items-center gap-2 text-sm text-slate-500">Back to Generator</button><span className="mx-4 text-slate-300">|</span><h3 className="m-0 text-lg">Communication Hub</h3></div><ROCommunication /></div>;
     }
-
     if (activeCategory === 'joining_offer') {
-        return (
-            <div style={{ padding: '0', height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white' }}>
-                    <button onClick={() => setActiveCategory('office_note')} style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}>
-                        <ChevronRight style={{ transform: 'rotate(180deg)' }} /> Back to Generator
-                    </button>
-                    <span style={{ margin: '0 1rem', color: '#cbd5e1' }}>|</span>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Joining Offer Letter</h3>
-                </div>
-                <JoiningOfferGenerator />
-            </div>
-        );
+        return <div className="p-0 h-full"><div className="flex items-center px-8 py-4 border-b border-slate-200 bg-white"><button onClick={() => setActiveCategory('office_note')} className="border-none bg-none cursor-pointer flex items-center gap-2 text-sm text-slate-500">Back to Generator</button><span className="mx-4 text-slate-300">|</span><h3 className="m-0 text-lg">Joining Offer Letter</h3></div><JoiningOfferGenerator /></div>;
+    }
+    if (activeCategory === 'branch_code_request') {
+        return <div className="p-0 h-full"><div className="flex items-center px-8 py-4 border-b border-slate-200 bg-white"><button onClick={() => setActiveCategory('office_note')} className="border-none bg-none cursor-pointer flex items-center gap-2 text-sm text-slate-500">Back to Generator</button><span className="mx-4 text-slate-300">|</span><h3 className="m-0 text-lg">Branch Code Request</h3></div><div className="p-8"><BranchCodeRequest user={user} bankConfig={bankConfig} initialData={documents.find(d => d.id === currentDocId)?.formData} onSave={(data) => handleSave('Draft', data)} onDownload={handleDownloadPDF} currentRefNo={currentRefNo} /></div></div>;
     }
 
-    if (activeCategory === 'branch_code_request') {
-        return (
-            <div style={{ padding: '0', height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white' }}>
-                    <button onClick={() => setActiveCategory('office_note')} style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}>
-                        <ChevronRight style={{ transform: 'rotate(180deg)' }} /> Back to Generator
-                    </button>
-                    <span style={{ margin: '0 1rem', color: '#cbd5e1' }}>|</span>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Branch Code Request</h3>
-                </div>
-                <div style={{ padding: '2rem' }}>
-                    <BranchCodeRequest
-                        user={user}
-                        bankConfig={bankConfig}
-                        initialData={documents.find(d => d.id === currentDocId)?.formData}
-                        onSave={(data) => handleSave('Draft', data)}
-                        onDownload={(id) => handleDownloadPDF(id)}
-                        currentRefNo={currentRefNo}
-                    />
-                </div>
-            </div>
-        );
-    }
     const actions = viewMode === 'new' && (
-        <div className="flex gap-2">
+        <div className="flex gap-3 items-center">
             <Button variant="secondary" icon={Save} onClick={() => handleSave('Draft')}>Save Draft</Button>
             <Button variant="primary" icon={Zap} onClick={() => handleSave('Final')}>Finalize</Button>
             {generated && <Button variant="gold" icon={Printer} onClick={handleDownloadPDF}>Download PDF</Button>}
@@ -768,1053 +495,197 @@ ${sectionD}
             actions={actions}
         >
             {viewMode === 'list' ? (
-                <Card noPadding>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50 border-b-2 border-slate-200">
-                                    <th className="p-4 font-semibold text-slate-700">Ref No</th>
-                                    <th className="p-4 font-semibold text-slate-700">Date</th>
-                                    <th className="p-4 font-semibold text-slate-700">Subject</th>
-                                    <th className="p-4 font-semibold text-slate-700">Type</th>
-                                    <th className="p-4 font-semibold text-slate-700">Status</th>
-                                    <th className="p-4 text-right font-semibold text-slate-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {documents.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="p-8 text-center text-slate-400">
-                                            No saved documents found.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    documents.map(doc => (
-                                        <tr key={doc.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                            <td className="p-4 font-bold text-primary-color">{doc.refNo}</td>
-                                            <td className="p-4 text-slate-500">{new Date(doc.createdAt).toLocaleDateString()}</td>
-                                            <td className="p-4 text-slate-700">{doc.subject || 'Untitled'}</td>
-                                            <td className="p-4">
-                                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-600 border border-blue-100 uppercase">
-                                                    {doc.category === 'office_note' ? 'Note' : 'Letter'}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${doc.status === 'Final'
-                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                                    : 'bg-slate-50 text-slate-500 border-slate-200'
-                                                    }`}>
-                                                    {doc.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="sm" onClick={() => handleEdit(doc)} icon={Edit} title="Edit" />
-                                                    <Button variant="ghost" size="sm" className="text-error-color hover:bg-red-50" onClick={() => handleDeleteDoc(doc.id)} icon={Trash2} title="Delete" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </Card>
+                <DocumentList
+                    documents={documents}
+                    onEdit={handleEdit}
+                    onDelete={handleDeleteDoc}
+                />
             ) : (
                 <div className="grid grid-cols-[260px,1fr] gap-6 h-full min-h-0">
-                    {/* Sidebar */}
-                    <Card noPadding className="h-fit sticky top-0 overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 bg-slate-50">
-                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Categories</h3>
-                        </div>
-                        <div className="flex flex-col py-2">
-                            {categories.map(cat => {
-                                const Icon = cat.icon;
-                                const isActive = activeCategory === cat.id;
-                                return (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => { setActiveCategory(cat.id); setGenerated(false); }}
-                                        className={`flex items-center gap-3 px-4 py-3 text-sm transition-all border-l-4 ${isActive
-                                            ? 'bg-blue-50 text-primary-color border-primary-color font-semibold'
-                                            : 'text-slate-500 border-transparent hover:bg-slate-50 hover:text-slate-700'
-                                            }`}
-                                    >
-                                        <Icon size={18} />
-                                        {cat.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                    <DocumentMenu
+                        categories={categories}
+                        activeCategory={activeCategory}
+                        setActiveCategory={setActiveCategory}
+                        documents={documents}
+                        onSelectRecent={(doc) => {
+                            handleEdit(doc);
+                        }}
+                        setViewMode={setViewMode}
+                    />
 
-                        {/* Recent Saved Notes List */}
-                        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                            <h4 className="flex items-center gap-2 mb-3 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                <Files size={14} /> Recent Saved
-                            </h4>
-                            <div className="flex flex-col gap-2">
-                                {documents.slice(0, 5).map(doc => (
-                                    <button
-                                        key={doc.id}
-                                        onClick={() => {
-                                            setFormData(doc.formData);
-                                            setActiveCategory(doc.category);
-                                            setOfficeNoteType(doc.type);
-                                            setCurrentDocId(doc.id);
-                                            setCurrentRefNo(doc.refNo);
-                                            setGenerated(true);
-                                        }}
-                                        className="p-3 text-left bg-white border border-slate-200 rounded-md hover:border-primary-color hover:shadow-sm transition-all group"
-                                    >
-                                        <div className="font-semibold text-slate-700 text-xs truncate group-hover:text-primary-color">{doc.subject || '(No Subject)'}</div>
-                                        <div className="text-[10px] text-slate-400 mt-1 flex justify-between">
-                                            <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
-                                            <span>{doc.refNo}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                                {documents.length === 0 && <div className="text-xs text-slate-400 text-center py-4">No saved notes yet.</div>}
-                                {documents.length > 5 && (
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className="text-[10px] font-bold text-primary-color hover:underline text-center"
-                                    >
-                                        View all documents
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </Card>
-
-                    {/* Main Content */}
                     <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2">
-                        {/* Office Note Sub-Selector */}
-                        {activeCategory === 'office_note' && (
-                            <Card className="bg-indigo-50/50 border-indigo-100 p-4">
-                                <div className="flex items-center gap-4">
-                                    <span className="text-sm font-bold text-indigo-900">Note Type:</span>
-                                    <select
-                                        value={officeNoteType}
-                                        onChange={(e) => setOfficeNoteType(e.target.value)}
-                                        className="flex-1 p-2 bg-white border border-indigo-200 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                                    >
-                                        {officeNoteTypes.map(t => (
-                                            <option key={t.id} value={t.id}>{t.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </Card>
-                        )}
+                        <DocumentEditor
+                            activeCategory={activeCategory}
+                            officeNoteType={officeNoteType}
+                            setOfficeNoteType={setOfficeNoteType}
+                            officeNoteTypes={officeNoteTypes}
+                            categories={categories}
+                            formData={formData}
+                            setFormData={setFormData}
+                            onGenerate={() => setGenerated(true)}
+                            fileInputRef={fileInputRef}
+                            rates={rates}
+                            fetchRowRate={fetchRowRate}
+                            calculateBrokenPeriodInterest={calculateBrokenPeriodInterest}
+                        />
+                    </div>
+                </div>
+            )}
 
-                        <div className={`grid ${generated ? 'grid-cols-2' : 'grid-cols-1'} gap-6 items-start`}>
-                            {/* Input Form */}
-                            <Card>
-                                <div className="mb-6 pb-4 border-b border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800">
-                                        Compose {categories.find(c => c.id === activeCategory)?.name || 'Document'}
-                                    </h3>
-                                </div>
-
-                                {/* Broken Period Special Inputs */}
-                                {activeCategory === 'office_note' && officeNoteType === 'broken_period' && (
-                                    <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '4px', marginBottom: '1rem', border: '1px solid #bbf7d0' }}>
-                                        <h4 style={{ margin: '0 0 1rem 0', color: '#166534' }}>Account & Interest Details</h4>
-
-                                        {/* Account Details */}
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-                                            <div>
-                                                <label className="label">Account Name</label>
-                                                <input className="input" value={formData.bpAccountName} onChange={e => setFormData({ ...formData, bpAccountName: e.target.value })} />
-                                            </div>
-                                            <div>
-                                                <label className="label">Account Number</label>
-                                                <input className="input" value={formData.bpAccountNo} onChange={e => setFormData({ ...formData, bpAccountNo: e.target.value })} />
-                                            </div>
-                                            <div>
-                                                <label className="label">Open Date (Contracted Rate)</label>
-                                                <input type="date" className="input" value={formData.bpOpenDate} onChange={e => setFormData({ ...formData, bpOpenDate: e.target.value })} />
-                                            </div>
-                                            <div>
-                                                <label className="label">Status</label>
-                                                <select className="input" value={formData.bpStatus} onChange={e => {
-                                                    const newStatus = e.target.value;
-                                                    const isPreclosed = newStatus === 'Preclosed';
-                                                    setFormData(prev => {
-                                                        const updatedPeriods = prev.bpPeriods.map(row => {
-                                                            if (row.amount && row.from && row.to && row.product) {
-                                                                const autoRate = fetchRowRate(row, prev.bpOpenDate, isPreclosed);
-                                                                const updatedRow = { ...row, rate: autoRate };
-                                                                const calc = calculateBrokenPeriodInterest(updatedRow.amount, updatedRow.from, updatedRow.to, updatedRow.product, rates, isPreclosed);
-                                                                if (calc) updatedRow.interest = calc.totalInterest;
-                                                                return updatedRow;
-                                                            }
-                                                            return row;
-                                                        });
-                                                        return { ...prev, bpStatus: newStatus, bpPeriods: updatedPeriods };
-                                                    });
-                                                }}>
-                                                    <option value="Open">Open (Active)</option>
-                                                    <option value="Closed">Matured (Closed)</option>
-                                                    <option value="Preclosed">Preclosed (Penalty Applied)</option>
-                                                </select>
-                                            </div>
-                                            {(formData.bpStatus === 'Closed' || formData.bpStatus === 'Preclosed') && (
-                                                <div>
-                                                    <label className="label">Credit Proceeds To</label>
-                                                    <input className="input" value={formData.bpCreditAccount} onChange={e => setFormData({ ...formData, bpCreditAccount: e.target.value })} placeholder="Dest. Account No" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Dynamic Period Table */}
-                                        <div style={{ border: '1px solid #bbf7d0', borderRadius: '4px', overflow: 'hidden', background: 'white' }}>
-                                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                                                <thead style={{ background: '#dcfce7' }}>
-                                                    <tr>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Product</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Start</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>End</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Amount</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Rate</th>
-                                                        <th style={{ padding: '8px', textAlign: 'right' }}>Int.</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {formData.bpPeriods.map((row, idx) => (
-                                                        <tr key={row.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                                            <td style={{ padding: '4px' }}>
-                                                                <select
-                                                                    style={{ width: '100%', padding: '4px' }}
-                                                                    value={row.product}
-                                                                    onChange={e => updateBpPeriod(row.id, 'product', e.target.value)}
-                                                                >
-                                                                    <option value="">Select...</option>
-                                                                    {[...new Set(rates.map(r => r.product))].map(p => <option key={p} value={p}>{p}</option>)}
-                                                                </select>
-                                                            </td>
-                                                            <td style={{ padding: '4px' }}><input type="date" style={{ width: '100%', padding: '4px' }} value={row.from} onChange={e => updateBpPeriod(row.id, 'from', e.target.value)} /></td>
-                                                            <td style={{ padding: '4px' }}><input type="date" style={{ width: '100%', padding: '4px' }} value={row.to} onChange={e => updateBpPeriod(row.id, 'to', e.target.value)} /></td>
-                                                            <td style={{ padding: '4px' }}><input type="number" style={{ width: '80px', padding: '4px' }} value={row.amount} onChange={e => updateBpPeriod(row.id, 'amount', e.target.value)} placeholder="₹" /></td>
-                                                            <td style={{ padding: '4px' }}><input type="number" style={{ width: '50px', padding: '4px' }} value={row.rate} onChange={e => updateBpPeriod(row.id, 'rate', e.target.value)} placeholder="%" /></td>
-                                                            <td style={{ padding: '4px' }}>
-                                                                <input
-                                                                    style={{ width: '100%', padding: '4px', textAlign: 'right', border: 'none', background: 'transparent' }}
-                                                                    value={row.interest ? `₹${Number(row.interest).toFixed(2)}` : ''}
-                                                                    readOnly
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Time Barred Draft Special Inputs */}
-                                {activeCategory === 'office_note' && officeNoteType === 'time_barred_draft' && (
-                                    <div style={{ background: '#fff7ed', padding: '1rem', borderRadius: '4px', marginBottom: '1rem', border: '1px solid #fed7aa' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                            <h4 style={{ margin: 0, color: '#9a3412' }}>Draft & Purchaser Details</h4>
-                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                <input
-                                                    type="file"
-                                                    ref={fileInputRef}
-                                                    onChange={handleExcelUpload}
-                                                    style={{ display: 'none' }}
-                                                    accept=".xlsx, .xls, .csv"
-                                                />
-                                                <button
-                                                    onClick={() => fileInputRef.current.click()}
-                                                    className="btn-outline"
-                                                    style={{ fontSize: '0.8rem', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                >
-                                                    <Upload size={14} /> Upload Excel
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ border: '1px solid #fed7aa', borderRadius: '4px', overflow: 'hidden', background: 'white', marginBottom: '1rem' }}>
-                                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
-                                                <thead style={{ background: '#fef3c7' }}>
-                                                    <tr>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>S.No</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Issue Branch</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Drawee Branch</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>DD No</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Date</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Amount</th>
-                                                        <th style={{ padding: '8px', textAlign: 'left' }}>Payee</th>
-                                                        <th style={{ padding: '8px' }}></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {formData.ddEntries?.map((dd, index) => (
-                                                        <tr key={dd.id} style={{ borderBottom: '1px solid #fed7aa' }}>
-                                                            <td style={{ padding: '4px', textAlign: 'center' }}>{index + 1}</td>
-                                                            <td style={{ padding: '4px' }}><input style={{ width: '100%', padding: '4px' }} value={dd.issueBranch} onChange={e => updateDDEntry(dd.id, 'issueBranch', e.target.value)} placeholder="SOL/Name" /></td>
-                                                            <td style={{ padding: '4px' }}><input style={{ width: '100%', padding: '4px' }} value={dd.draweeBranch} onChange={e => updateDDEntry(dd.id, 'draweeBranch', e.target.value)} placeholder="SOL/Name" /></td>
-                                                            <td style={{ padding: '4px' }}><input style={{ width: '100%', padding: '4px' }} value={dd.number} onChange={e => updateDDEntry(dd.id, 'number', e.target.value)} /></td>
-                                                            <td style={{ padding: '4px' }}><input type="date" style={{ width: '100%', padding: '4px' }} value={dd.date} onChange={e => updateDDEntry(dd.id, 'date', e.target.value)} /></td>
-                                                            <td style={{ padding: '4px' }}><input type="number" style={{ width: '100%', padding: '4px' }} value={dd.amount} onChange={e => updateDDEntry(dd.id, 'amount', e.target.value)} placeholder="₹" /></td>
-                                                            <td style={{ padding: '4px' }}><input style={{ width: '100%', padding: '4px' }} value={dd.payee} onChange={e => updateDDEntry(dd.id, 'payee', e.target.value)} /></td>
-                                                            <td style={{ padding: '4px', textAlign: 'center' }}>
-                                                                <button onClick={() => removeDDEntry(dd.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>×</button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                            <div style={{ padding: '8px', textAlign: 'center', background: '#fffbeb', borderTop: '1px solid #fed7aa' }}>
-                                                <button onClick={addDDEntry} className="btn-outline" style={{ fontSize: '0.8rem', padding: '4px 8px' }}>+ Add Draft</button>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ background: 'white', padding: '1rem', borderRadius: '4px', border: '1px solid #fed7aa', marginBottom: '1rem' }}>
-                                            <h5 style={{ margin: '0 0 0.75rem 0', color: '#9a3412', borderBottom: '1px solid #fed7aa', paddingBottom: '0.25rem' }}>Scrutiny Checklist (Tables A-D)</h5>
-
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                                                {/* Section A */}
-                                                <div style={{ border: '1px solid #ffedd5', padding: '0.75rem', borderRadius: '4px' }}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '0.8rem', color: '#92400e', marginBottom: '0.5rem' }}>A. Scrutiny of Documents</div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                                        {[
-                                                            { id: 'originalPresented', label: 'Original / Replacement Draft presented' },
-                                                            { id: 'signaturesVerified', label: 'Signatures verified with records' },
-                                                            { id: 'circularAdhered', label: 'Circular Misc/451/2022-23 adhered' },
-                                                            { id: 'notPaidPreviously', label: 'Verified not paid previously' },
-                                                            { id: 'indemnityObtained', label: 'Indemnity obtained (if applicable)' }
-                                                        ].map(item => (
-                                                            <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={formData.ddChecklist?.[item.id] || false}
-                                                                    onChange={e => setFormData(prev => ({ ...prev, ddChecklist: { ...prev.ddChecklist, [item.id]: e.target.checked } }))}
-                                                                />
-                                                                {item.label}
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {/* Section B */}
-                                                <div style={{ border: '1px solid #ffedd5', padding: '0.75rem', borderRadius: '4px' }}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '0.8rem', color: '#92400e', marginBottom: '0.5rem' }}>B. Original Surrendered for Replacement</div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                                        {[
-                                                            { id: 'originalAvailable', label: 'Original DDs available with Branch' },
-                                                            { id: 'staffSignatureMatched', label: 'Staff signatures matched in DDR' },
-                                                            { id: 'requestLetterPayee', label: 'Request letter from payee' },
-                                                            { id: 'identityPayeeEstablished', label: 'Identity of payee established' },
-                                                            { id: 'endorsementCancelled', label: 'Endorsement cancelled by endorser' },
-                                                            { id: 'specialCrossingCancelled', label: 'Special crossing cancelled by bank' },
-                                                            { id: 'guidelinesAdheredB', label: 'All guidelines adhered to' },
-                                                            { id: 'chargesCollectedB', label: 'Charges collected per circular' }
-                                                        ].map(item => (
-                                                            <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
-                                                                <input type="checkbox" checked={formData.ddChecklist[item.id]} onChange={e => setFormData(prev => ({ ...prev, ddChecklist: { ...prev.ddChecklist, [item.id]: e.target.checked } }))} />
-                                                                {item.label}
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {/* Section C */}
-                                                <div style={{ border: '1px solid #ffedd5', padding: '0.75rem', borderRadius: '4px' }}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '0.8rem', color: '#92400e', marginBottom: '0.5rem' }}>C. Lost by Applicant</div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                                        {[
-                                                            { id: 'cautionMarkedC', label: 'Caution Marked in HDDLOST' },
-                                                            { id: 'requestLetterApplicant', label: 'Request letter from applicant' },
-                                                            { id: 'identityApplicantEstablished', label: 'Identity establishing' },
-                                                            { id: 'notDeliveredPayee', label: 'Satisfied not delivered to payee' },
-                                                            { id: 'indemnityApplicant', label: 'Stamped Indemnity Letter (F.286)' },
-                                                            { id: 'guidelinesAdheredC', label: 'All guidelines adhered to' },
-                                                            { id: 'chargesCollectedC', label: 'Charges collected per circular' }
-                                                        ].map(item => (
-                                                            <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
-                                                                <input type="checkbox" checked={formData.ddChecklist[item.id]} onChange={e => setFormData(prev => ({ ...prev, ddChecklist: { ...prev.ddChecklist, [item.id]: e.target.checked } }))} />
-                                                                {item.label}
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {/* Section D */}
-                                                <div style={{ border: '1px solid #ffedd5', padding: '0.75rem', borderRadius: '4px' }}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '0.8rem', color: '#92400e', marginBottom: '0.5rem' }}>D. Lost by Payee</div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                                        {[
-                                                            { id: 'cautionMarkedD', label: 'Caution Marked in HDDLOST' },
-                                                            { id: 'requestLetterPayeeD', label: 'Request letter from payee' },
-                                                            { id: 'identityPayeeEstablishedD', label: 'Identity established' },
-                                                            { id: 'registeredLetterSent', label: 'Regd letter sent to purchaser' },
-                                                            { id: 'indemnityPayee', label: 'Stamped Indemnity Letter (F.286)' },
-                                                            { id: 'guidelinesAdheredD', label: 'All guidelines adhered to' },
-                                                            { id: 'chargesCollectedD', label: 'Charges collected per circular' }
-                                                        ].map(item => (
-                                                            <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
-                                                                <input type="checkbox" checked={formData.ddChecklist[item.id]} onChange={e => setFormData(prev => ({ ...prev, ddChecklist: { ...prev.ddChecklist, [item.id]: e.target.checked } }))} />
-                                                                {item.label}
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="label">Reason for Cancellation</label>
-                                            <textarea className="input" rows="2" value={formData.ddReason} onChange={e => setFormData({ ...formData, ddReason: e.target.value })} />
-                                        </div>
-                                        <div style={{ marginTop: '1rem' }}>
-                                            <label className="label">Signatory Name</label>
-                                            <input className="input" value={formData.signatoryName} onChange={e => setFormData({ ...formData, signatoryName: e.target.value })} placeholder="e.g. Name of the Official" />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeCategory === 'office_note' || activeCategory === 'letter' ? (
-                                    <>
-                                        <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>Department</label>
-                                                    <input
-                                                        className="input"
-                                                        value={formData.department}
-                                                        onChange={e => setFormData({ ...formData, department: e.target.value })}
-                                                        style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                                                    />
-                                                </div>
-                                                {activeCategory === 'letter' && (
-                                                    <div>
-                                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>Letter Type</label>
-                                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                                                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                                                <input
-                                                                    type="radio"
-                                                                    name="letterType"
-                                                                    checked={formData.letterType === 'internal'}
-                                                                    onChange={() => setFormData(prev => ({ ...prev, letterType: 'internal' }))}
-                                                                />
-                                                                Internal
-                                                            </label>
-                                                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                                                <input
-                                                                    type="radio"
-                                                                    name="letterType"
-                                                                    checked={formData.letterType === 'external'}
-                                                                    onChange={() => setFormData(prev => ({ ...prev, letterType: 'external' }))}
-                                                                />
-                                                                External
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>To</label>
-                                        <input
-                                            className="input"
-                                            value={formData.recipient}
-                                            onChange={e => setFormData({ ...formData, recipient: e.target.value })}
-                                            style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                                        />
-
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1rem', marginBottom: '1rem' }}>
-                                            <div>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>Note No.</label>
-                                                <input
-                                                    className="input"
-                                                    value={formData.officeNoteNo}
-                                                    onChange={e => setFormData({ ...formData, officeNoteNo: e.target.value })}
-                                                    placeholder="e.g. 05"
-                                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>Subject</label>
-                                                <input
-                                                    className="input"
-                                                    value={formData.subject}
-                                                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                                    placeholder="e.g. Request for Asset Transfer"
-                                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                            <div>
-                                                <label className="label">Amount (₹)</label>
-                                                <input
-                                                    type="number"
-                                                    value={formData.currentEntry.amount}
-                                                    onChange={(e) => setFormData(prev => ({ ...prev, currentEntry: { ...prev.currentEntry, amount: e.target.value } }))}
-                                                    className="input"
-                                                    placeholder="0.00"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="label">Payee's Name</label>
-                                                <input
-                                                    type="text"
-                                                    value={formData.currentEntry.payee}
-                                                    onChange={(e) => setFormData(prev => ({ ...prev, currentEntry: { ...prev.currentEntry, payee: e.target.value } }))}
-                                                    className="input"
-                                                    placeholder="Payee Name"
-                                                />
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                                <button
-                                                    className="btn btn-secondary"
-                                                    onClick={() => {
-                                                        if (!formData.currentEntry.amount || !formData.currentEntry.payee) {
-                                                            alert("Please enter Amount and Payee");
-                                                            return;
-                                                        }
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            ddEntries: [...prev.ddEntries, { ...prev.currentEntry, id: Date.now() }],
-                                                            currentEntry: { amount: '', payee: '' }
-                                                        }));
-                                                    }}
-                                                    style={{ width: '100%' }}
-                                                >
-                                                    + Add Draft
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Added Drafts List */}
-                                        {formData.ddEntries?.length > 0 && (
-                                            <div style={{ marginBottom: '1rem', border: '1px solid #e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                                                <table style={{ width: '100%', fontSize: '0.9rem' }}>
-                                                    <thead style={{ background: '#f8fafc' }}>
-                                                        <tr>
-                                                            <th style={{ padding: '0.5rem', textAlign: 'left' }}>Payee</th>
-                                                            <th style={{ padding: '0.5rem', textAlign: 'right' }}>Amount</th>
-                                                            <th style={{ padding: '0.5rem', width: '40px' }}></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {formData.ddEntries?.map((dd, idx) => (
-                                                            <tr key={idx} style={{ borderTop: '1px solid #e2e8f0' }}>
-                                                                <td style={{ padding: '0.5rem' }}>{dd.payee}</td>
-                                                                <td style={{ padding: '0.5rem', textAlign: 'right' }}>₹{dd.amount}</td>
-                                                                <td style={{ padding: '0.5rem', textAlign: 'center' }}>
-                                                                    <button
-                                                                        onClick={() => setFormData(prev => ({ ...prev, ddEntries: prev.ddEntries.filter((_, i) => i !== idx) }))}
-                                                                        style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                                    >
-                                                                        <Trash2 size={14} />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-                                        {officeNoteType === 'time_barred_draft' && (
-                                            <div>
-                                                <label className="label">Draft Status</label>
-                                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                                        <input
-                                                            type="radio"
-                                                            name="draftStatus"
-                                                            checked={formData.draftStatus === 'presented'}
-                                                            onChange={() => setFormData(prev => ({ ...prev, draftStatus: 'presented' }))}
-                                                        />
-                                                        Presented
-                                                    </label>
-                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                                        <input
-                                                            type="radio"
-                                                            name="draftStatus"
-                                                            checked={formData.draftStatus === 'lost'}
-                                                            onChange={() => setFormData(prev => ({ ...prev, draftStatus: 'lost' }))}
-                                                        />
-                                                        Lost
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {officeNoteType !== 'broken_period' && (
-                                            <>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold' }}>Content</label>
-                                                <textarea
-                                                    rows="15"
-                                                    value={formData.content}
-                                                    onChange={e => setFormData({ ...formData, content: e.target.value })}
-                                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontFamily: 'inherit' }}
-                                                    placeholder="Type the body of the letter here..."
-                                                />
-                                            </>
-                                        )}
-
-                                        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
-                                            <button className="btn btn-primary" onClick={handleGenerate} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                Generate Preview <ChevronRight size={16} />
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
-                                        <p>Module <strong>{categories.find(c => c.id === activeCategory)?.name || 'Document'}</strong> is under construction.</p>
-                                    </div>
-                                )}
-                            </Card>
-                        </div>
-
-                        {/* Floating Preview Panel */}
-                        {generated && (
-                            <div style={{
-                                position: 'fixed',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'flex-start',
-                                zIndex: 1000,
-                                padding: '2rem',
-                                overflowY: 'auto',
-                                backdropFilter: 'blur(4px)'
-                            }}>
-                                {/* Print Styles */}
-                                <style>
-                                    {`
-                                            @media print {
-                                                @page {
-                                                    size: A4;
-                                                    margin: 20mm;
-                                                }
-                                                body {
-                                                    background: white;
-                                                }
-                                                body * { visibility: hidden !important; }
-                                                .printable-document, .printable-document * { 
-                                                    visibility: visible !important; 
-                                                }
-                                                .printable-document {
-                                                    position: absolute !important;
-                                                    left: 0 !important;
-                                                    top: 0 !important;
-                                                    width: 100% !important;
-                                                    max-width: 100% !important;
-                                                    padding: 0 !important;
-                                                    margin: 0 !important;
-                                                    box-shadow: none !important;
-                                                    border: none !important;
-                                                }
-                                                .no-print { display: none !important; }
-
-                                                /* Ensure table headers repeat on new pages */
-                                                thead { display: table-header-group; }
-                                                tfoot { display: table-footer-group; }
-                                                tr { page-break-inside: avoid; }
-                                            }
-                                        `}
-                                </style>
-
-                                <div className="card printable-document" style={{
-                                    width: '100%',
-                                    maxWidth: '900px',
-                                    border: '1px solid #e2e8f0',
-                                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-                                    background: 'white',
-                                    position: 'relative'
-                                }}>
-                                    {/* Modal Toolbar */}
-                                    <div className="no-print" style={{
-                                        padding: '1rem 2rem',
-                                        backgroundColor: '#f8fafc',
-                                        borderBottom: '1px solid #e2e8f0',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexShrink: 0
-                                    }}>
-                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>Preview</h3>
-                                            {activeCategory === 'office_note' && (
-                                                <div style={{ display: 'flex', background: '#e2e8f0', padding: '2px', borderRadius: '6px' }}>
-                                                    <button
-                                                        onClick={() => setPreviewMode('note')}
-                                                        style={{
-                                                            padding: '0.4rem 1rem',
-                                                            borderRadius: '4px',
-                                                            border: 'none',
-                                                            background: previewMode === 'note' ? 'white' : 'transparent',
-                                                            fontSize: '0.8rem',
-                                                            fontWeight: previewMode === 'note' ? '600' : '400',
-                                                            cursor: 'pointer',
-                                                            boxShadow: previewMode === 'note' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-                                                        }}
-                                                    >
-                                                        Office Note
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setPreviewMode('advise')}
-                                                        style={{
-                                                            padding: '0.4rem 1rem',
-                                                            borderRadius: '4px',
-                                                            border: 'none',
-                                                            background: previewMode === 'advise' ? 'white' : 'transparent',
-                                                            fontSize: '0.8rem',
-                                                            fontWeight: previewMode === 'advise' ? '600' : '400',
-                                                            cursor: 'pointer',
-                                                            boxShadow: previewMode === 'advise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-                                                        }}
-                                                    >
-                                                        Sanction Advise
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                            <Button variant="secondary" icon={Printer} onClick={() => window.print()}>Print</Button>
-                                            <Button variant="gold" icon={Printer} onClick={handleDownloadPDF}>Download PDF</Button>
-                                            <button
-                                                onClick={() => { setGenerated(false); setPreviewMode('note'); }}
-                                                style={{ padding: '0.5rem', borderRadius: '4px', border: 'none', background: '#fee2e2', color: '#ef4444', cursor: 'pointer' }}
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div id="pdf-content" style={{ padding: '2rem', background: 'white' }}>
-                                        <div style={{ padding: '3rem', fontFamily: 'Century Gothic, sans-serif', color: 'black', lineHeight: '1.4', fontSize: '11pt' }}>
-                                            {previewMode === 'advise' ? (
-                                                <div style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', borderBottom: '2px solid black', paddingBottom: '1rem' }}>
-                                                        <div style={{ textAlign: 'center' }}>
-                                                            <img src="/logo_center.svg" alt="IOB" style={{ height: '80px', objectFit: 'contain' }} />
-                                                            <div style={{ fontWeight: 'bold', fontSize: '14pt', marginTop: '0.5rem', color: '#254aa0' }}>SANCTION ADVISE</div>
-                                                            <div style={{ fontSize: '10pt', fontWeight: 'bold' }}>Department: {formData.department}</div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                                                        <div>
-                                                            <strong>From:</strong><br />
-                                                            The Chief Manager<br />
-                                                            Regional Office, {user?.region_name || 'Dindigul'}
-                                                        </div>
-                                                        <div style={{ textAlign: 'right' }}>
-                                                            <strong>To:</strong><br />
-                                                            The Branch Manager<br />
-                                                            {branchName || '................'} Branch ({branchCode || '....'})
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{ marginBottom: '1.5rem' }}>
-                                                        <strong>Ref:</strong> {currentRefNo || 'PLN/ADV/FY24-25/TEMP'}<br />
-                                                        <strong>Date:</strong> {date || new Date().toLocaleDateString('en-GB')}
-                                                    </div>
-
-                                                    <div style={{ fontWeight: 'bold', marginBottom: '1.5rem' }}>
-                                                        Sub: {formData.subject.startsWith('Sanction') ? formData.subject : `Sanction for ${formData.subject}`}
-                                                    </div>
-
-                                                    <div style={{ textAlign: 'justify', lineHeight: '1.6', marginBottom: '2rem' }}>
-                                                        <p>Dear Sir,</p>
-                                                        <p>With reference to your Office Note No. <strong>{formData.officeNoteNo || '....'}</strong> dated <strong>{date || '........'}</strong>, we are pleased to inform you that sanction is hereby accorded by the Regional Office for the following request:</p>
-                                                        <div style={{ margin: '1.5rem 0', padding: '1rem', border: '1px dashed #ccc', background: '#f8fafc' }}>
-                                                            <strong>{formData.subject}</strong>
-                                                        </div>
-                                                        {officeNoteType === 'broken_period' && (
-                                                            <div>
-                                                                <p>The calculation of broken period interest for account <strong>{formData.bpAccountNo}</strong> ({formData.bpAccountName}) has been verified and found to be in order.</p>
-                                                                {formData.bpStatus === 'Closed' && (
-                                                                    <p>Please note that as the account is preclosed, the applicable interest rate has been reduced by 1% as per the Bank's penal charge guidelines for preclosure.</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                        <p>You are advised to proceed with the necessary entries/actions as per the extant guidelines of the Bank. Please ensure that all conditions mentioned in the original proposal are strictly adhered to.</p>
-                                                        <p>Necessary entries may be passed in the branch books and relative vouchers preserved for audit purpose.</p>
-                                                    </div>
-
-                                                    <div style={{ marginTop: '5rem', textAlign: 'right' }}>
-                                                        <p>Yours Faithfully,</p>
-                                                        <br /><br />
-                                                        <div style={{ fontWeight: 'bold' }}>
-                                                            (..................................)<br />
-                                                            CHIEF MANAGER
-                                                        </div>
-                                                        <div style={{ fontSize: '9pt', color: '#666' }}>{user?.region_name || 'Dindigul'} Regional Office</div>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    {activeCategory === 'office_note' && officeNoteType === 'time_barred_draft' ? (
-                                                        <>
-                                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', border: '1px solid black', fontSize: '11pt' }}>
-                                                                <tbody>
-                                                                    <tr style={{ borderBottom: '1px solid black' }}>
-                                                                        <td style={{ width: '35%', borderRight: '1px solid black', padding: '10px', verticalAlign: 'top' }}>
-                                                                            <div style={{ fontWeight: 'normal' }}>From</div>
-                                                                            <div style={{ marginTop: '4px' }}>The Chief Manager</div>
-                                                                            <div>Indian Overseas Bank</div>
-                                                                            <div>Regional Office</div>
-                                                                            <div style={{ marginTop: '0.5rem', width: '80%' }}>{(user?.region_name || branchName) ? `${user?.region_name || branchName} Region` : '....................'}</div>
-                                                                        </td>
-                                                                        <td style={{ width: '30%', borderRight: '1px solid black', padding: '10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                                            <img src="/logo_center.svg" alt="IOB" style={{ height: '105px', objectFit: 'contain', display: 'inline-block' }} />
-                                                                        </td>
-                                                                        <td style={{ width: '35%', padding: '10px', verticalAlign: 'top' }}>
-                                                                            <div style={{ fontWeight: 'normal' }}>To</div>
-                                                                            <div style={{ marginTop: '4px' }}>The Chief Manager</div>
-                                                                            <div>Indian Overseas Bank</div>
-                                                                            <div>IBR Division - BOD</div>
-                                                                            <div>Central office</div>
-                                                                            <div>Chennai</div>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td style={{ borderRight: '1px solid black', padding: '5px 10px' }}>
-                                                                            Ref no. IOB/{user?.linked_region_code || branchCode || 'RO'}/RO/{new Date().getFullYear()}/{(new Date().getMonth() + 1).toString().padStart(2, '0')}/{formData.officeNoteNo || '____'}
-                                                                        </td>
-                                                                        <td style={{ borderRight: '1px solid black' }}></td>
-                                                                        <td style={{ padding: '5px 10px' }}>
-                                                                            Date: {date || new Date().toLocaleDateString('en-GB')}
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-
-                                                            <div style={{ textAlign: 'center', fontWeight: 'bold', textDecoration: 'underline', marginBottom: '1.5rem', fontSize: '12pt' }}>
-                                                                Sub: Approval for payment of Time Barred Drafts
-                                                            </div>
-
-                                                            <div style={{ marginBottom: '1.5rem', fontSize: '11pt' }}>
-                                                                On the request and copies of documents received from the above branch, we recommend that approval may be given for payment/cancellation of the following time barred drafts which have been{' '}
-                                                                <strong>
-                                                                    <span style={{ textDecoration: formData.draftStatus === 'lost' ? 'line-through' : 'none' }}>presented to the branch</span>
-                                                                    /
-                                                                    <span style={{ textDecoration: formData.draftStatus === 'presented' ? 'line-through' : 'none' }}>reported lost</span>
-                                                                    . (Strike out whichever is not applicable).
-                                                                </strong>
-                                                            </div>
-
-                                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', border: '1px solid black' }}>
-                                                                <thead>
-                                                                    <tr style={{ borderBottom: '1px solid black' }}>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Serial Number</th>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Issue Branch</th>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Drawee branch</th>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>DD No (9 digits)</th>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Issue Date</th>
-                                                                        <th style={{ borderRight: '1px solid black', borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Amount in ₹</th>
-                                                                        <th style={{ borderBottom: '1px solid black', padding: '5px', fontSize: '11pt' }}>Payee's Name</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {formData.ddEntries.map((dd, idx) => (
-                                                                        <tr key={dd.id} style={{ borderBottom: '1px solid black' }}>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', textAlign: 'center', fontSize: '11pt' }}>{idx + 1}</td>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', fontSize: '11pt' }}>{dd.issueBranch}</td>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', fontSize: '11pt' }}>{dd.draweeBranch}</td>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', fontSize: '11pt' }}>{dd.number}</td>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', fontSize: '11pt' }}>{dd.date ? new Date(dd.date).toLocaleDateString('en-GB') : ''}</td>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', textAlign: 'right', fontSize: '11pt' }}>{dd.amount ? Number(dd.amount).toLocaleString('en-IN') : ''}</td>
-                                                                            <td style={{ padding: '5px', fontSize: '11pt' }}>{dd.payee}</td>
-                                                                        </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
-
-                                                            <div style={{ marginBottom: '1.5rem', fontSize: '11pt', textAlign: 'justify' }}>
-                                                                We further certify that we have scrutinized the copies of all relevant documents received from the branch and conditions have been fulfilled as listed below. We are satisfied with the branch's claim. This has the concurrence of our Chief/Senior Regional Manager.
-                                                            </div>
-
-                                                            <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>*List of Copies of Documents scrutinized, and conditions fulfilled:</div>
-                                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem', border: '1px solid black' }}>
-                                                                <tbody>
-                                                                    {[
-                                                                        { key: 'originalPresented', label: 'Original / Replacement Draft presented' },
-                                                                        { key: 'signaturesVerified', label: 'Signatures on the draft verified with records' },
-                                                                        { key: 'circularAdhered', label: 'Conditions of Circular Misc/451/2022-23 adhered to' },
-                                                                        { key: 'notPaidPreviously', label: 'Verified that the draft has not been paid previously' },
-                                                                        { key: 'indemnityObtained', label: 'Indemnity obtained (if applicable)' }
-                                                                    ].map(item => (
-                                                                        <tr key={item.key} style={{ borderBottom: '1px solid black' }}>
-                                                                            <td style={{ borderRight: '1px solid black', padding: '5px', fontSize: '11pt' }}>{item.label}</td>
-                                                                            <td style={{ padding: '5px', textAlign: 'center', fontSize: '11pt', fontWeight: 'bold' }}>
-                                                                                {formData.ddChecklist[item.key] ? 'YES' : 'NO'}
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
-
-                                                            <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                                                <div style={{ fontSize: '8pt', color: '#666' }}>Page 1 of 1</div>
-                                                                <div style={{ textAlign: 'left' }}>
-                                                                    <div style={{ marginBottom: '1rem' }}>(Name: {formData.signatoryName || '________________________'})</div>
-                                                                    <div style={{ fontWeight: 'bold' }}>Chief Manager</div>
-                                                                </div>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {/* HEADER SELECTION */}
-                                                            {activeCategory === 'office_note' ? (
-                                                                /* OFFICE NOTE HEADER */
-                                                                <div style={{ marginBottom: '2rem', borderBottom: '1px solid black', paddingBottom: '0.5rem' }}>
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                                                                        <div>INDIAN OVERSEAS BANK</div>
-                                                                        <div>{branchName || 'Regional Office'}</div>
-                                                                    </div>
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10pt', marginBottom: '1rem' }}>
-                                                                        <div>Department: <strong>{formData.department}</strong></div>
-                                                                        <div>Date: {new Date().toLocaleDateString('en-GB')}</div>
-                                                                    </div>
-                                                                    <div style={{ textAlign: 'center', fontWeight: 'bold', textDecoration: 'underline', fontSize: '12pt' }}>OFFICE NOTE</div>
-                                                                </div>
-                                                            ) : activeCategory === 'letter' ? (
-                                                                formData.letterType === 'internal' ? (
-                                                                    /* INTERNAL LETTER HEADER */
-                                                                    <div style={{ marginBottom: '2rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
-                                                                        <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14pt', marginBottom: '0.5rem' }}>INTER-OFFICE MEMO</div>
-                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10pt' }}>
-                                                                            <div>
-                                                                                <strong>Dept:</strong> {formData.department}<br />
-                                                                                <strong>From:</strong> {branchName || 'Regional Office'}
-                                                                            </div>
-                                                                            <div style={{ textAlign: 'right' }}>
-                                                                                <strong>Ref:</strong> {formData.officeNoteNo || 'N/A'}<br />
-                                                                                <strong>Date:</strong> {new Date().toLocaleDateString('en-GB')}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    /* EXTERNAL LETTER HEADER */
-                                                                    <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                                                                        <img src="/logo_center.svg" alt="IOB" style={{ height: '70px', objectFit: 'contain', marginBottom: '1rem' }} />
-                                                                        <div style={{ fontWeight: 'bold', fontSize: '12pt' }}>INDIAN OVERSEAS BANK</div>
-                                                                        <div style={{ fontSize: '10pt' }}>{branchName || 'Regional Office, 763 Anna Salai, Chennai 600002'}</div>
-                                                                        <div style={{ fontSize: '10pt' }}>Phone: 044-28519638 | Email: chennai@iob.in</div>
-                                                                        <div style={{ marginTop: '1rem', borderTop: '2px solid black' }}></div>
-                                                                    </div>
-                                                                )
-                                                            ) : (
-                                                                /* FALLBACK HEADER */
-                                                                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-                                                                    <img src="/logo_center.svg" alt="IOB" style={{ height: '90px', objectFit: 'contain' }} />
-                                                                </div>
-                                                            )}
-
-                                                            {/* METADATA For External Letters only (Internal handled in header) */}
-                                                            {activeCategory === 'letter' && formData.letterType === 'external' && (
-                                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '11pt' }}>
-                                                                    <div>Ref No: IOB/{branchCode || 'RO'}/{new Date().getFullYear()}/{(new Date().getMonth() + 1).toString().padStart(2, '0')}/CTE</div>
-                                                                    <div>Date: {new Date().toLocaleDateString('en-GB')}</div>
-                                                                </div>
-                                                            )}
-
-                                                            <div style={{ marginBottom: '1.5rem' }}>
-                                                                To,<br />
-                                                                <strong>{formData.recipient}</strong>
-                                                            </div>
-
-                                                            <div style={{ textDecoration: 'underline', fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center' }}>
-                                                                Sub: {formData.subject}
-                                                            </div>
-
-                                                            {officeNoteType === 'broken_period' ? (
-                                                                <div style={{ fontSize: '11pt', textAlign: 'justify' }}>
-                                                                    <p>We request your good selves to accord sanction for payment of Broken Period Interest for the following account:</p>
-                                                                    <p>
-                                                                        <strong>Account Name:</strong> {formData.bpAccountName || '________________'}<br />
-                                                                        <strong>Account No:</strong> {formData.bpAccountNo || '________________'}<br />
-                                                                        <strong>Open Date:</strong> {formData.bpOpenDate ? new Date(formData.bpOpenDate).toLocaleDateString('en-GB') : '________________'}<br />
-                                                                        <strong>Status:</strong> {formData.bpStatus}
-                                                                        {formData.bpStatus === 'Closed' && <><br /><strong>Credit To:</strong> {formData.bpCreditAccount || '________________'}</>}
-                                                                    </p>
-
-                                                                    <div style={{ margin: '1rem 0' }}>
-                                                                        <strong>Interest Calculation Details:</strong>
-                                                                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '0.5rem', border: '1px solid black' }}>
-                                                                            <thead style={{ background: '#f0f0f0' }}>
-                                                                                <tr>
-                                                                                    <th style={{ border: '1px solid black', padding: '5px', textAlign: 'left' }}>Period</th>
-                                                                                    <th style={{ border: '1px solid black', padding: '5px', textAlign: 'left' }}>Product</th>
-                                                                                    <th style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>Amount</th>
-                                                                                    <th style={{ border: '1px solid black', padding: '5px', textAlign: 'center' }}>Rate</th>
-                                                                                    <th style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>Interest</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {formData.bpPeriods.map((p, i) => (
-                                                                                    <tr key={i}>
-                                                                                        <td style={{ border: '1px solid black', padding: '5px' }}>
-                                                                                            {p.from ? new Date(p.from).toLocaleDateString('en-GB') : ''} to {p.to ? new Date(p.to).toLocaleDateString('en-GB') : ''}
-                                                                                        </td>
-                                                                                        <td style={{ border: '1px solid black', padding: '5px' }}>{p.product}</td>
-                                                                                        <td style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>₹{Number(p.amount).toLocaleString('en-IN')}</td>
-                                                                                        <td style={{ border: '1px solid black', padding: '5px', textAlign: 'center' }}>{p.rate}%</td>
-                                                                                        <td style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>₹{Number(p.interest).toLocaleString('en-IN')}</td>
-                                                                                    </tr>
-                                                                                ))}
-                                                                                <tr style={{ fontWeight: 'bold', background: '#f9fafb' }}>
-                                                                                    <td colSpan="4" style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>Total Interest Payable</td>
-                                                                                    <td style={{ border: '1px solid black', padding: '5px', textAlign: 'right' }}>
-                                                                                        ₹{formData.bpPeriods.reduce((sum, p) => sum + (Number(p.interest) || 0), 0).toLocaleString('en-IN')}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                        {formData.bpStatus === 'Closed' && (
-                                                                            <p style={{ fontSize: '0.9rem', fontStyle: 'italic', marginTop: '0.5rem' }}>
-                                                                                (Note: Penal charge of 1% applied for preclosure as per Bank guidelines)
-                                                                            </p>
-                                                                        )}
-                                                                    </div>
-
-                                                                    <p>
-                                                                        The system is not allowing auto-closure/calculation for these specific broken periods, hence manual calculation is required.
-                                                                        We certify that the rates applied are correct as per HO guidelines (Contracted Rate based on Open Date) and the calculation has been double-checked.
-                                                                    </p>
-                                                                </div>
-                                                            ) : (
-                                                                <div style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
-                                                                    {formData.content}
-                                                                </div>
-                                                            )}
-
-                                                            <div style={{ marginTop: '4rem', textAlign: 'right' }}>
-                                                                <p>Yours Faithfully,</p>
-                                                                <br /><br /><br />
-                                                                <p style={{ fontWeight: 'bold' }}>Branch Manager / Authorised Signatory</p>
-                                                            </div>
-
-                                                            <div style={{ textAlign: 'center', borderTop: '1px solid #ccc', paddingTop: '0.5rem', marginTop: '3rem', fontSize: '8pt', color: '#666', fontFamily: 'Arial, sans-serif' }}>
-                                                                {activeCategory === 'letter' && formData.letterType === 'external'
-                                                                    ? "Registered Office: 763 Anna Salai, Chennai 600002 | www.iob.in | Toll Free: 1800 425 4445"
-                                                                    : `Internal Document | Generated by ${user?.name || 'User'} | Department: ${formData.department}`}
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
+            {generated && (
+                <PreviewModal
+                    activeCategory={activeCategory}
+                    previewMode={previewMode}
+                    setPreviewMode={setPreviewMode}
+                    onClose={() => setGenerated(false)}
+                    onDownloadPDF={handleDownloadPDF}
+                >
+                    {/* Render Content Logic based on Preview Mode */}
+                    {previewMode === 'advise' ? (
+                        <div className="print-page font-serif">
+                            <div className="print-header-container">
+                                <div className="text-center w-full">
+                                    <img src="/logo_center.svg" alt="IOB" className="print-logo mx-auto block" />
+                                    <div className="font-bold text-xl mt-2 text-[#254aa0]">SANCTION ADVISE</div>
+                                    <div className="text-sm font-bold mt-1">Department: {formData.department}</div>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                </div >
+
+                            <div className="print-row">
+                                <div>
+                                    <strong>From:</strong><br />
+                                    The Chief Manager<br />
+                                    Regional Office, {user?.region_name || 'Dindigul'}
+                                </div>
+                                <div className="text-right">
+                                    <strong>To:</strong><br />
+                                    The Branch Manager<br />
+                                    {branchName || '................'} Branch ({branchCode || '....'})
+                                </div>
+                            </div>
+
+                            <div className="print-section">
+                                <strong>Ref:</strong> {currentRefNo || 'PLN/ADV/FY24-25/TEMP'}<br />
+                                <strong>Date:</strong> {date || new Date().toLocaleDateString('en-GB')}
+                            </div>
+
+                            <div className="print-subject">
+                                Sub: {formData.subject.startsWith('Sanction') ? formData.subject : `Sanction for ${formData.subject}`}
+                            </div>
+
+                            <div className="print-content">
+                                <p>Dear Sir,</p>
+                                <p>With reference to your Office Note No. <strong>{formData.officeNoteNo || '....'}</strong> dated <strong>{date || '........'}</strong>, we are pleased to inform you that sanction is hereby accorded by the Regional Office for the following request:</p>
+                                <div className="my-6 p-4 border border-dashed border-slate-300 bg-slate-50">
+                                    <strong>{formData.subject}</strong>
+                                </div>
+                                {officeNoteType === 'broken_period' && (
+                                    <div>
+                                        <p>The calculation of broken period interest for account <strong>{formData.bpAccountNo}</strong> ({formData.bpAccountName}) has been verified and found to be in order.</p>
+                                        {formData.bpStatus === 'Closed' && (
+                                            <p>Please note that as the account is preclosed, the applicable interest rate has been reduced by 1% as per the Bank's penal charge guidelines for preclosure.</p>
+                                        )}
+                                    </div>
+                                )}
+                                <p>You are advised to proceed with the necessary entries/actions as per the extant guidelines of the Bank. Please ensure that all conditions mentioned in the original proposal are strictly adhered to.</p>
+                                <p>Necessary entries may be passed in the branch books and relative vouchers preserved for audit purpose.</p>
+                            </div>
+
+                            <div className="print-footer">
+                                <div className="print-signatory">
+                                    <p>Yours Faithfully,</p>
+                                    <br /><br />
+                                    <div className="font-bold">
+                                        (..................................)<br />
+                                        CHIEF MANAGER
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-1">{user?.region_name || 'Dindigul'} Regional Office</div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {activeCategory === 'office_note' && officeNoteType === 'time_barred_draft' ? (
+                                <>
+                                    <table className="print-table">
+                                        <tbody>
+                                            <tr className="print-td-bottom">
+                                                <td className="print-td print-td-right w-[35%] align-top">
+                                                    <div className="font-normal">From</div>
+                                                    <div className="mt-1">The Chief Manager</div>
+                                                    <div>Indian Overseas Bank</div>
+                                                    <div>Regional Office</div>
+                                                    <div className="mt-2 w-[80%]">{(user?.region_name || branchName) ? `${user?.region_name || branchName} Region` : '....................'}</div>
+                                                </td>
+                                                <td className="print-td print-td-right w-[30%] text-center align-middle">
+                                                    <img src="/logo_center.svg" alt="IOB" className="h-[105px] object-contain inline-block" />
+                                                </td>
+                                                <td className="print-td w-[35%] align-top">
+                                                    <div className="font-normal">To</div>
+                                                    <div className="mt-1">The Chief Manager</div>
+                                                    <div>Indian Overseas Bank</div>
+                                                    <div>IBR Division - BOD</div>
+                                                    <div>Central office</div>
+                                                    <div>Chennai</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="print-td print-td-right py-[5px] px-[10px]">
+                                                    Ref no. IOB/{user?.linked_region_code || branchCode || 'RO'}/RO/{new Date().getFullYear()}/{(new Date().getMonth() + 1).toString().padStart(2, '0')}/{formData.officeNoteNo || '____'}
+                                                </td>
+                                                <td className="print-td print-td-right"></td>
+                                                <td className="print-td py-[5px] px-[10px]">
+                                                    Date: {date || new Date().toLocaleDateString('en-GB')}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div className="text-center font-bold underline mb-6 text-lg">
+                                        Sub: Approval for payment of Time Barred Drafts
+                                    </div>
+
+                                    <div className="mb-6 text-[11pt]">
+                                        On the request and copies of documents received from the above branch, we recommend that approval may be given for payment/cancellation of the following time barred drafts which have been{' '}{formData.draftStatus === 'lost' ? 'lost' : 'presented for payment'}.
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="print-page font-serif">
+                                    <div className="print-header-container border-b-[2px] border-black pb-4 mb-6 flex justify-center">
+                                        <div className="text-center">
+                                            <img src="/logo_center.svg" alt="IOB" className="print-logo mx-auto block" />
+                                            <div className="font-bold text-xl mt-2 text-[#254aa0]">OFFICE NOTE</div>
+                                            <div className="text-sm font-bold mt-1">Department: {formData.department}</div>
+                                        </div>
+                                    </div>
+                                    <div className="print-row mb-6">
+                                        <div>
+                                            <strong>Note No:</strong> {formData.officeNoteNo || '....'}<br />
+                                            <strong>Date:</strong> {date}
+                                        </div>
+                                        <div>
+                                            <strong>To:</strong> {formData.recipient}
+                                        </div>
+                                    </div>
+                                    <div className="print-subject">
+                                        Sub: {formData.subject}
+                                    </div>
+                                    <div className="print-content">
+                                        {formData.content}
+                                    </div>
+                                </div>
+                            )}
+                            <div className="mt-20">
+                                <div className="font-bold">
+                                    ({formData.signatoryName || '..................................'})<br />
+                                    CHIEF MANAGER
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </PreviewModal>
             )}
-        </ModuleLayout >
+        </ModuleLayout>
     );
 };
 

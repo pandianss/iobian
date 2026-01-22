@@ -19,8 +19,10 @@ import {
     Layers,
     Megaphone,
     Percent,
-    Calculator
+    Calculator,
+    Settings
 } from 'lucide-react';
+import { UI_TEXT } from '../constants/uiText';
 
 // Lazy Load Modules
 
@@ -29,20 +31,21 @@ const InventoryManager = React.lazy(() => import('../modules/Inventory/Inventory
 const RegionManager = React.lazy(() => import('../modules/Admin/RegionManager'));
 const BranchManager = React.lazy(() => import('../modules/Admin/BranchManager'));
 // BranchOpeningSurvey integrated into DocumentGenerator
-const CampaignManager = React.lazy(() => import('../modules/RO/CampaignManager'));
+const CampaignManager = React.lazy(() => import('../mis/Campaigns'));
 // RoCommunication integrated into DocumentGenerator
 const StaffManager = React.lazy(() => import('../modules/HR/StaffManager'));
 const RestorationVault = React.lazy(() => import('../modules/Admin/RestorationVault'));
 const DesignationManager = React.lazy(() => import('../modules/Admin/DesignationManager'));
-const PlanningDashboard = React.lazy(() => import('../modules/Planning/PlanningDashboard'));
+const PlanningDashboard = React.lazy(() => import('../mis/Planning'));
 // JoiningOfferGenerator integrated into DocumentGenerator
 // const RetirementGenerator = React.lazy(() => import('../modules/HR/RetirementGenerator')); // Integrated into DocumentGenerator
 const DepartmentManager = React.lazy(() => import('../modules/Admin/DepartmentManager'));
-const InterestRateManager = React.lazy(() => import('../modules/Planning/InterestRateManager'));
-const InterestWorksheet = React.lazy(() => import('../modules/Planning/InterestWorksheet'));
+const InterestRateManager = React.lazy(() => import('../mis/Planning/InterestRateManager'));
+const InterestWorksheet = React.lazy(() => import('../mis/Planning/InterestWorksheet'));
 const DindigulLanding = React.lazy(() => import('../modules/RO/DindigulRegion/DindigulLanding'));
 const DocumentGenerator = React.lazy(() => import('../modules/CTE/DocumentGenerator'));
 const ConductDashboard = React.lazy(() => import('../modules/Conduct/ConductDashboard'));
+const SystemConfiguration = React.lazy(() => import('../modules/Admin/SystemConfiguration'));
 
 const Dashboard = ({ user, onLogout, timeLeft }) => {
     const [activeView, setActiveView] = useState('dashboard');
@@ -73,26 +76,26 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
             case 'dashboard':
                 return (
                     // ... dashboard content
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div className="flex flex-col gap-6">
                         <div className="card">
-                            <h3>Welcome back, {user.full_name}</h3>
-                            <p style={{ color: 'var(--text-secondary)' }}>
-                                You are logged in as <strong>{user.role}</strong>.
-                                {user.linked_branch_code && <span> Managing Branch: <strong>{user.linked_branch_code}</strong></span>}
+                            <h3>{UI_TEXT.HEADER.WELCOME}, {user.full_name}</h3>
+                            <p className="text-text-secondary">
+                                {UI_TEXT.HEADER.LOGGED_IN_AS} <strong>{user.role}</strong>.
+                                {user.linked_branch_code && <span> {UI_TEXT.HEADER.MANAGING_BRANCH}: <strong>{user.linked_branch_code}</strong></span>}
                             </p>
                         </div>
                         {/* ... */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
                             <div className="card">
-                                <h4>Pending Actions</h4>
-                                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--secondary-color)' }}>12</div>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Requests awaiting your approval</p>
+                                <h4>{UI_TEXT.HEADER.PENDING_ACTIONS}</h4>
+                                <div className="text-3xl font-bold text-secondary-color">12</div>
+                                <p className="text-sm text-text-secondary">{UI_TEXT.HEADER.REQUESTS_AWAITING}</p>
                             </div>
 
                             <div className="card">
-                                <h4>Performance Score</h4>
-                                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--accent-color)' }}>85/100</div>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Updated today</p>
+                                <h4>{UI_TEXT.HEADER.PERFORMANCE_SCORE}</h4>
+                                <div className="text-3xl font-bold text-accent-color">85/100</div>
+                                <p className="text-sm text-text-secondary">{UI_TEXT.HEADER.UPDATED_TODAY}</p>
                             </div>
                         </div>
                     </div>
@@ -131,86 +134,55 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                 return <DocumentGenerator user={user} branchCode={user.linked_branch_code} branchName={user.branch_name} />;
             case 'conduct':
                 return <ConductDashboard />;
+            case 'system_config':
+                return <SystemConfiguration />;
             default:
                 return <div>Module Under Construction</div>;
         }
     };
 
     return (
-        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="h-screen flex flex-col overflow-hidden">
             {/* Top Navigation */}
-            <header style={{
-                height: 'var(--header-height, 60px)',
-                background: 'linear-gradient(to right, var(--primary-color), #3b82f6)',
-                borderBottom: '4px solid var(--secondary-color)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0 2rem',
-                justifyContent: 'space-between',
-                flexShrink: 0,
-                boxShadow: 'var(--shadow-md)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <img src="/IOB_LOGO_2025.svg" alt="IOBIAN" style={{ height: '50px', objectFit: 'contain' }} />
-                    <div style={{ fontSize: '0.9rem', opacity: 0.9, borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1.5rem', color: 'white' }}>
+            {/* Top Navigation */}
+            <header className="dashboard-header">
+                <div className="header-brand">
+                    <img src="/IOB_LOGO_2025.svg" alt="IOBIAN" />
+                    <div className="header-brand-text">
                         {user.office_level === 'CO' ? 'Central Office' : user.office_level === 'RO' ? 'Regional Office' : user.office_level} Workspace
                     </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="header-controls">
+                    <div className="header-pill">
                         <Clock size={14} />
                         {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                     </div>
-                    <span style={{ color: 'white', fontWeight: 'bold' }}>{user.full_name}</span>
-                    <button onClick={onLogout} style={{ background: 'white', border: 'none', color: 'var(--primary-color)', padding: '0.4rem 1rem', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold' }}>
-                        <LogOut size={16} /> Logout
+                    <span className="text-white font-bold">{user.full_name}</span>
+                    <button onClick={() => setActiveView('system_config')} className="header-icon-btn" title={UI_TEXT.HEADER.SYSTEM_CONFIG}>
+                        <Settings size={18} />
+                    </button>
+                    <button onClick={onLogout} className="header-logout-btn">
+                        <LogOut size={16} /> {UI_TEXT.HEADER.LOGOUT}
                     </button>
                 </div>
             </header>
 
-            <main style={{
-                flex: 1,
-                padding: '2rem',
-                display: 'grid',
-                gridTemplateColumns: isSidebarCollapsed ? '80px 1fr' : '250px 1fr',
-                gridTemplateRows: 'minmax(0, 1fr)', // CRITICAL: Constrain grid height to viewport, preventing expansion
-                gap: '2rem',
-                transition: 'grid-template-columns 0.3s ease',
-                overflow: 'hidden', // Enforce constraint on main container
-                minHeight: 0 // Allow shrinking below content size
-            }}>
+            <main className={`flex-1 p-8 grid gap-8 overflow-hidden min-h-0 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'grid-cols-[80px_1fr]' : 'grid-cols-[250px_1fr]'}`}>
                 {/* Sidebar */}
-                <aside className="card" style={{
-                    height: '100%', // Full height sidebar
-                    transition: 'width 0.3s ease',
-                    width: isSidebarCollapsed ? '80px' : '100%',
-                    padding: isSidebarCollapsed ? '1rem 0.5rem' : '1.5rem',
-                    overflowY: 'auto', // Sidebar scrolls internally if needed
-                    overflowX: 'hidden'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                        {!isSidebarCollapsed && <h4 style={{ margin: 0 }}>Menu</h4>}
+                {/* Sidebar */}
+                <aside className={`card h-full transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden ${isSidebarCollapsed ? 'w-[80px] p-2' : 'w-full p-6'}`}>
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-border-color">
+                        {!isSidebarCollapsed && <h4 className="m-0 text-text-secondary">{UI_TEXT.MENU.HEADER}</h4>}
                         <button
                             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: 'var(--text-secondary)',
-                                marginLeft: isSidebarCollapsed ? 'auto' : '0',
-                                marginRight: isSidebarCollapsed ? 'auto' : '0',
-                                width: '100%',
-                                display: 'flex',
-                                justifyContent: 'center'
-                            }}
+                            className={`bg-transparent border-none cursor-pointer text-text-secondary flex justify-center w-full hover:text-primary-color transition-colors ${isSidebarCollapsed ? 'mx-auto' : ''}`}
                             title={isSidebarCollapsed ? "Expand" : "Collapse"}
                         >
                             {isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                         </button>
                     </div>
 
-                    <ul style={{ listStyle: 'none' }}>
+                    <ul className="list-none p-0 m-0">
                         {[
                             { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [] },
                             { id: 'service_requests', label: 'Service Requests', icon: <Wrench size={20} />, roles: [] },
@@ -226,10 +198,11 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                             { id: 'designation_manager', label: 'Designations', icon: <BadgeCheck size={20} />, roles: ['SuperAdmin', 'CO_HRD'] },
                             // { id: 'joining_offer_letter', label: 'Joining Offer Letter', icon: <FileText size={20} />, roles: ['SuperAdmin', 'CO_HRD'] }, // Moved to Document Generator
                             // { id: 'retirement_generator', label: 'Retirement Relieving', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'CO', 'CO_HRD'] }, // Moved to Document Generator
-                            { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin'] },
+                            { id: 'department_manager', label: 'Departments', icon: <Layers size={20} />, roles: ['SuperAdmin', 'RO'] },
                             { id: 'document_generator', label: 'Document Generator', icon: <FileText size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] },
                             { id: 'conduct', label: 'Conduct & Discipline', icon: <ShieldCheck size={20} />, roles: ['SuperAdmin', 'RO', 'Branch', 'CO'] },
-                            { id: 'dindigul_region', label: 'Dindigul Region', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] }
+                            { id: 'dindigul_region', label: 'Dindigul Region', icon: <MapIcon size={20} />, roles: ['SuperAdmin', 'RO', 'Branch'] },
+                            { id: 'system_config', label: 'System Configuration', icon: <Settings size={20} />, roles: ['SuperAdmin', 'RO'] }
                         ].map(item => {
                             if (item.roles.length > 0 && !item.roles.includes(user.role)) return null;
 
@@ -239,21 +212,15 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
                                     key={item.id}
                                     onClick={() => setActiveView(item.id)}
                                     title={isSidebarCollapsed ? item.label : ''}
-                                    style={{
-                                        padding: '0.75rem 0.5rem',
-                                        cursor: 'pointer',
-                                        color: isActive ? 'var(--secondary-color)' : 'inherit',
-                                        fontWeight: isActive ? 'bold' : 'normal',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                                        gap: '0.75rem',
-                                        borderRadius: '0.5rem',
-                                        background: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                                        marginBottom: '0.25rem'
-                                    }}
+                                    className={`
+                                        p-3 cursor-pointer flex items-center gap-3 rounded-lg mb-1 transition-colors duration-200
+                                        ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}
+                                        ${isActive
+                                            ? 'bg-primary-color/10 text-primary-color font-bold'
+                                            : 'text-text-secondary hover:bg-slate-50 hover:text-text-primary'}
+                                    `}
                                 >
-                                    <span style={{ display: 'flex', alignItems: 'center' }}>{item.icon}</span>
+                                    <span className="flex items-center">{item.icon}</span>
                                     {!isSidebarCollapsed && <span>{item.label}</span>}
                                 </li>
                             );
@@ -264,28 +231,13 @@ const Dashboard = ({ user, onLogout, timeLeft }) => {
 
 
                 {/* content area */}
-                <div style={{
-                    animation: 'fadeIn 0.3s ease',
-                    maxWidth: '100%',
-                    height: '100%',
-                    minHeight: 0,
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading Module...</div>}>
+                <div className="dashboard-content-area">
+                    <Suspense fallback={<div className="loading-fallback">Loading Module...</div>}>
                         {renderContent()}
                     </Suspense>
                 </div>
-            </main >
-            <style>{`
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-        </div >
+            </main>
+        </div>
     );
 };
 

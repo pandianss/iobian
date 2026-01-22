@@ -1,7 +1,7 @@
 import { Package, Plus, Minus, Send, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 
 const InventoryManager = () => {
     // Mock Inventory Data
@@ -104,7 +104,6 @@ const InventoryManager = () => {
         </ModuleLayout>
     );
 };
-    );
-};
+
 
 export default InventoryManager;

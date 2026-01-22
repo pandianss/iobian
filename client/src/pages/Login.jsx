@@ -52,7 +52,7 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roll_number: rollNumber, password })
@@ -72,26 +72,20 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--bg-color)'
-    }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
-        <button onClick={() => navigate('/')} style={{ marginBottom: '1rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+    <div className="min-h-screen flex items-center justify-center bg-bg-color">
+      <div className="card w-full max-w-[400px]">
+        <button onClick={() => navigate('/')} className="mb-4 bg-transparent border-none text-text-secondary cursor-pointer hover:text-primary-color transition-colors">
           ← Back
         </button>
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <img src="/IOB_LOGO_2025.svg" alt="IOB" style={{ height: '80px', objectFit: 'contain' }} />
+        <div className="text-center mb-6">
+          <img src="/IOB_LOGO_2025.svg" alt="IOB" className="h-20 object-contain mx-auto" />
         </div>
-        <h2 style={{ marginBottom: '1.5rem' }}>Secure Employee Login</h2>
+        <h2 className="mb-6 text-2xl font-bold text-center">Secure Employee Login</h2>
 
         {step === 1 ? (
           <form onSubmit={validateUser}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Roll Number</label>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Roll Number</label>
               <input
                 type="text"
                 value={rollNumber}
@@ -99,23 +93,25 @@ const Login = ({ onLoginSuccess }) => {
                 placeholder="e.g. 12345"
                 autoFocus
               />
-              <small style={{ color: 'var(--text-secondary)' }}>Enter your 5 digit Roll Number.</small>
+              <small className="text-text-secondary">Enter your 5 digit Roll Number.</small>
             </div>
-            {error && <div style={{ color: 'var(--error-color)', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+
+
+            {error && <div className="text-error-color mb-4 text-sm">{error}</div>}
+            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
               {loading ? 'Validating...' : 'Next'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleLogin}>
-            <div style={{ background: 'rgba(37, 74, 160, 0.1)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', border: '1px solid rgba(37, 74, 160, 0.3)' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{userData.full_name}</div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{userData.designation} | {userData.office_level}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--secondary-color)', cursor: 'pointer', marginTop: '0.5rem' }} onClick={() => setStep(1)}>change user?</div>
+            <div className="bg-primary-color/10 p-4 rounded-lg mb-6 border border-primary-color/30">
+              <div className="font-bold text-lg">{userData.full_name}</div>
+              <div className="text-sm text-text-secondary">{userData.designation} | {userData.office_level}</div>
+              <div className="text-xs text-secondary-color cursor-pointer mt-2 hover:underline" onClick={() => setStep(1)}>change user?</div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</label>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Password</label>
               <input
                 type="password"
                 value={password}
@@ -124,8 +120,8 @@ const Login = ({ onLoginSuccess }) => {
                 autoFocus
               />
             </div>
-            {error && <div style={{ color: 'var(--error-color)', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+            {error && <div className="text-error-color mb-4 text-sm">{error}</div>}
+            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
               {loading ? 'Authenticating...' : 'Login'}
             </button>
           </form>

@@ -166,7 +166,7 @@ const BranchSurveyList = ({ onCreateNew, onSelect, onSettings }) => {
                     background-color: #f9fafb;
                 }
             `}</style>
-        </div >
+        </div>
     );
 };
 

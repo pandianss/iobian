@@ -226,8 +226,7 @@ const BranchMap = ({ branches, regionName }) => {
                     onClick={handleCanvasClick}
                     onMouseMove={handleCanvasMove}
                     onMouseLeave={() => setHoveredBranch(null)}
-                    className="w-full border border-gray-200 rounded-lg"
-                    style={{ maxHeight: '500px' }}
+                    className="w-full border border-gray-200 rounded-lg max-h-[500px]"
                 />
 
                 {selectedBranch && (
@@ -252,12 +251,10 @@ const BranchMap = ({ branches, regionName }) => {
 
                 {hoveredBranch !== null && !selectedBranch && branches[hoveredBranch] && (
                     <div
-                        className="absolute bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-none whitespace-nowrap"
+                        className="absolute bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-none whitespace-nowrap -translate-x-1/2 z-[1000]"
                         style={{
                             left: `${mousePos.x}px`,
-                            top: `${mousePos.y - 40}px`,
-                            transform: 'translateX(-50%)',
-                            zIndex: 1000
+                            top: `${mousePos.y - 40}px`
                         }}
                     >
                         {branches[hoveredBranch].branch_name}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Save, Printer, FileText } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
 
 const BranchCodeRequest = ({ user, bankConfig, onSave, onDownload, initialData, currentRefNo }) => {
     const [formData, setFormData] = React.useState({

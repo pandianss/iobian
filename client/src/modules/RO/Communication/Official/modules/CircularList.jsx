@@ -5,61 +5,56 @@ const CircularList = ({ onCreateNew, onSelect }) => {
     const { circulars, deleteCircular } = useData();
 
     return (
-        <div className="page-container">
-            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="p-6 max-w-7xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="page-title">Circulars</h1>
-                    <p className="text-neutral-500">Manage internal circulars and memos.</p>
+                    <h1 className="text-2xl font-bold text-slate-800">Circulars</h1>
+                    <p className="text-slate-500">Manage internal circulars and memos.</p>
                 </div>
                 <button className="btn btn-primary" onClick={onCreateNew}>
                     + Create New Circular
                 </button>
             </div>
 
-            <div className="card">
+            <div className="card text-center p-8 text-slate-500">
                 {circulars.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                    <div>
                         No circulars found. Create your first circular.
                     </div>
                 ) : (
-                    <div className="table-container">
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="overflow-x-auto w-full">
+                        <table className="w-full border-collapse">
                             <thead>
-                                <tr style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'left' }}>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Date</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Ref No</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Subject</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151', textAlign: 'right' }}>Actions</th>
+                                <tr className="border-b border-gray-200 text-left">
+                                    <th className="p-3 font-semibold text-slate-700">Date</th>
+                                    <th className="p-3 font-semibold text-slate-700">Ref No</th>
+                                    <th className="p-3 font-semibold text-slate-700">Subject</th>
+                                    <th className="p-3 font-semibold text-slate-700 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {circulars.map((circular) => (
                                     <tr
                                         key={circular.id}
-                                        style={{ borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
+                                        className="border-b border-gray-100 cursor-pointer hover:bg-slate-50 transition-colors"
                                         onClick={() => onSelect && onSelect(circular)}
                                     >
-                                        <td style={{ padding: '0.75rem' }}>
+                                        <td className="p-3">
                                             {circular.issuanceDate
                                                 ? new Date(circular.issuanceDate).toLocaleDateString()
                                                 : (circular.date ? new Date(circular.date).toLocaleDateString() : 'N/A')
                                             }
                                         </td>
-                                        <td style={{ padding: '0.75rem', fontFamily: 'monospace' }}>{circular.refNo}</td>
-                                        <td style={{ padding: '0.75rem', maxWidth: '300px' }}>
-                                            <div style={{
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }}>
-                                                {circular.scannedPdf && <span style={{ marginRight: '0.5rem' }}>📎</span>}
+                                        <td className="p-3 font-mono text-sm">{circular.refNo}</td>
+                                        <td className="p-3 max-w-[300px]">
+                                            <div className="truncate">
+                                                {circular.scannedPdf && <span className="mr-2">📎</span>}
                                                 {circular.subject}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '0.75rem', textAlign: 'right' }}>
+                                        <td className="p-3 text-right">
                                             <button
-                                                className="btn btn-outline"
-                                                style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem', color: 'var(--error)', borderColor: 'var(--error)' }}
+                                                className="btn btn-outline border-error-color text-error-color hover:bg-red-50 py-1 px-3 text-sm"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (confirm('Are you sure you want to delete this circular?')) {
@@ -77,14 +72,6 @@ const CircularList = ({ onCreateNew, onSelect }) => {
                     </div>
                 )}
             </div>
-            <style>{`
-                .table-container {
-                    overflow-x: auto;
-                }
-                tr:hover {
-                    background-color: #f9fafb;
-                }
-            `}</style>
         </div>
     );
 };

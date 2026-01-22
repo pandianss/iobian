@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ConductDashboard from './modules/Conduct/ConductDashboard';
 import DindigulLanding from './modules/RO/DindigulRegion/DindigulLanding';
-import RegionTemplate from './modules/RO/RegionTemplate';
+import RegionTemplate from './mis/RegionDashboard';
 import ChangePassword from './pages/ChangePassword';
 import './index.css';
 

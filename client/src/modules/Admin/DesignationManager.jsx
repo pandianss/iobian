@@ -1,7 +1,7 @@
 import { BadgeCheck, Plus, Edit2, Trash2, X, CheckCircle2, AlertCircle, ShieldCheck, UserCheck } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 
 const DesignationManager = ({ user }) => {
     // Default to false if user not provided, strictly check roles
@@ -212,7 +212,6 @@ const DesignationManager = ({ user }) => {
         </ModuleLayout>
     );
 };
-    );
-};
+
 
 export default DesignationManager;

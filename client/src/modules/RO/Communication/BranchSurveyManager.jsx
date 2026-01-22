@@ -8,7 +8,7 @@ const BranchSurveyManager = () => {
     const [selectedSurvey, setSelectedSurvey] = useState(null);
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div className="relative">
             {mode === 'list' && (
                 <BranchSurveyList
                     onCreateNew={() => {

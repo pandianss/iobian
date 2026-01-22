@@ -146,8 +146,8 @@ const BranchMap = ({ branches }) => {
     };
 
     return (
-        <div style={{ height: '600px', width: '100%', marginTop: '1rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ccc', position: 'relative' }}>
-            <MapContainer center={defaultCenter} zoom={5} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+        <div className="h-[600px] w-full mt-4 rounded-lg overflow-hidden border border-gray-300 relative">
+            <MapContainer center={defaultCenter} zoom={5} scrollWheelZoom={true} className="h-full w-full">
                 <TileLayer
                     attribution='&copy; OpenStreetMap'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -181,7 +181,7 @@ const BranchMap = ({ branches }) => {
                         position={[rc.lat, rc.lng]}
                         icon={L.divIcon({
                             className: 'region-label-icon',
-                            html: `<div style="background: white; padding: 2px 5px; border: 1px solid #333; border-radius: 4px; font-weight: bold; font-size: 10px; white-space: nowrap; transform: translate(-50%, -50%); box-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                            html: `<div class="region-label-popup">
                                      ${rc.region}
                                    </div>`,
                             iconSize: [0, 0] // Hide default sizing logic
@@ -191,7 +191,7 @@ const BranchMap = ({ branches }) => {
 
             </MapContainer>
             {validBranches.length === 0 && (
-                <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'white', padding: '10px', borderRadius: '4px', zIndex: 1000 }}>
+                <div className="absolute top-2 right-2 bg-white p-2 rounded z-[1000] shadow-md">
                     No valid coordinates found for markers.
                 </div>
             )}

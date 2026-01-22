@@ -50,121 +50,65 @@ const ChangePassword = ({ user, onPasswordChanged, onLogout }) => {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)',
-            padding: '1rem'
-        }}>
-            <div className="card" style={{ maxWidth: '450px', width: '100%', padding: '2rem' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{
-                        background: '#eff6ff',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1rem auto'
-                    }}>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200 p-4">
+            <div className="card w-full max-w-[450px] p-8">
+                <div className="text-center mb-8">
+                    <div className="bg-blue-50 w-[60px] h-[60px] rounded-full flex items-center justify-center mx-auto mb-4">
                         <Lock size={30} className="text-primary" />
                     </div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>Change Password</h2>
-                    <p style={{ color: '#64748b' }}>
-                        For security reasons, you act must update your password before proceeding.
-                    </p>
                 </div>
+                <h2 className="text-2xl font-bold text-slate-800">Change Password</h2>
+                <p className="text-text-secondary">
+                    For security reasons, you must update your password before proceeding.
+                </p>
+
 
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#334155' }}>New Password</label>
+                    <div className="mb-6">
+                        <label className="block mb-2 font-medium text-slate-700">New Password</label>
                         <input
                             type="password"
-                            className="form-control"
+                            className="form-control w-full"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="Enter new password"
                             required
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '0.5rem',
-                                fontSize: '1rem'
-                            }}
                         />
                     </div>
 
-                    <div style={{ marginBottom: '2rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#334155' }}>Confirm Password</label>
+                    <div className="mb-8">
+                        <label className="block mb-2 font-medium text-slate-700">Confirm Password</label>
                         <input
                             type="password"
-                            className="form-control"
+                            className="form-control w-full"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm new password"
                             required
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '0.5rem',
-                                fontSize: '1rem'
-                            }}
                         />
                     </div>
 
                     {msg.text && (
-                        <div style={{
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            marginBottom: '1.5rem',
-                            textAlign: 'center',
-                            background: msg.type === 'error' ? '#fef2f2' : '#f0fdf4',
-                            color: msg.type === 'error' ? '#ef4444' : '#16a34a',
-                            border: `1px solid ${msg.type === 'error' ? '#fecaca' : '#bbf7d0'}`
-                        }}>
+                        <div className={`p-3 rounded-lg mb-6 text-center border ${msg.type === 'error'
+                            ? 'bg-red-50 text-error-color border-red-200'
+                            : 'bg-green-50 text-success-color border-green-200'
+                            }`}>
                             {msg.text}
                         </div>
                     )}
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div className="flex gap-4">
                         <button
                             type="button"
                             onClick={onLogout}
-                            style={{
-                                flex: 1,
-                                padding: '0.75rem',
-                                border: '1px solid #d1d5db',
-                                background: 'white',
-                                color: '#374151',
-                                borderRadius: '0.5rem',
-                                cursor: 'pointer',
-                                fontWeight: '500'
-                            }}
+                            className="flex-1 px-4 py-3 border border-border-color bg-white text-text-primary rounded-lg cursor-pointer font-medium hover:bg-slate-50 transition-colors"
                         >
                             Log Out
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            style={{
-                                flex: 2,
-                                padding: '0.75rem',
-                                border: 'none',
-                                background: 'var(--primary-color, #2563eb)',
-                                color: 'white',
-                                borderRadius: '0.5rem',
-                                cursor: loading ? 'wait' : 'pointer',
-                                fontWeight: '500',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem'
-                            }}
+                            className="flex-[2] btn btn-primary flex items-center justify-center gap-2"
                         >
                             {loading ? 'Updating...' : (
                                 <>

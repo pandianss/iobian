@@ -3,9 +3,9 @@ import { Printer, Upload, User, Calendar, FileText, BadgeCheck, Save, ArrowLeft,
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import * as pdfjsLib from 'pdfjs-dist';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 import { Download as DownloadIcon, Edit2 as EditIcon } from 'lucide-react';
 
 // Config PDF.js Worker

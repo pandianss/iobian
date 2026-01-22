@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Map, Plus, Edit2, Trash2, X, Globe, Building2, CheckCircle2, AlertCircle } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 
 const RegionManager = () => {
     const [regions, setRegions] = useState([]);

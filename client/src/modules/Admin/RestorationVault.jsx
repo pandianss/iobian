@@ -1,7 +1,7 @@
 import { Trash2, RefreshCcw, UserMinus, History, CheckCircle2, AlertCircle } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 
 const RestorationVault = () => {
     const [deletedItems, setDeletedItems] = useState([]);
@@ -106,7 +106,6 @@ const RestorationVault = () => {
         </ModuleLayout>
     );
 };
-    );
-};
+
 
 export default RestorationVault;

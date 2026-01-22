@@ -5,11 +5,11 @@ const LetterList = ({ onCreateNew, onSelect }) => {
     const { letters, deleteLetter } = useData();
 
     return (
-        <div className="page-container">
-            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="p-6 max-w-7xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="page-title">Letters</h1>
-                    <p className="text-neutral-500">Manage your correspondence records.</p>
+                    <h1 className="text-2xl font-bold text-slate-800">Letters</h1>
+                    <p className="text-slate-500">Manage your correspondence records.</p>
                 </div>
                 <button className="btn btn-primary" onClick={onCreateNew}>
                     + Create New Letter
@@ -18,50 +18,45 @@ const LetterList = ({ onCreateNew, onSelect }) => {
 
             <div className="card">
                 {letters.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                    <div className="text-center p-8 text-slate-500">
                         No letters found. Create your first letter.
                     </div>
                 ) : (
-                    <div className="table-container">
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
                             <thead>
-                                <tr style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'left' }}>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Date</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Ref No</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Recipient</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Subject</th>
-                                    <th style={{ padding: '0.75rem', fontWeight: '600', color: '#374151', textAlign: 'right' }}>Actions</th>
+                                <tr className="border-b border-border-color text-left">
+                                    <th className="p-3 font-semibold text-text-primary">Date</th>
+                                    <th className="p-3 font-semibold text-text-primary">Ref No</th>
+                                    <th className="p-3 font-semibold text-text-primary">Recipient</th>
+                                    <th className="p-3 font-semibold text-text-primary">Subject</th>
+                                    <th className="p-3 font-semibold text-text-primary text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {letters.map((letter) => (
                                     <tr
                                         key={letter.id}
-                                        style={{ borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
+                                        className="border-b border-gray-100 hover:bg-slate-50 cursor-pointer transition-colors"
                                         onClick={() => onSelect && onSelect(letter)}
                                     >
-                                        <td style={{ padding: '0.75rem' }}>
+                                        <td className="p-3">
                                             {new Date(letter.date).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '0.75rem', fontFamily: 'monospace' }}>{letter.refNo}</td>
-                                        <td style={{ padding: '0.75rem' }}>
-                                            <div style={{ fontWeight: '500' }}>{letter.recipientName}</div>
-                                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{letter.recipientDesignation}</div>
+                                        <td className="p-3 font-mono">{letter.refNo}</td>
+                                        <td className="p-3">
+                                            <div className="font-medium">{letter.recipientName}</div>
+                                            <div className="text-sm text-slate-500">{letter.recipientDesignation}</div>
                                         </td>
-                                        <td style={{ padding: '0.75rem', maxWidth: '300px' }}>
-                                            <div style={{
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }}>
-                                                {letter.scannedPdf && <span style={{ marginRight: '0.5rem', fontSize: '1.2rem' }} title="Has PDF Attachment">📎</span>}
+                                        <td className="p-3 max-w-[300px]">
+                                            <div className="truncate">
+                                                {letter.scannedPdf && <span className="mr-2 text-lg" title="Has PDF Attachment">📎</span>}
                                                 {letter.subject}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '0.75rem', textAlign: 'right' }}>
+                                        <td className="p-3 text-right">
                                             <button
-                                                className="btn btn-outline"
-                                                style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem', color: 'var(--error)', borderColor: 'var(--error)' }}
+                                                className="btn btn-outline text-error-color border-error-color py-1 px-2 text-sm hover:bg-red-50"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (confirm('Are you sure you want to delete this letter?')) {
@@ -79,14 +74,7 @@ const LetterList = ({ onCreateNew, onSelect }) => {
                     </div>
                 )}
             </div>
-            <style>{`
-                .table-container {
-                    overflow-x: auto;
-                }
-                tr:hover {
-                    background-color: #f9fafb;
-                }
-            `}</style>
+            {/* Removed inline style block */}
         </div>
     );
 };

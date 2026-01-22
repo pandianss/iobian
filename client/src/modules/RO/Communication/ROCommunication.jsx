@@ -62,14 +62,7 @@ const ROCommunication = () => {
 const TabButton = ({ active, onClick, icon, label }) => (
     <button
         onClick={onClick}
-        className={`btn rounded-0 py-3 px-4 d-flex align-items-center gap-2 ${active ? 'border-primary border-bottom-2 text-primary bg-light' : 'text-muted border-transparent'}`}
-        style={{
-            border: 'none',
-            borderBottom: active ? '3px solid #0d6efd' : '3px solid transparent',
-            background: active ? '#f8f9fa' : 'transparent',
-            fontWeight: active ? '600' : '400',
-            transition: 'all 0.2s'
-        }}
+        className={`btn rounded-none py-3 px-4 flex items-center gap-2 transition-all duration-200 border-b-2 bg-transparent ${active ? 'border-primary text-primary bg-slate-50 font-bold' : 'border-transparent text-slate-500 font-normal'}`}
     >
         <span>{icon}</span>
         <span>{label}</span>

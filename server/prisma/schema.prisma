@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    Int      @id @default(autoincrement())
+  roll_number           String   @unique
+  password_hash         String
+  role                  String
+  office_level          String
+  full_name             String
+  full_name_hindi       String?
+  mobile                String?
+  designation           String?
+  designation_hindi     String?
+  photo_url             String?
+  is_head               Boolean  @default(false)
+  is_deleted            Boolean  @default(false)
+  must_change_password  Boolean  @default(false)
+  
+  linked_branch_code    String?
+  linked_region_code    String?
+  
+  linked_branch         Branch?  @relation(fields: [linked_branch_code], references: [branch_code])
+  linked_region         Region?  @relation(fields: [linked_region_code], references: [region_code])
+
+  departments           String? 
+  history               String? 
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Branch {
+  id              Int      @id @default(autoincrement())
+  branch_code     String   @unique
+  branch_name     String
+  branch_type     String?  @default("Branch")
+  category        String?
+  region_code     String?
+  state           String?
+  district        String?
+  taluk           String?
+  revenue_centre  String?
+  locality        String?
+  latitude        String?
+  longitude       String?
+  pincode         String?
+  is_deleted      Boolean  @default(false)
+
+  region          Region?  @relation(fields: [region_code], references: [region_code])
+  users           User[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Region {
+  id                    Int      @id @default(autoincrement())
+  region_code           String   @unique
+  region_name           String
+  region_name_hindi     String?
+  region_name_local     String?
+  region_address        String?
+  region_address_hindi  String?
+  region_address_local  String?
+  head_office_code      String?  @default("CO")
+  is_deleted            Boolean  @default(false)
+
+  branches              Branch[]
+  users                 User[]
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Division {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+}
+
+model Designation {
+  id        Int    @id @default(autoincrement())
+  title     String @unique
+  workclass Int    @default(0)
+}
+
+model Campaign {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  department_code String?
+  startDate       String?
+  endDate         String?
+  type            String?
+  unit            String?
+  status          String?  @default("Active")
+  image           String?
+  overall_target  Float?   @default(0)
+  data            String?
+  achievement_entries String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  category    String
+  type        String
+  subject     String
+  content     String?
+  refNo       String?  @unique
+  status      String   @default("Draft")
+  formData    String?
+  is_deleted  Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BranchSurvey {
+  id              Int      @id @default(autoincrement())
+  refNo           String?  @unique
+  region          String?
+  applicationType String?
+  date            String?
+  branch_name     String?
+  formData        String?
+  is_deleted      Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BankConfig {
+  id              Int      @id @default(1)
+  name_english    String?
+  name_hindi      String?
+  name_local      String?
+  dept_english    String?
+  dept_hindi      String?
+  dept_local      String?
+}
+
+model InterestRate {
+  id             Int      @id @default(autoincrement())
+  type           String
+  product        String
+  effectiveDate  String
+  rate           String
+  circular       String?
+  isAnyAmount    Boolean  @default(true)
+  amountFrom     String?  @default("")
+  amountTo       String?  @default("")
+}

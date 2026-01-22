@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import { Plus, Upload, Trash2, Edit2, FileSpreadsheet, Map as MapIcon, List as ListIcon, RefreshCcw, X, Search, CheckCircle2, AlertCircle } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 import BranchMap from './BranchMap';
 import { INDIAN_STATES } from '../../constants/geoData';
 

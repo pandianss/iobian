@@ -4,81 +4,52 @@ import { Globe, Building2, Map, Users } from 'lucide-react';
 
 const PublicHome = () => {
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-        }}>
-            <div className="glass-panel" style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center', maxWidth: '1000px', width: '90%', border: '1px solid rgba(37, 74, 160, 0.1)' }}>
-                <img src="/IOB_LOGO_2025.svg" alt="IOB" style={{ height: '120px', marginBottom: '1.5rem', objectFit: 'contain' }} />
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Unified Banking Operations Portal</h1>
-                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
+            <div className="glass-panel p-12 rounded-3xl text-center max-w-[1000px] w-[90%] border border-primary-color/10">
+                <img src="/IOB_LOGO_2025.svg" alt="IOB" className="h-[120px] mb-6 object-contain mx-auto" />
+                <h1 className="text-4xl mb-4 font-bold text-slate-800">Unified Banking Operations Portal</h1>
+                <p className="text-lg text-text-secondary mb-12">
                     Centralized coordination for seamless banking operations.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', justifyContent: 'center' }}>
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6 justify-center">
 
                     {/* 1. IOB Online */}
-                    <div className="card hover-card" onClick={() => window.open('https://www.iob.in', '_blank')} style={cardStyleByColor('var(--primary-color)')}>
-                        <Globe size={40} style={{ marginBottom: '1rem', color: 'var(--primary-color)' }} />
-                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--primary-color)' }}>IOB Online</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Internet Banking & Corporate Website</p>
+                    <div className="card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center p-8 border border-primary-color bg-white rounded-2xl" onClick={() => window.open('https://www.iob.in', '_blank')}>
+                        <Globe size={40} className="mb-4 text-primary-color" />
+                        <h4 className="mb-2 text-primary-color font-bold">IOB Online</h4>
+                        <p className="text-sm text-text-secondary">Internet Banking & Corporate Website</p>
                     </div>
 
                     {/* 2. CO Departments */}
-                    <div className="card hover-card" style={cardStyleByColor('var(--secondary-color)')}>
-                        <Building2 size={40} style={{ marginBottom: '1rem', color: 'var(--secondary-color)' }} />
-                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--secondary-color)' }}>CO Departments</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Central Office Portals & Circulars</p>
+                    <div className="card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center p-8 border border-secondary-color bg-white rounded-2xl">
+                        <Building2 size={40} className="mb-4 text-secondary-color" />
+                        <h4 className="mb-2 text-secondary-color font-bold">CO Departments</h4>
+                        <p className="text-sm text-text-secondary">Central Office Portals & Circulars</p>
                     </div>
 
                     {/* 3. Region Website */}
-                    <Link to="/public/region/3933" style={{ textDecoration: 'none' }}>
-                        <div className="card hover-card" style={cardStyleByColor('var(--accent-color)')}>
-                            <Map size={40} style={{ marginBottom: '1rem', color: 'var(--accent-color)' }} />
-                            <h4 style={{ marginBottom: '0.5rem', color: 'var(--accent-color)' }}>Region Website</h4>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Dindigul Region Public Portal</p>
+                    <Link to="/public/region/3933" className="no-underline">
+                        <div className="card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center p-8 border border-accent-color bg-white rounded-2xl">
+                            <Map size={40} className="mb-4 text-accent-color" />
+                            <h4 className="mb-2 text-accent-color font-bold">Region Website</h4>
+                            <p className="text-sm text-text-secondary">Dindigul Region Public Portal</p>
                         </div>
                     </Link>
 
                     {/* 4. Region User Login */}
-                    <Link to="/login" style={{ textDecoration: 'none' }}>
-                        <div className="card hover-card" style={cardStyleByColor('#dc3545')}>
-                            <Users size={40} style={{ marginBottom: '1rem', color: '#dc3545' }} />
-                            <h4 style={{ marginBottom: '0.5rem', color: '#dc3545' }}>Region User Login</h4>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Authorized Staff Access Only</p>
+                    <Link to="/login" className="no-underline">
+                        <div className="card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center p-8 border border-red-500 bg-white rounded-2xl">
+                            <Users size={40} className="mb-4 text-red-500" />
+                            <h4 className="mb-2 text-red-500 font-bold">Region User Login</h4>
+                            <p className="text-sm text-text-secondary">Authorized Staff Access Only</p>
                         </div>
                     </Link>
 
                 </div>
             </div>
-            <style>{`
-                .hover-card {
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    border-width: 1px;
-                    border-style: solid;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    padding: 2rem !important;
-                }
-                .hover-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                }
-            `}</style>
         </div>
     );
 };
-
-const cardStyleByColor = (color) => ({
-    borderColor: color,
-    background: 'white',
-    borderRadius: '1rem'
-});
 
 export default PublicHome;

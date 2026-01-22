@@ -1609,7 +1609,7 @@ const BranchOpeningSurvey = ({ onBack, initialData, user }) => {
                     .page-break { page-break-before: always !important; }
                 }
             `}</style>
-        </div >
+        </div>
     );
 };
 

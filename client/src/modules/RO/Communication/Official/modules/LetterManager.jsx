@@ -8,7 +8,7 @@ const LetterManager = () => {
     const [selectedLetter, setSelectedLetter] = useState(null);
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div className="relative">
             {mode === 'list' && (
                 <LetterList
                     onCreateNew={() => {

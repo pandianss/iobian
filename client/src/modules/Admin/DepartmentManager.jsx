@@ -1,7 +1,7 @@
 import { Users, Plus, Edit2, Trash2, X, Building, CheckCircle2, AlertCircle, Briefcase } from 'lucide-react';
-import Button from '../../components/Common/Button';
-import Card from '../../components/Common/Card';
-import ModuleLayout from '../../components/Common/ModuleLayout';
+import Button from '../../framework/ui/Button';
+import Card from '../../framework/ui/Card';
+import ModuleLayout from '../../framework/layouts/ModuleLayout';
 
 const DepartmentManager = () => {
     const [departments, setDepartments] = useState([]);

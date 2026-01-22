@@ -8,7 +8,7 @@ const CircularManager = () => {
     const [selectedCircular, setSelectedCircular] = useState(null);
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div className="relative">
             {mode === 'list' && (
                 <CircularList
                     onCreateNew={() => {
